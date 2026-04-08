@@ -1,0 +1,64 @@
+@import "tailwindcss";
+@import "./styles/tablet-optimizations.css";
+
+:root {
+    --sidebar-width: 280px;
+}
+
+@theme {
+    /* Primary Colors (Darkest for Maximum Contrast) */
+    --color-primary-50: #eef2ff;
+    --color-primary-100: #e0e7ff;
+    --color-primary-200: #c7d2fe;
+    --color-primary-300: #a5b4fc;
+    --color-primary-400: #818cf8;
+    --color-primary-500: #3730a3; /* Indigo 800 */
+    --color-primary-600: #312e81; /* Indigo 900 */
+    --color-primary-700: #1e1b4b; /* Indigo 950 */
+    --color-primary-800: #1e1b4b;
+    --color-primary-900: #0f172a;
+    --color-primary-950: #020617;
+    --color-primary: #3730a3;
+
+    /* Semantic Overrides */
+    --color-on-primary: #ffffff;
+    --color-surface-container: #ffffff;
+    --color-surface-container-low: #f8fafc;
+}
+
+body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar for a premium look */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+}
+
+/* Animations using standard Tailwind transitions */
+.transition-sidebar {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Standard appearance property for compatibility */
+.standard-appearance {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
