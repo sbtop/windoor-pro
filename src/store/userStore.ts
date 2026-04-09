@@ -11,12 +11,13 @@ export interface UserData {
 interface UserState {
     isAuthenticated: boolean;
     currentUser: UserData | null;
-    
+
     // Actions
     login: (email: string, password: string) => Promise<boolean>;
     register: (name: string, email: string, password: string) => Promise<boolean>;
     logout: () => void;
     setDisplayName: (name: string) => void;
+    resetPassword: (email: string, newPassword: string) => Promise<boolean>;
 }
 
 // ── Helpers para la "Base de datos" de cuentas ────────────────────────────────
@@ -108,7 +109,7 @@ export const useUserStore = create<UserState>()(
                 if (currentUser) {
                     // Update session
                     set({ currentUser: { ...currentUser, name } });
-                    
+
                     // Update in 'database'
                     const accounts = getRegisteredAccounts();
                     const idx = accounts.findIndex(a => a.userId === currentUser.userId);
@@ -117,6 +118,21 @@ export const useUserStore = create<UserState>()(
                         localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
                     }
                 }
+            },
+
+            resetPassword: async (email, newPassword) => {
+                const accounts = getRegisteredAccounts();
+                const idx = accounts.findIndex(a => a.email.toLowerCase() === email.toLowerCase());
+
+                if (idx === -1) {
+                    return false; // Email no encontrado
+                }
+
+                // Update password in 'database'
+                accounts[idx].password = newPassword;
+                localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+
+                return true;
             },
         }),
         {

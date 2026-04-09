@@ -36,6 +36,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
         projectType: 'ventana'
     });
 
+    // Advanced filters
+    const [showFilters, setShowFilters] = useState(false);
+    const [filterStatus, setFilterStatus] = useState<string>('all');
+    const [filterType, setFilterType] = useState<string>('all');
+    const [sortBy, setSortBy] = useState<string>('date-desc');
+    const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+
     const { pricingConfig } = useSettingsStore();
     const { currentUser } = useUserStore();
     const userId = currentUser?.userId || 'unknown';
@@ -154,12 +161,43 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
         }
     };
 
-    // Filter projects based on search query
-    const filteredProjects = projects.filter(project =>
-        project.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.siteAddress?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        project.projectType?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Filter projects based on search query and advanced filters
+    const filteredProjects = projects
+        .filter(project => {
+            // Search filter
+            const matchesSearch =
+                project.clientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                project.siteAddress?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                project.projectType?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                project.projectName?.toLowerCase().includes(searchQuery.toLowerCase());
+
+            // Status filter
+            const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
+
+            // Type filter
+            const matchesType = filterType === 'all' || project.projectType === filterType;
+
+            return matchesSearch && matchesStatus && matchesType;
+        })
+        .sort((a, b) => {
+            // Sorting
+            switch (sortBy) {
+                case 'date-desc':
+                    return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+                case 'date-asc':
+                    return Number(a.createdAt || 0) - Number(b.createdAt || 0);
+                case 'name-asc':
+                    return (a.clientName || '').localeCompare(b.clientName || '');
+                case 'name-desc':
+                    return (b.clientName || '').localeCompare(a.clientName || '');
+                case 'price-desc':
+                    return Number(b.quotation?.totales?.precioVenta || 0) - Number(a.quotation?.totales?.precioVenta || 0);
+                case 'price-asc':
+                    return Number(a.quotation?.totales?.precioVenta || 0) - Number(b.quotation?.totales?.precioVenta || 0);
+                default:
+                    return 0;
+            }
+        });
 
     // Handle new project creation
     const handleCreateProject = () => {
@@ -306,8 +344,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 <div className="col-span-12 md:col-span-4 bg-primary-700 text-white p-8 rounded-xl shadow-2xl shadow-indigo-950/20 relative overflow-hidden">
                     <div className="relative z-10">
                         <span className="text-[11px] font-black uppercase tracking-widest text-indigo-200 mb-1 block">Cotizaciones Activas</span>
-                        <h2 className="text-3xl font-headline font-bold">14</h2>
-                        <p className="text-xs text-indigo-300 font-bold mt-2">4 proyectos requieren actualización de medidas.</p>
+                        <h2 className="text-3xl font-headline font-bold">{projects.filter(p => p.status === 'quoted').length}</h2>
+                        <p className="text-xs text-indigo-300 font-bold mt-2">
+                            {projects.filter(p => p.status === 'draft').length} proyectos requieren actualización de medidas.
+                        </p>
                     </div>
                     <div className="absolute -right-4 -bottom-4 opacity-10">
                         <span className="material-symbols-outlined text-[120px]" style={{ fontVariationSettings: "'wght' 100" }}>architecture</span>
@@ -326,134 +366,330 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                     <p className="text-2xl font-black text-blue-800">{projects.filter(p => p.status === 'in-production').length}</p>
                 </div>
                 <div className="col-span-12 md:col-span-4 bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-1">Cotizaciones</h4>
+                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-1">Cotizaciones Activas</h4>
                     <p className="text-2xl font-black text-amber-800">{projects.filter(p => p.status === 'quoted').length}</p>
                 </div>
             </div>
 
             {/* Project List Section */}
             <div className="bg-surface-container-low rounded-xl overflow-hidden">
-                <div className="p-6 flex justify-between items-center border-b border-outline-variant/10 bg-surface-container-highest/30">
-                    <h3 className="font-headline font-bold text-lg text-primary">Proyectos Activos</h3>
-                    <div className="flex gap-2">
-                        {/* Search */}
-                        <div className="relative">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                <div className="p-6 border-b border-outline-variant/10 bg-surface-container-highest/30">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-headline font-bold text-lg text-primary">Proyectos Activos</h3>
+                        <div className="flex gap-2">
+                            {/* View Mode Toggle */}
+                            <button
+                                onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
+                                className="p-2 bg-surface-container-lowest text-slate-500 rounded-md hover:bg-white transition-colors"
+                                title={viewMode === 'table' ? 'Ver como tarjetas' : 'Ver como tabla'}
+                            >
+                                <span className="material-symbols-outlined">
+                                    {viewMode === 'table' ? 'grid_view' : 'table_rows'}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Search and Filters Bar */}
+                    <div className="flex flex-col md:flex-row gap-3">
+                        {/* Search Input */}
+                        <div className="relative flex-1">
+                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
                             <input
-                                className="pl-10 pr-4 py-2 bg-surface-container-lowest border-none rounded-md text-sm focus:ring-2 focus:ring-primary/20 w-64"
-                                placeholder="Buscar por cliente o dirección..."
+                                className="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
+                                placeholder="Buscar por cliente, dirección o tipo de proyecto..."
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                    <span className="material-symbols-outlined text-lg">close</span>
+                                </button>
+                            )}
                         </div>
-                        {/* Filter */}
-                        <button className="p-2 bg-surface-container-lowest text-slate-500 rounded-md hover:bg-white transition-colors">
-                            <span className="material-symbols-outlined">filter_list</span>
-                        </button>
+
+                        {/* Filter Button */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className={`flex items-center gap-2 px-4 py-3 border-2 rounded-xl font-bold text-sm transition-all ${
+                                    showFilters || filterStatus !== 'all' || filterType !== 'all'
+                                        ? 'bg-indigo-50 border-indigo-600 text-indigo-700'
+                                        : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300'
+                                }`}
+                            >
+                                <span className="material-symbols-outlined">tune</span>
+                                Filtros
+                                {(filterStatus !== 'all' || filterType !== 'all') && (
+                                    <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
+                                )}
+                            </button>
+
+                            {/* Filter Dropdown */}
+                            {showFilters && (
+                                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-10 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-3">Filtros</h4>
+
+                                    {/* Status Filter */}
+                                    <div className="mb-4">
+                                        <label className="text-xs font-bold text-slate-700 mb-2 block">Estado</label>
+                                        <select
+                                            value={filterStatus}
+                                            onChange={(e) => setFilterStatus(e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                        >
+                                            <option value="all">Todos los estados</option>
+                                            <option value="draft">Borrador</option>
+                                            <option value="quoted">Cotizado</option>
+                                            <option value="in-production">En Producción</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Type Filter */}
+                                    <div className="mb-4">
+                                        <label className="text-xs font-bold text-slate-700 mb-2 block">Tipo de Proyecto</label>
+                                        <select
+                                            value={filterType}
+                                            onChange={(e) => setFilterType(e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                        >
+                                            <option value="all">Todos los tipos</option>
+                                            <option value="ventana">Ventanas</option>
+                                            <option value="puerta">Puertas</option>
+                                            <option value="fachada">Fachadas</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Sort */}
+                                    <div className="mb-4">
+                                        <label className="text-xs font-bold text-slate-700 mb-2 block">Ordenar por</label>
+                                        <select
+                                            value={sortBy}
+                                            onChange={(e) => setSortBy(e.target.value)}
+                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                        >
+                                            <option value="date-desc">Fecha (más recientes)</option>
+                                            <option value="date-asc">Fecha (más antiguos)</option>
+                                            <option value="name-asc">Nombre (A-Z)</option>
+                                            <option value="name-desc">Nombre (Z-A)</option>
+                                            <option value="price-desc">Precio (mayor a menor)</option>
+                                            <option value="price-asc">Precio (menor a mayor)</option>
+                                        </select>
+                                    </div>
+
+                                    {/* Clear Filters */}
+                                    <button
+                                        onClick={() => {
+                                            setFilterStatus('all');
+                                            setFilterType('all');
+                                            setSortBy('date-desc');
+                                        }}
+                                        className="w-full py-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+                                    >
+                                        Limpiar filtros
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="text-[11px] font-black uppercase tracking-widest text-slate-700 border-b border-slate-200 bg-slate-100">
-                                <th className="px-8 py-5">Cliente</th>
-                                <th className="px-8 py-5">Contacto</th>
-                                <th className="px-8 py-5">Dirección</th>
-                                <th className="px-8 py-5">Tipo</th>
-                                <th className="px-8 py-5">Estado</th>
-                                <th className="px-8 py-5 text-right">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/40">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan={6} className="px-8 py-6 text-center">
-                                        <p className="text-indigo-400 font-bold">Cargando proyectos...</p>
-                                    </td>
+                {/* Table View */}
+                {viewMode === 'table' && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="text-[11px] font-black uppercase tracking-widest text-slate-700 border-b border-slate-200 bg-slate-100">
+                                    <th className="px-8 py-5">Cliente</th>
+                                    <th className="px-8 py-5">Contacto</th>
+                                    <th className="px-8 py-5">Dirección</th>
+                                    <th className="px-8 py-5">Tipo</th>
+                                    <th className="px-8 py-5">Estado</th>
+                                    <th className="px-8 py-5 text-right">Acción</th>
                                 </tr>
-                            ) : filteredProjects.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="px-8 py-12 text-center">
-                                        <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_open</span>
-                                        <p className="text-slate-600 font-bold">
-                                            {searchQuery ? 'No se encontraron resultados' : 'No hay proyectos guardados'}
-                                        </p>
-                                        <p className="text-sm text-slate-400 mt-1">
-                                            {searchQuery ? 'Intenta con otra búsqueda' : 'Crea una ventana para comenzar'}
-                                        </p>
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredProjects.map((project) => (
-                                    <tr key={project.id} className="group hover:bg-surface-container-high/50 transition-colors">
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">
-                                                    {project.clientName?.charAt(0) || 'C'}
-                                                </div>
-                                                <span className="font-bold text-primary text-sm">{project.clientName || 'Sin cliente'}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-6 text-sm text-secondary">{project.contactPhone || '(555) 000-0000'}</td>
-                                        <td className="px-8 py-6 text-sm text-secondary">{project.siteAddress || 'Dirección no especificada'}</td>
-                                        <td className="px-8 py-6">
-                                            <span className="text-[10px] font-bold uppercase px-2 py-1 bg-tertiary-fixed text-primary rounded">
-                                                {project.projectType || 'Ventana'}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-2 h-2 rounded-full ${getStatusColor(project.status)}`}></div>
-                                                <span className="text-xs font-medium text-slate-600">{getStatusLabel(project.status)}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right whitespace-nowrap">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => handleAction('edit', project.id)}
-                                                    className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-primary rounded-xl transition-all active:scale-90 group"
-                                                    title="Editar medidas"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">edit</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleAction('pdf', project.id)}
-                                                    className="p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl transition-all active:scale-90 group"
-                                                    title="Generar PDF"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleAction('production', project.id)}
-                                                    className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-all active:scale-90 group"
-                                                    title="Enviar a producción"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">factory</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleAction('gallery', project.id)}
-                                                    className="p-2.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-xl transition-all active:scale-90 group"
-                                                    title="Galería de obra"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">photo_library</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleAction('delete', project.id)}
-                                                    className="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all active:scale-90 group"
-                                                    title="Eliminar proyecto"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">delete</span>
-                                                </button>
-                                            </div>
+                            </thead>
+                            <tbody className="divide-y divide-white/40">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-8 py-6 text-center">
+                                            <p className="text-indigo-400 font-bold">Cargando proyectos...</p>
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                ) : filteredProjects.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-8 py-12 text-center">
+                                            <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_open</span>
+                                            <p className="text-slate-600 font-bold">
+                                                {searchQuery ? 'No se encontraron resultados' : 'No hay proyectos guardados'}
+                                            </p>
+                                            <p className="text-sm text-slate-400 mt-1">
+                                                {searchQuery ? 'Intenta con otra búsqueda' : 'Crea una ventana para comenzar'}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredProjects.map((project) => (
+                                        <tr key={project.id} className="group hover:bg-surface-container-high/50 transition-colors">
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">
+                                                        {project.clientName?.charAt(0) || 'C'}
+                                                    </div>
+                                                    <span className="font-bold text-primary text-sm">{project.clientName || 'Sin cliente'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6 text-sm text-secondary">{project.contactPhone || '(555) 000-0000'}</td>
+                                            <td className="px-8 py-6 text-sm text-secondary">{project.siteAddress || 'Dirección no especificada'}</td>
+                                            <td className="px-8 py-6">
+                                                <span className="text-[10px] font-bold uppercase px-2 py-1 bg-tertiary-fixed text-primary rounded">
+                                                    {project.projectType || 'Ventana'}
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${getStatusColor(project.status)}`}></div>
+                                                    <span className="text-xs font-medium text-slate-600">{getStatusLabel(project.status)}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6 text-right whitespace-nowrap">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={() => handleAction('edit', project.id)}
+                                                        className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-primary rounded-xl transition-all active:scale-90 group"
+                                                        title="Editar medidas"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[20px]">edit</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction('pdf', project.id)}
+                                                        className="p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl transition-all active:scale-90 group"
+                                                        title="Generar PDF"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction('production', project.id)}
+                                                        className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-all active:scale-90 group"
+                                                        title="Enviar a producción"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[20px]">factory</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction('gallery', project.id)}
+                                                        className="p-2.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-xl transition-all active:scale-90 group"
+                                                        title="Galería de obra"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[20px]">photo_library</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction('delete', project.id)}
+                                                        className="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all active:scale-90 group"
+                                                        title="Eliminar proyecto"
+                                                    >
+                                                        <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {/* Cards View */}
+                {viewMode === 'cards' && (
+                    <div className="p-6">
+                        {loading ? (
+                            <div className="text-center py-12">
+                                <p className="text-indigo-400 font-bold">Cargando proyectos...</p>
+                            </div>
+                        ) : filteredProjects.length === 0 ? (
+                            <div className="text-center py-12">
+                                <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_open</span>
+                                <p className="text-slate-600 font-bold">
+                                    {searchQuery ? 'No se encontraron resultados' : 'No hay proyectos guardados'}
+                                </p>
+                                <p className="text-sm text-slate-400 mt-1">
+                                    {searchQuery ? 'Intenta con otra búsqueda' : 'Crea una ventana para comenzar'}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {filteredProjects.map((project) => (
+                                    <div key={project.id} className="bg-white rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:shadow-lg transition-all group">
+                                        {/* Card Header */}
+                                        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                                                    {project.clientName?.charAt(0) || 'C'}
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-900 text-sm">{project.clientName || 'Sin cliente'}</h4>
+                                                    <p className="text-xs text-slate-500">{project.projectName || 'Sin nombre'}</p>
+                                                </div>
+                                            </div>
+                                            <div className={`w-3 h-3 rounded-full ${getStatusColor(project.status)}`} title={getStatusLabel(project.status)}></div>
+                                        </div>
+
+                                        {/* Card Body */}
+                                        <div className="p-4 space-y-3">
+                                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                                                <span className="material-symbols-outlined text-sm">location_on</span>
+                                                <span className="truncate">{project.siteAddress || 'Dirección no especificada'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                                                <span className="material-symbols-outlined text-sm">phone</span>
+                                                <span>{project.contactPhone || '(555) 000-0000'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                                                <span className="material-symbols-outlined text-sm">category</span>
+                                                <span className="font-medium">{project.projectType || 'Ventana'}</span>
+                                            </div>
+                                            {project.quotation?.totales?.precioVenta && (
+                                                <div className="pt-3 border-t border-slate-100">
+                                                    <p className="text-xs text-slate-500">Precio de venta</p>
+                                                    <p className="text-lg font-black text-indigo-600">
+                                                        ${project.quotation.totales.precioVenta.toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Card Footer */}
+                                        <div className="p-4 border-t border-slate-100 flex gap-2">
+                                            <button
+                                                onClick={() => handleAction('edit', project.id)}
+                                                className="flex-1 py-2 bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">edit</span>
+                                                Editar
+                                            </button>
+                                            <button
+                                                onClick={() => handleAction('pdf', project.id)}
+                                                className="flex-1 py-2 bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
+                                                PDF
+                                            </button>
+                                            <button
+                                                onClick={() => handleAction('delete', project.id)}
+                                                className="py-2 px-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Pagination */}
                 <div className="p-6 flex justify-between items-center bg-surface-container-highest/10 text-xs text-slate-500 font-medium">
