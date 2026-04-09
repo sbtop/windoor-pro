@@ -219,20 +219,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
                                     </div>
                                 )
                             ))}
-                            <div className="border-t border-slate-700 pt-3 space-y-1">
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-slate-400">Costo Directo</span>
-                                    <span className="text-slate-200 font-bold">
-                                        {pricingResult.moneda}{pricingResult.totales.costoDirecto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between text-xs">
-                                    <span className="text-slate-400">Margen ({pricingResult.totales.margenPorcentaje}%)</span>
-                                    <span className="text-emerald-400 font-bold">
-                                        +{pricingResult.moneda}{pricingResult.totales.gananciaBruta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center mt-2 pt-2 border-t border-slate-700">
+                            <div className="border-t border-slate-700 pt-3">
+                                <div className="flex justify-between items-center">
                                     <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Precio de Venta</span>
                                     <span className="text-lg font-black text-emerald-400">
                                         {pricingResult.moneda}{pricingResult.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}

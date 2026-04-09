@@ -277,15 +277,6 @@ const PropertiesPanel: React.FC = () => {
                             </div>
 
                             <div className="border-t border-emerald-200/50 pt-3">
-                                <div className="flex justify-between items-center text-sm mb-1">
-                                    <span className="text-emerald-800 font-medium">Costo Total Directo:</span>
-                                    <span className="font-bold text-emerald-900">{pricingResult.moneda}{pricingResult.totales.costoDirecto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs mb-3">
-                                    <span className="text-emerald-700/80">Margen de Ganancia ({pricingResult.totales.margenPorcentaje}%):</span>
-                                    <span className="font-medium text-emerald-800">+{pricingResult.moneda}{pricingResult.totales.gananciaBruta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
-                                </div>
-
                                 <div className="flex justify-between items-end mt-4 p-3 bg-white/60 rounded-xl">
                                     <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest leading-none">Precio<br />Venta</span>
                                     <span className="text-xl font-display font-black text-emerald-900 leading-none">
