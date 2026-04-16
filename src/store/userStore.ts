@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface UserData {
@@ -48,89 +49,94 @@ const generateUserId = (): string => {
  * `windoor-session-v2`. Además maneja la simulación de registro/login.
  */
 export const useUserStore = create<UserState>()(
-    (set, get) => ({
-        isAuthenticated: false,
-        currentUser: null,
+    persist(
+        (set, get) => ({
+            isAuthenticated: false,
+            currentUser: null,
 
-        login: async (email, password) => {
-            const accounts = getRegisteredAccounts();
-            const user = accounts.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
-            
-            if (user) {
-                set({ 
-                    isAuthenticated: true, 
-                    currentUser: {
-                        userId: user.userId,
-                        email: user.email,
-                        name: user.name
-                    } 
-                });
-                return true;
-            }
-            return false;
-        },
-
-        register: async (name, email, password) => {
-            const accounts = getRegisteredAccounts();
-            if (accounts.some(a => a.email.toLowerCase() === email.toLowerCase())) {
-                throw new Error("El correo ya está registrado");
-            }
-
-            const newUser = {
-                userId: generateUserId(),
-                name,
-                email,
-                password // En una app real, nunca se guarda en texto claro
-            };
-
-            saveAccount(newUser);
-
-            // Auto-login after register
-            set({
-                isAuthenticated: true,
-                currentUser: {
-                    userId: newUser.userId,
-                    email: newUser.email,
-                    name: newUser.name
-                }
-            });
-
-            return true;
-        },
-
-        logout: () => {
-            set({ isAuthenticated: false, currentUser: null });
-        },
-
-        setDisplayName: (name) => {
-            const { currentUser } = get();
-            if (currentUser) {
-                // Update session
-                set({ currentUser: { ...currentUser, name } });
-
-                // Update in 'database'
+            login: async (email, password) => {
                 const accounts = getRegisteredAccounts();
-                const idx = accounts.findIndex(a => a.userId === currentUser.userId);
-                if (idx > -1) {
-                    accounts[idx].name = name;
-                    localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+                const user = accounts.find(a => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
+                
+                if (user) {
+                    set({ 
+                        isAuthenticated: true, 
+                        currentUser: {
+                            userId: user.userId,
+                            email: user.email,
+                            name: user.name
+                        } 
+                    });
+                    return true;
                 }
-            }
-        },
+                return false;
+            },
 
-        resetPassword: async (email, newPassword) => {
-            const accounts = getRegisteredAccounts();
-            const idx = accounts.findIndex(a => a.email.toLowerCase() === email.toLowerCase());
+            register: async (name, email, password) => {
+                const accounts = getRegisteredAccounts();
+                if (accounts.some(a => a.email.toLowerCase() === email.toLowerCase())) {
+                    throw new Error("El correo ya está registrado");
+                }
 
-            if (idx === -1) {
-                return false; // Email no encontrado
-            }
+                const newUser = {
+                    userId: generateUserId(),
+                    name,
+                    email,
+                    password // En una app real, nunca se guarda en texto claro
+                };
 
-            // Update password in 'database'
-            accounts[idx].password = newPassword;
-            localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+                saveAccount(newUser);
 
-            return true;
-        },
-    })
+                // Auto-login after register
+                set({
+                    isAuthenticated: true,
+                    currentUser: {
+                        userId: newUser.userId,
+                        email: newUser.email,
+                        name: newUser.name
+                    }
+                });
+
+                return true;
+            },
+
+            logout: () => {
+                set({ isAuthenticated: false, currentUser: null });
+            },
+
+            setDisplayName: (name) => {
+                const { currentUser } = get();
+                if (currentUser) {
+                    // Update session
+                    set({ currentUser: { ...currentUser, name } });
+
+                    // Update in 'database'
+                    const accounts = getRegisteredAccounts();
+                    const idx = accounts.findIndex(a => a.userId === currentUser.userId);
+                    if (idx > -1) {
+                        accounts[idx].name = name;
+                        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+                    }
+                }
+            },
+
+            resetPassword: async (email, newPassword) => {
+                const accounts = getRegisteredAccounts();
+                const idx = accounts.findIndex(a => a.email.toLowerCase() === email.toLowerCase());
+
+                if (idx === -1) {
+                    return false; // Email no encontrado
+                }
+
+                // Update password in 'database'
+                accounts[idx].password = newPassword;
+                localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+
+                return true;
+            },
+        }),
+        {
+            name: 'windoor-session-v2',
+        }
+    )
 );

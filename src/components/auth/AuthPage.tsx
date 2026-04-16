@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, ArrowRight, Building2 } from 'lucide-react';
+import { useUserContext } from '../../context/UserContext';
 
 const AuthPage: React.FC = () => {
-    console.log('AuthPage rendered');
     const [isLogin, setIsLogin] = useState(true);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -10,61 +10,7 @@ const AuthPage: React.FC = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const ACCOUNTS_KEY = 'windoor-accounts-v2';
-    const SESSION_KEY = 'windoor-session-v2';
-
-    const getAccounts = () => {
-        try {
-            return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]');
-        } catch {
-            return [];
-        }
-    };
-
-    const login = async (email: string, password: string) => {
-        const accounts = getAccounts();
-        const user = accounts.find((a: any) => a.email.toLowerCase() === email.toLowerCase() && a.password === password);
-        if (user) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify({
-                isAuthenticated: true,
-                currentUser: {
-                    userId: user.userId,
-                    email: user.email,
-                    name: user.name
-                }
-            }));
-            return true;
-        }
-        return false;
-    };
-
-    const register = async (name: string, email: string, password: string) => {
-        const accounts = getAccounts();
-        if (accounts.some((a: any) => a.email.toLowerCase() === email.toLowerCase())) {
-            throw new Error("El correo ya está registrado");
-        }
-
-        const newUser = {
-            userId: `usr-${Math.random().toString(36).substr(2, 9)}`,
-            name,
-            email,
-            password
-        };
-
-        accounts.push(newUser);
-        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-
-        localStorage.setItem(SESSION_KEY, JSON.stringify({
-            isAuthenticated: true,
-            currentUser: {
-                userId: newUser.userId,
-                email: newUser.email,
-                name: newUser.name
-            }
-        }));
-
-        return true;
-    };
+    const { login, register } = useUserContext();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,8 +22,6 @@ const AuthPage: React.FC = () => {
                 const success = await login(email, password);
                 if (!success) {
                     setError('Credenciales incorrectas. Verifica tu correo y contraseña.');
-                } else {
-                    window.location.reload();
                 }
             } else {
                 if (!name || !email || !password) {
@@ -91,7 +35,6 @@ const AuthPage: React.FC = () => {
                     return;
                 }
                 await register(name, email, password);
-                window.location.reload();
             }
         } catch (err: any) {
             setError(err.message || 'Ocurrió un error inesperado.');

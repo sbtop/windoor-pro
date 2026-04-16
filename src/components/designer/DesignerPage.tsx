@@ -9,7 +9,7 @@ import { calcularCotizacionSaaS } from '../../services/pricing';
 import { saveProject, ProjectData } from '../../lib/localStorage/db';
 import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
-import { useUserStore } from '../../store/userStore';
+import { useUserContext } from '../../context/UserContext';
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
@@ -28,7 +28,7 @@ const DesignerPage: React.FC = () => {
     const selectedElement = getSelected();
     const activeClient = useDesignerStore(s => s.activeClient);
     const { pricingConfig } = useSettingsStore();
-    const { currentUser } = useUserStore();
+    const { currentUser } = useUserContext();
 
     // 🎨 Local UI State
     const [showGrid, setShowGrid] = useState(true);

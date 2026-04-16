@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ViewType } from '../../types';
-import { useUserStore } from '../../store/userStore';
+import { useUserContext } from '../../context/UserContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Bell, 
@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
-    const { currentUser, logout } = useUserStore();
+    const { currentUser, logout } = useUserContext();
 
     const navItems = [
         { id: 'home' as ViewType, label: 'Dashboard', icon: LayoutDashboard },

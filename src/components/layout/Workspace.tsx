@@ -35,7 +35,8 @@ import {
     BarChart3,
     FolderOpen,
     Maximize2,
-    Settings
+    Settings,
+    PenTool
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -268,7 +269,23 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
         const project = projects.find(p => p.id === projectId);
         switch (action) {
             case 'edit':
-                console.log('Editar proyecto:', projectId, project);
+                console.log('Editar datos del proyecto:', projectId, project);
+                if (project) {
+                    // Abrir modal de edición del proyecto
+                    setSelectedProject(project);
+                    setEditProjectData({
+                        projectName: project.projectName,
+                        clientName: project.clientName,
+                        siteAddress: project.siteAddress,
+                        contactPhone: project.contactPhone,
+                        projectType: project.projectType,
+                        status: project.status
+                    });
+                    setIsEditingProjectData(true);
+                }
+                break;
+            case 'design':
+                console.log('Abrir diseñador:', projectId, project);
                 if (project) {
                     const { setElements, setActiveClient } = useDesignerStore.getState();
                     // Cargar elementos del proyecto en el diseñador
@@ -570,10 +587,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                 </div>
                                             </td>
                                             <td className="px-8 py-5 text-right flex justify-end gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => handleAction('edit', project.id)} className="p-2 hover:bg-primary/10 text-slate-400 hover:text-primary rounded-lg transition-colors"><Edit3 size={16} /></button>
-                                                <button onClick={() => handleAction('pdf', project.id)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"><FileText size={16} /></button>
-                                                <button onClick={() => handleAction('production', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors"><Factory size={16} /></button>
-                                                <button onClick={() => handleAction('delete', project.id)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
+                                                <button onClick={() => handleAction('edit', project.id)} className="p-2 hover:bg-primary/10 text-slate-400 hover:text-primary rounded-lg transition-colors" title="Editar datos"><Edit3 size={16} /></button>
+                                                <button onClick={() => handleAction('design', project.id)} className="p-2 hover:bg-purple-50 text-slate-400 hover:text-purple-600 rounded-lg transition-colors" title="Abrir diseñador"><PenTool size={16} /></button>
+                                                <button onClick={() => handleAction('pdf', project.id)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors" title="Generar PDF"><FileText size={16} /></button>
+                                                <button onClick={() => handleAction('production', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors" title="Producción"><Factory size={16} /></button>
+                                                <button onClick={() => handleAction('delete', project.id)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors" title="Eliminar"><Trash2 size={16} /></button>
                                             </td>
                                         </motion.tr>
                                     ))}
@@ -616,6 +634,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                     </div>
                                     <div className="flex gap-2">
                                         <button onClick={() => handleAction('edit', project.id)} className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-primary/10 hover:text-primary transition-all">Editar</button>
+                                        <button onClick={() => handleAction('design', project.id)} className="px-3 py-2 bg-purple-100 text-purple-700 rounded-xl font-black text-xs hover:bg-purple-200 transition-all"><PenTool size={16} /></button>
                                         <button onClick={() => handleAction('pdf', project.id)} className="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-indigo-50 hover:text-indigo-600 transition-all"><FileText size={16} /></button>
                                         <button onClick={() => handleAction('delete', project.id)} className="px-3 py-2 bg-red-50 text-red-600 rounded-xl font-black text-xs transition-all"><Trash2 size={16} /></button>
                                     </div>

@@ -3,7 +3,7 @@ import { Settings, Save, CheckCircle2, RefreshCw, Ruler, Box, Package, User, Bui
 import { ViewType } from '../types';
 import { useSettingsStore } from '../store/settingsStore';
 import { MaterialDictionary } from '../services/pricing';
-import { useUserStore } from '../store/userStore';
+import { useUserContext } from '../context/UserContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SettingsPageProps {
@@ -12,7 +12,7 @@ interface SettingsPageProps {
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
     const { pricingConfig, updatePricingConfig, resetPricingConfig } = useSettingsStore();
-    const { currentUser, setDisplayName } = useUserStore();
+    const { currentUser, setDisplayName } = useUserContext();
 
     const [localConfig, setLocalConfig] = useState(pricingConfig);
     const [localName, setLocalName] = useState(currentUser?.name || '');

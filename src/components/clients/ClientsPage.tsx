@@ -16,7 +16,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { getUserClients, saveClient, deleteClient } from '../../lib/localStorage/db';
 import { ClientData, ViewType } from '../../types';
-import { useUserStore } from '../../store/userStore';
+import { useUserContext } from '../../context/UserContext';
 import { useDesignerStore } from '../../store/designerStore';
 
 interface ClientsPageProps {
@@ -40,7 +40,7 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
     });
 
     const { setActiveClient, clearCanvas } = useDesignerStore();
-    const { currentUser } = useUserStore();
+    const { currentUser } = useUserContext();
     const userId = currentUser?.userId || 'unknown';
 
     useEffect(() => {
