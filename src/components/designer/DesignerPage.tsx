@@ -10,6 +10,8 @@ import { saveProject, ProjectData } from '../../lib/localStorage/db';
 import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useUserStore } from '../../store/userStore';
+import { motion } from 'framer-motion';
+import { cn } from '../../lib/utils';
 
 const DesignerPage: React.FC = () => {
     // 🌍 Global State
@@ -140,9 +142,13 @@ const DesignerPage: React.FC = () => {
     }, [selectedId, deleteSelected, selectElement]);
 
     return (
-        <div className="flex flex-col md:flex-row h-full relative overflow-hidden bg-slate-50">
+        <div className="flex flex-col md:flex-row h-full relative overflow-hidden bg-slate-50/50">
             {/* ─ Toolbar ─────────────────────────────────────────────── */}
-            <div className="md:relative absolute bottom-4 md:bottom-auto left-4 right-4 md:left-auto md:right-auto md:w-20 bg-white/95 backdrop-blur-md md:bg-white border md:border-t-0 md:border-b-0 md:border-l-0 border-slate-200 md:border-r md:rounded-none rounded-2xl flex flex-row md:flex-col items-center p-2 md:py-6 gap-2 shadow-xl md:shadow-soft-sm z-[100] overflow-x-auto shrink-0 touch-pan-x no-scrollbar">
+            <motion.div 
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="md:relative absolute bottom-6 md:bottom-auto left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-auto md:ml-6 md:my-auto md:w-20 glass-card p-2 md:py-6 flex flex-row md:flex-col items-center gap-3 z-[100] shadow-2xl border-white/40 ring-1 ring-black/5"
+            >
                 {/* Active client indicator */}
                 {activeClient && (
                     <div className="hidden md:flex items-center gap-1.5 px-2 py-1.5 bg-emerald-50 rounded-xl mb-2 w-full">
@@ -227,18 +233,32 @@ const DesignerPage: React.FC = () => {
                         />
                     </>
                 )}
-            </div>
+            </motion.div>
 
             {/* ─ Canvas Area ───────────────────────────────────────────── */}
             <div
                 ref={containerRef}
-                className="flex-1 bg-slate-50 overflow-hidden relative"
-                style={{ background: '#f8fafc' }}
+                className="flex-1 overflow-hidden relative m-4 md:m-6 rounded-[32px] bg-white shadow-inner border border-slate-200/50"
+                style={{ 
+                    backgroundImage: `radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
+                                     radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.05) 0, transparent 50%),
+                                     radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.05) 0, transparent 50%)`,
+                    backgroundColor: '#ffffff'
+                }}
             >
+                {/* Visual Grid Background (CSS only) */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                     style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+                />
+
                 {/* Zoom badge */}
-                <div className="absolute top-4 right-4 z-10 px-3 py-1.5 bg-indigo-50/90 backdrop-blur-sm border border-indigo-200 rounded-xl text-xs font-bold text-indigo-600 shadow-soft-sm">
-                    {zoom}%
-                </div>
+                <motion.div 
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="absolute top-6 right-6 z-10 px-4 py-2 bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl text-[10px] font-black tracking-widest text-slate-500 shadow-sm uppercase"
+                >
+                    Escala: {zoom}%
+                </motion.div>
 
                 {/* Empty state */}
                 {elements.length === 0 && (
@@ -292,14 +312,20 @@ const activeMap = {
 };
 
 const ToolButton: React.FC<ToolButtonProps> = ({ icon, label, color, onClick, active }) => (
-    <button
+    <motion.button
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.95 }}
         title={label}
         onClick={onClick}
-        className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center gap-0.5 text-slate-400 border border-transparent transition-all shadow-soft-sm ${colorMap[color]} ${active ? activeMap[color] : 'bg-white border-slate-100'}`}
+        className={cn(
+            "w-14 h-14 md:w-16 md:h-16 rounded-2xl flex flex-col items-center justify-center gap-1.5 transition-all",
+            "border border-white/50 shadow-sm",
+            active ? "bg-primary text-white shadow-lg shadow-primary/20 border-primary" : "bg-white/60 text-slate-400 hover:text-slate-600 hover:bg-white hover:border-slate-300"
+        )}
     >
         {icon}
-        <span className="text-[8px] font-bold uppercase tracking-wider">{label}</span>
-    </button>
+        <span className="text-[7px] font-black uppercase tracking-widest">{label}</span>
+    </motion.button>
 );
 
 export default DesignerPage;

@@ -51,9 +51,9 @@ const ElementShape: React.FC<ElementShapeProps> = ({ el, isSelected, onSelect, o
         }
     }, [isSelected]);
 
-    const FRAME = 8;
+    const FRAME = 10;
     const baseColor = el.type === 'window' ? '#6366f1' : '#0ea5e9';
-    const frameColor = '#1e293b';
+    const frameColor = '#0f172a'; // Deep obsidian
     const glassColor = el.type === 'window' ? '#bae6fd' : '#dbeafe';
 
     const vW = el.width * VISUAL_SCALE;
@@ -96,173 +96,144 @@ const ElementShape: React.FC<ElementShapeProps> = ({ el, isSelected, onSelect, o
                 onDragEnd={handleDragEnd}
                 onTransformEnd={handleTransformEnd}
             >
-                {/* Outer frame */}
+                {/* Real Outer Shadow Layer */}
+                <Rect
+                    width={vW}
+                    height={vH}
+                    fill="#000"
+                    opacity={0.15}
+                    cornerRadius={6}
+                    shadowColor="#000"
+                    shadowBlur={25}
+                    shadowOpacity={0.4}
+                    shadowOffset={{ x: 0, y: 12 }}
+                    listening={false}
+                />
+
+                {/* Main Frame */}
                 <Rect
                     width={vW}
                     height={vH}
                     fill={frameColor}
-                    cornerRadius={4}
-                    shadowColor="rgba(0,0,0,0.25)"
-                    shadowBlur={isSelected ? 20 : 8}
-                    shadowOffset={{ x: 0, y: 4 }}
-                    shadowOpacity={1}
-                    stroke={isSelected ? baseColor : 'transparent'}
-                    strokeWidth={2}
+                    cornerRadius={6}
+                    stroke={isSelected ? baseColor : '#334155'}
+                    strokeWidth={isSelected ? 3 : 1}
                 />
 
-                {/* Panels */}
+                {/* Panels Area */}
                 {el.panels.map((panel, idx) => {
                     const panelWidth = (panel.widthRatio / totalRatio) * (vW - FRAME * 2);
                     const panelX = FRAME + el.panels.slice(0, idx).reduce((acc, p) => acc + (p.widthRatio / totalRatio) * (vW - FRAME * 2), 0);
                     const innerH = vH - FRAME * 2;
                     const sep = idx < el.panels.length - 1;
-                    const pW = panelWidth - (sep ? 4 : 0); // usable panel width
+                    const pW = panelWidth - (sep ? 2 : 0);
 
                     return (
                         <Group key={panel.id} x={panelX} y={FRAME}>
-                            {/* Glass */}
-                            <Rect width={pW} height={innerH} fill={glassColor} opacity={0.75} />
-                            {/* Panel separator */}
-                            {sep && <Rect x={panelWidth - 6} width={4} height={innerH} fill={frameColor} />}
-                            {/* Gleam */}
-                            <Rect x={4} y={4} width={Math.max(4, pW * 0.3)} height={innerH * 0.3} fill="white" opacity={0.3} cornerRadius={2} listening={false} />
+                            {/* Glass Layer with Gradient */}
+                            <Rect 
+                                width={pW} 
+                                height={innerH} 
+                                fillLinearGradientStartPoint={{ x: 0, y: 0 }}
+                                fillLinearGradientEndPoint={{ x: pW, y: innerH }}
+                                fillLinearGradientColorStops={[0, '#bae6fd', 1, '#7dd3fc']}
+                                opacity={0.8}
+                                cornerRadius={idx === 0 ? 2 : 0}
+                            />
+                            
+                            {/* Panel Inner Border */}
+                            <Rect 
+                                width={pW} 
+                                height={innerH} 
+                                stroke={frameColor} 
+                                strokeWidth={2}
+                                opacity={0.3}
+                                listening={false}
+                            />
+
+                            {/* Realistic Glass Gleam */}
+                            <Line
+                                points={[5, 15, pW - 15, innerH - 5]}
+                                stroke="#fff"
+                                strokeWidth={1}
+                                opacity={0.4}
+                                listening={false}
+                            />
 
                             {/* ─── Opening Type Visuals ────────────────────── */}
                             {el.type === 'window' && el.openingType === 'fija' && (
-                                <>
-                                    {/* Fixed window: X-cross pattern (industry standard) */}
-                                    <Line
-                                        points={[4, 4, pW - 4, innerH - 4]}
-                                        stroke="#64748b"
-                                        strokeWidth={1.5}
-                                        opacity={0.5}
-                                        listening={false}
-                                    />
-                                    <Line
-                                        points={[pW - 4, 4, 4, innerH - 4]}
-                                        stroke="#64748b"
-                                        strokeWidth={1.5}
-                                        opacity={0.5}
-                                        listening={false}
-                                    />
-                                </>
+                                <Group opacity={0.4}>
+                                    <Line points={[10, 10, pW - 10, innerH - 10]} stroke="#0f172a" strokeWidth={0.5} />
+                                    <Line points={[pW - 10, 10, 10, innerH - 10]} stroke="#0f172a" strokeWidth={0.5} />
+                                </Group>
                             )}
 
                             {el.type === 'window' && el.openingType === 'abatible' && (
-                                <>
-                                    {/* Casement window: triangle from hinge side to center top */}
+                                <Group opacity={0.6}>
                                     <Line
-                                        points={[
-                                            2, innerH - 2,       // bottom-left (hinge)
-                                            pW / 2, 2,           // top center (swing peak)
-                                            pW - 2, innerH - 2,  // bottom-right (hinge)
-                                        ]}
-                                        stroke="#6366f1"
+                                        points={[2, innerH - 2, pW / 2, 8, pW - 2, innerH - 2]}
+                                        stroke={baseColor}
                                         strokeWidth={1.5}
-                                        opacity={0.55}
-                                        dash={[6, 4]}
-                                        closed={false}
-                                        listening={false}
+                                        dash={[8, 5]}
                                     />
-                                    {/* Small arc indicator at top center */}
-                                    <Line
-                                        points={[pW / 2 - 8, 8, pW / 2, 2, pW / 2 + 8, 8]}
-                                        stroke="#6366f1"
-                                        strokeWidth={2}
-                                        opacity={0.7}
-                                        listening={false}
-                                    />
-                                    {/* Handle on the side */}
-                                    {pW > 30 && (
-                                        <Rect x={pW - 14} y={innerH / 2 - 10} width={6} height={20} fill="#6366f1" opacity={0.6} cornerRadius={3} />
-                                    )}
-                                </>
+                                    {/* Designer Dot for Handle */}
+                                    <Rect x={pW - 12} y={innerH / 2 - 8} width={4} height={16} fill={baseColor} cornerRadius={2} />
+                                </Group>
                             )}
 
                             {el.type === 'window' && (el.openingType === 'corrediza' || !el.openingType) && (
-                                <>
-                                    {/* Sliding window: horizontal arrow indicating slide direction */}
-                                    {pW > 40 && (
-                                        <>
-                                            {/* Center handle */}
-                                            <Rect x={pW / 2 - 3} y={innerH / 2 - 10} width={6} height={20} fill="#94a3b8" cornerRadius={3} />
-                                            {/* Arrow line */}
-                                            <Line
-                                                points={[
-                                                    pW * 0.2, innerH / 2,
-                                                    pW * 0.8, innerH / 2,
-                                                ]}
-                                                stroke="#94a3b8"
-                                                strokeWidth={1.5}
-                                                opacity={0.5}
-                                                listening={false}
-                                            />
-                                            {/* Arrow head right */}
-                                            <Line
-                                                points={[
-                                                    pW * 0.75, innerH / 2 - 5,
-                                                    pW * 0.8, innerH / 2,
-                                                    pW * 0.75, innerH / 2 + 5,
-                                                ]}
-                                                stroke="#94a3b8"
-                                                strokeWidth={1.5}
-                                                opacity={0.5}
-                                                listening={false}
-                                            />
-                                            {/* Arrow head left */}
-                                            <Line
-                                                points={[
-                                                    pW * 0.25, innerH / 2 - 5,
-                                                    pW * 0.2, innerH / 2,
-                                                    pW * 0.25, innerH / 2 + 5,
-                                                ]}
-                                                stroke="#94a3b8"
-                                                strokeWidth={1.5}
-                                                opacity={0.5}
-                                                listening={false}
-                                            />
-                                        </>
-                                    )}
-                                </>
+                                <Group opacity={0.5}>
+                                    <Rect x={pW / 2 - 2} y={innerH / 2 - 12} width={4} height={24} fill="#475569" cornerRadius={2} />
+                                    <Line points={[pW * 0.3, innerH / 2, pW * 0.7, innerH / 2]} stroke="#475569" strokeWidth={1} />
+                                </Group>
                             )}
 
-                            {/* Door handle */}
+                            {/* Door Handle Premium */}
                             {el.type === 'door' && (
-                                <>
-                                    <Rect x={panelWidth - 22} y={innerH * 0.35} width={8} height={50} fill="#94a3b8" cornerRadius={4} />
-                                    <Rect x={panelWidth - 26} y={innerH * 0.35 + 20} width={14} height={4} fill="#64748b" cornerRadius={2} />
-                                </>
+                                <Group x={pW - 24} y={innerH * 0.45}>
+                                    <Rect width={10} height={60} fill="#f1f5f9" cornerRadius={4} />
+                                    <Rect x={-10} y={25} width={24} height={6} fill="#f1f5f9" cornerRadius={3} />
+                                </Group>
                             )}
                         </Group>
                     );
                 })}
 
-                {/* Width dimension label */}
-                <Text
-                    x={0} y={-22}
-                    width={vW}
-                    align="center"
-                    text={`↔  ${(el.width / 1000).toFixed(2)} m`}
-                    fontSize={11}
-                    fontFamily="Inter, sans-serif"
-                    fontStyle="bold"
-                    fill={isSelected ? baseColor : '#94a3b8'}
-                    listening={false}
-                />
-                {/* Height dimension label */}
-                <Text
-                    x={vW + 6}
-                    y={vH / 2}
-                    rotation={90}
-                    text={`↔  ${(el.height / 1000).toFixed(2)} m`}
-                    fontSize={11}
-                    fontFamily="Inter, sans-serif"
-                    fontStyle="bold"
-                    fill={isSelected ? baseColor : '#94a3b8'}
-                    listening={false}
-                />
-                {/* Type badge */}
-                <Text x={8} y={8} text={el.type === 'window' ? '🪟' : '🚪'} fontSize={14} listening={false} />
+                {/* Dimensions Labels - Premium Typography */}
+                <Group y={-35} x={0}>
+                    <Rect width={vW} height={24} fill="#0f172a" cornerRadius={12} shadowBlur={10} shadowOpacity={0.1} />
+                    <Text
+                        width={vW}
+                        height={24}
+                        verticalAlign="middle"
+                        align="center"
+                        text={`${(el.width / 1000).toFixed(2)} m`}
+                        fontSize={10}
+                        fontFamily="Outfit, Inter, sans-serif"
+                        fontStyle="bold"
+                        fill="#fff"
+                        listening={false}
+                    />
+                </Group>
+
+                <Group x={vW + 15} y={0}>
+                    <Rect width={24} height={vH} fill="#0f172a" cornerRadius={12} shadowBlur={10} shadowOpacity={0.1} />
+                    <Text
+                        width={vH}
+                        height={24}
+                        rotation={90}
+                        offsetX={vH / 2}
+                        offsetY={-vH / 2}
+                        verticalAlign="middle"
+                        align="center"
+                        text={`${(el.height / 1000).toFixed(2)} m`}
+                        fontSize={10}
+                        fontFamily="Outfit, Inter, sans-serif"
+                        fontStyle="bold"
+                        fill="#fff"
+                        listening={false}
+                    />
+                </Group>
             </Group>
 
             {isSelected && (

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Building2 } from 'lucide-react';
 import { useUserStore } from '../../store/userStore';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../../lib/utils';
 
 const AuthPage: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -84,249 +86,233 @@ const AuthPage: React.FC = () => {
     };
 
     return (
-        <div className="flex h-screen bg-slate-50 font-body overflow-hidden">
-            {/* 📸 Panel Izquierdo (Visual) */}
-            <div className="hidden lg:flex w-1/2 bg-slate-900 relative overflow-hidden flex-col items-center justify-center p-12">
-                {/* Patrón de fondo geométrico (simulando vidrios) */}
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[120%] bg-indigo-500 transform rotate-12" />
-                    <div className="absolute top-[20%] right-[-20%] w-[60%] h-[80%] bg-blue-500 transform -rotate-12" />
-                </div>
-                
-                <div className="relative z-10 text-center max-w-lg">
-                    <div className="flex items-center justify-center gap-3 mb-8">
-                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                            <span className="material-symbols-outlined text-white text-4xl">architecture</span>
-                        </div>
-                    </div>
-                    <h1 className="text-5xl font-display font-black text-white mb-6 uppercase tracking-tight">
-                        WinDoor Pro
-                    </h1>
-                    <p className="text-slate-300 text-lg font-medium leading-relaxed mb-12">
-                        El cotizador y diseñador más avanzado para profesionales del aluminio y el vidrio. Gestiona tu negocio desde un solo lugar.
-                    </p>
-                    
-                    <div className="grid grid-cols-2 gap-4 text-left">
-                        <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                            <ShieldCheck className="w-8 h-8 text-indigo-400 mb-3" />
-                            <h3 className="text-white font-bold mb-1">Cotizaciones Precisas</h3>
-                            <p className="text-slate-400 text-sm">Calcula costos reales basados en perfiles y desperdicios.</p>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                            <span className="material-symbols-outlined text-blue-400 text-3xl mb-3 block">draw</span>
-                            <h3 className="text-white font-bold mb-1">Diseño Visual 2D</h3>
-                            <p className="text-slate-400 text-sm">Traza ventanas y puertas con nuestro lienzo interactivo.</p>
-                        </div>
-                    </div>
-                </div>
+        <div className="min-h-screen w-full relative flex items-center justify-center p-4 md:p-8 bg-[#020617] overflow-hidden font-body">
+            {/* 🎭 Complex Mesh Gradient Background */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-sky-600/20 blur-[120px] rounded-full" />
+                <div className="absolute top-[30%] left-[20%] w-[30%] h-[30%] bg-purple-600/10 blur-[100px] rounded-full" />
             </div>
 
-            {/* 🔐 Panel Derecho (Formulario) */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
-                <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-8 duration-500">
-                    <div className="mb-10 text-center lg:text-left">
-                        <h2 className="text-3xl font-display font-black text-slate-900 mb-2">
-                            {isLogin ? 'Bienvenido de nuevo' : 'Crea tu cuenta'}
-                        </h2>
-                        <p className="text-slate-500 font-medium">
-                            {isLogin 
-                                ? 'Ingresa tus credenciales para acceder a tus proyectos.' 
-                                : 'Regístrate y comienza a cotizar como todo un profesional.'}
-                        </p>
-                    </div>
-
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg text-sm font-bold flex items-center gap-3">
-                            <span className="material-symbols-outlined text-red-500">error</span>
-                            {error}
+            <main className="w-full max-w-5xl grid lg:grid-cols-2 gap-12 items-center relative z-10">
+                {/* 🚀 Brand Side */}
+                <div className="hidden lg:flex flex-col">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-3 mb-10"
+                    >
+                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/40 group overflow-hidden">
+                            <Building2 className="text-white w-6 h-6 group-hover:scale-110 transition-transform" />
                         </div>
-                    )}
+                        <h1 className="text-2xl font-black text-white tracking-tighter uppercase">WinDoor Pro</h1>
+                    </motion.div>
 
-                    {success && (
-                        <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg text-sm font-bold flex items-center gap-3">
-                            <span className="material-symbols-outlined text-green-500">check_circle</span>
-                            {success}
-                        </div>
-                    )}
+                    <div className="space-y-8">
+                        <motion.h2 
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-6xl font-black text-white leading-[0.9] tracking-tighter"
+                        >
+                            Diseño de <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-sky-400">Vanguardia.</span>
+                        </motion.h2>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {!isLogin && (
-                            <div>
-                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-2 block">Nombre de tu Empresa / Tuyo</label>
-                                <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                    <input 
-                                        type="text" 
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
-                                        placeholder="Ej. Vidrios Alfa"
-                                    />
-                                </div>
+                        <motion.p 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-slate-400 text-lg max-w-md leading-relaxed"
+                        >
+                            La plataforma definitiva para el diseño y cotización técnica de carpintería de aluminio y vidrio.
+                        </motion.p>
+
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                            className="flex items-center gap-4 py-6 border-t border-white/5"
+                        >
+                            <div className="flex -space-x-3">
+                                {[1,2,3,4].map(i => (
+                                    <div key={i} className="w-10 h-10 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center">
+                                        <User size={16} className="text-slate-400" />
+                                    </div>
+                                ))}
                             </div>
-                        )}
+                            <span className="text-sm font-bold text-slate-500 italic">+2,500 talleres en México confían en nosotros.</span>
+                        </motion.div>
+                    </div>
+                </div>
 
-                        <div>
-                            <label className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-2 block">Correo Electrónico</label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                {/* 🔒 Auth Form Card */}
+                <motion.div 
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="bg-slate-900/50 backdrop-blur-xl shadow-2xl border border-white/10 ring-1 ring-black/5 p-8 md:p-12 rounded-3xl"
+                >
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={isLogin ? 'login' : 'register'}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="space-y-8"
+                        >
+                            <div className="text-center lg:text-left">
+                                <h3 className="text-3xl font-black text-white tracking-tight mb-2">
+                                    {isLogin ? 'Iniciar Conexión' : 'Nueva Licencia'}
+                                </h3>
+                                <p className="text-slate-400 font-medium text-sm">
+                                    {isLogin ? 'Accede a tu panel central de fabricación.' : 'Crea tu espacio de trabajo profesional.'}
+                                </p>
+                            </div>
+
+                            {error && (
+                                <motion.div 
+                                    initial={{ scale: 0.9, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl text-xs font-bold flex items-center gap-3"
+                                >
+                                    <Lock size={16} />
+                                    {error}
+                                </motion.div>
+                            )}
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                {!isLogin && (
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Razón Social / Nombre</label>
+                                        <div className="relative group">
+                                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-500 transition-colors" />
+                                            <input 
+                                                type="text" 
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                className="w-full bg-slate-900/50 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                                placeholder="Ej. Vidrios Alfa"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Correo Corporativo</label>
+                                    <div className="relative group">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-500 transition-colors" />
+                                        <input 
+                                            type="email" 
+                                            required
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full bg-slate-900/50 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                            placeholder="admin@empresa.com"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Token de Acceso</label>
+                                    <div className="relative group">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-500 transition-colors" />
+                                        <input 
+                                            type="password" 
+                                            required
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full bg-slate-900/50 border border-white/5 rounded-2xl pl-12 pr-4 py-4 text-white text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                </div>
+
+                                <motion.button 
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-indigo-500/30 transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-4"
+                                >
+                                    {loading ? (
+                                        <span className="animate-spin w-5 h-5 border-2 border-white/20 border-t-white rounded-full" />
+                                    ) : (
+                                        <>
+                                            {isLogin ? 'Entrar al Sistema' : 'Completar Registro'} 
+                                            <ArrowRight size={18} />
+                                        </>
+                                    )}
+                                </motion.button>
+                            </form>
+
+                            <div className="pt-6 border-t border-white/5 flex flex-col gap-4">
+                                <button 
+                                    onClick={() => setIsLogin(!isLogin)}
+                                    className="text-[11px] font-black text-slate-500 hover:text-white uppercase tracking-[0.2em] transition-colors"
+                                >
+                                    {isLogin ? '¿No tienes acceso? Crea tu cuenta' : '¿Ya tienes licencia? Conectar aquí'}
+                                </button>
+                                {isLogin && (
+                                    <button 
+                                        onClick={() => setShowResetPassword(true)}
+                                        className="text-[11px] font-black text-indigo-500 hover:text-white uppercase tracking-[0.2em] transition-colors"
+                                    >
+                                        Restablecer Credenciales
+                                    </button>
+                                )}
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
+                </motion.div>
+            </main>
+
+            {/* Modal de Restablecimiento */}
+            <AnimatePresence>
+                {showResetPassword && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[200] p-4">
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-slate-900 border border-white/10 rounded-[40px] shadow-2xl max-w-md w-full p-10"
+                        >
+                            <div className="text-center mb-8">
+                                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <Sparkles className="text-indigo-500 w-8 h-8" />
+                                </div>
+                                <h4 className="text-2xl font-black text-white mb-2 tracking-tighter">Recuperar Acceso</h4>
+                                <p className="text-slate-500 text-sm font-medium leading-relaxed">Te enviaremos las instrucciones de restablecimiento de seguridad.</p>
+                            </div>
+
+                            <form onSubmit={handleResetPassword} className="space-y-4">
                                 <input 
                                     type="email" 
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
-                                    placeholder="ejemplo@correo.com"
+                                    className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 text-white text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-600"
+                                    placeholder="Tu correo corporativo"
                                 />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-2 block">Contraseña</label>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                            {isLogin && (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowResetPassword(true)}
-                                    className="mt-2 text-sm text-indigo-600 font-bold hover:underline"
-                                >
-                                    ¿Olvidaste tu contraseña?
-                                </button>
-                            )}
-                        </div>
-
-                        <button 
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-4 bg-slate-900 hover:bg-indigo-600 text-white rounded-2xl font-bold shadow-xl shadow-slate-900/20 transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-70"
-                        >
-                            {loading ? (
-                                <span className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full"></span>
-                            ) : isLogin ? (
-                                <>Entrar al cotizador <ArrowRight className="w-5 h-5" /></>
-                            ) : (
-                                <>Completar Registro <CheckCircle2 className="w-5 h-5" /></>
-                            )}
-                        </button>
-                    </form>
-
-                    <div className="mt-8 text-center">
-                        <p className="text-slate-500 text-sm font-medium">
-                            {isLogin ? '¿No tienes cuenta en WinDoor Pro?' : '¿Ya eres usuario de WinDoor Pro?'}
-                        </p>
-                        <button 
-                            onClick={() => {
-                                setIsLogin(!isLogin);
-                                setError('');
-                            }}
-                            className="mt-2 text-indigo-600 font-bold hover:underline"
-                        >
-                            {isLogin ? 'Crear una cuenta gratis' : 'Inicia sesión aquí'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Modal de Restablecimiento de Contraseña */}
-            {showResetPassword && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300">
-                        <div className="text-center mb-6">
-                            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Lock className="w-8 h-8 text-indigo-600" />
-                            </div>
-                            <h3 className="text-2xl font-display font-black text-slate-900 mb-2">
-                                Restablecer Contraseña
-                            </h3>
-                            <p className="text-slate-500 text-sm font-medium">
-                                Ingresa tu correo y la nueva contraseña para restablecer tu cuenta.
-                            </p>
-                        </div>
-
-                        {error && (
-                            <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg text-sm font-bold flex items-center gap-2">
-                                <span className="material-symbols-outlined text-red-500 text-lg">error</span>
-                                {error}
-                            </div>
-                        )}
-
-                        {success && (
-                            <div className="mb-4 p-3 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg text-sm font-bold flex items-center gap-2">
-                                <span className="material-symbols-outlined text-green-500 text-lg">check_circle</span>
-                                {success}
-                            </div>
-                        )}
-
-                        <form onSubmit={handleResetPassword} className="space-y-4">
-                            <div>
-                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-2 block">Correo Electrónico</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                    <input
-                                        type="email"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
-                                        placeholder="ejemplo@correo.com"
-                                    />
+                                <div className="flex gap-4 pt-4">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setShowResetPassword(false)}
+                                        className="flex-1 py-4 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:text-white transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-500/20"
+                                    >
+                                        Enviar
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className="text-[11px] font-black text-slate-900 uppercase tracking-widest mb-2 block">Nueva Contraseña</label>
-                                <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                    <input
-                                        type="password"
-                                        required
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setShowResetPassword(false);
-                                        setError('');
-                                        setSuccess('');
-                                        setNewPassword('');
-                                    }}
-                                    className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-all"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-                                >
-                                    {loading ? (
-                                        <span className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full"></span>
-                                    ) : (
-                                        <>Restablecer <CheckCircle2 className="w-5 h-5" /></>
-                                    )}
-                                </button>
-                            </div>
-                        </form>
+                            </form>
+                        </motion.div>
                     </div>
-                </div>
-            )}
+                )}
+            </AnimatePresence>
         </div>
     );
 };

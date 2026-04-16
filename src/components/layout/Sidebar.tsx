@@ -4,6 +4,30 @@ import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { calcularMaterialesVentana } from '../../services/manufacturing';
 import { calcularCotizacionSaaS } from '../../services/pricing';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Home, 
+    Users, 
+    FolderOpen, 
+    BarChart3, 
+    Calendar as CalendarIcon, 
+    Calculator, 
+    Settings, 
+    HelpCircle, 
+    FileText, 
+    Plus,
+    Maximize2,
+    CheckCircle2,
+    Info,
+    ChevronRight,
+    MousePointer2,
+    Ruler,
+    Layers,
+    Wrench,
+    AlertTriangle,
+    Check
+} from 'lucide-react';
+import { cn } from '../../lib/utils';
 import Calendar from '../Calendar';
 
 interface SidebarProps {
@@ -11,7 +35,6 @@ interface SidebarProps {
     onViewChange: (view: ViewType) => void;
 }
 
-// Map espesor label → dictionary ID
 const THICKNESS_TO_DICT_ID: Record<string, string> = {
     '6mm': 'vidrio_6mm',
     '8mm': 'vidrio_8mm',
@@ -22,6 +45,7 @@ const THICKNESS_TO_DICT_ID: Record<string, string> = {
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
+    // Technical state for designer
     const [glassCategory, setGlassCategory] = useState('templado');
     const [thickness, setThickness] = useState('6mm');
     const [hardware, setHardware] = useState('standard');
@@ -41,17 +65,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
 
     const isDesignerView = activeView === 'designer' || activeView === 'window' || activeView === 'door';
 
-    const configItems = [
-        { id: 'window', label: 'Nueva Ventana', icon: 'window' },
-        { id: 'door', label: 'Nueva Puerta', icon: 'door_open' },
-    ];
-
-    const toolsItems = [
-        { id: 'calculator', label: 'Calculadora', icon: 'straighten' },
-        { id: 'clients', label: 'Clientes', icon: 'people' },
-        { id: 'projects', label: 'Proyectos', icon: 'folder_open' },
-        { id: 'reports', label: 'Reportes', icon: 'analytics' },
-        { id: 'calendar', label: 'Agenda', icon: 'calendar_month' },
+    const menuItems = [
+        { id: 'home', label: 'Dashboard', icon: Home },
+        { id: 'projects', label: 'Proyectos', icon: FolderOpen },
+        { id: 'clients', label: 'Clientes', icon: Users },
+        { id: 'designer', label: 'Diseñador', icon: Maximize2 },
+        { id: 'reports', label: 'Reportes', icon: BarChart3 },
+        { id: 'calendar', label: 'Agenda', icon: CalendarIcon },
     ];
 
     const handleWidthChange = (value: number) => {
@@ -62,7 +82,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
         if (selectedElement && selectedId) updateElement(selectedId, { height: value });
     };
 
-    // ── LIVE PRICING CALCULATION ─────────────────────────────────────
     const glassId = THICKNESS_TO_DICT_ID[thickness] || 'vidrio_6mm';
 
     const calcResult = useMemo(() => {
@@ -83,304 +102,257 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
 
     const selectedGlassName = pricingConfig.diccionario[glassId as keyof typeof pricingConfig.diccionario]?.nombre || thickness;
 
-    // ── APPLY CHANGES → persist config to the element ────────────────
     const handleApplyChanges = () => {
         if (selectedElement && selectedId) {
             updateElement(selectedId, { glassType: glassId });
         }
         setApplied(true);
-        setTimeout(() => setApplied(false), 1800);
+        setTimeout(() => setApplied(false), 2000);
     };
 
-    const inputClass = "w-full px-3 py-2 bg-white border border-primary/10 rounded-md text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20";
+    const inputClass = "w-full px-3 py-2 bg-white/50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
 
-    // ─────────────────────────────────────────────────────────────────
-    // DESIGNER PANEL
-    // ─────────────────────────────────────────────────────────────────
-    if (isDesignerView) {
-        return (
-            <aside className="hidden md:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-72 bg-surface-container-low border-r border-primary/10 flex-col z-40 overflow-y-auto">
-                {/* Header */}
-                <div className="p-4 border-b border-slate-200">
-                    <h3 className="font-body text-xs font-black uppercase tracking-widest text-slate-700">Configuración Técnica</h3>
-                    <p className="text-[10px] text-slate-800 font-medium">Parámetros de diseño y materiales</p>
-                </div>
-
-                <div className="flex-1 p-4 space-y-6">
-                    {/* Glass Type / Category */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-sm">check_box_outline_blank</span>
-                            Tipo de Vidrio
-                        </label>
-                        <select
-                            value={glassCategory}
-                            onChange={(e) => setGlassCategory(e.target.value)}
-                            className={inputClass}
-                        >
-                            <option value="templado">Templado (Seguridad)</option>
-                            <option value="laminado">Laminado (Protección)</option>
-                            <option value="esmerilado">Esmerilado (Privacidad)</option>
-                            <option value="doble">Doble Acristalamiento</option>
-                            <option value="low-e">Low-E (Eficiencia)</option>
-                        </select>
-                    </div>
-
-                    {/* Thickness → Maps to dictionary key */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-sm">straighten</span>
-                            Espesor
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {['6mm', '8mm', '10mm', '12mm', '15mm', '19mm'].map((t) => (
-                                <button
-                                    key={t}
-                                    onClick={() => setThickness(t)}
-                                    className={`py-2 px-3 rounded-md text-xs font-bold transition-all ${thickness === t
-                                        ? 'bg-primary text-white shadow-md'
-                                        : 'bg-white text-slate-600 hover:bg-slate-50 border border-primary/10'
-                                    }`}
-                                >
-                                    {t}
-                                </button>
-                            ))}
-                        </div>
-                        {/* Show corresponding price */}
-                        {pricingConfig.diccionario[glassId as keyof typeof pricingConfig.diccionario] && (
-                            <p className="text-[10px] text-emerald-700 font-bold text-right">
-                                {selectedGlassName} — {pricingConfig.moneda}{pricingConfig.diccionario[glassId as keyof typeof pricingConfig.diccionario].precio.toLocaleString()}/m²
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Hardware */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-sm">settings</span>
-                            Herrajes y Perfiles
-                        </label>
-                        <select
-                            value={hardware}
-                            onChange={(e) => setHardware(e.target.value)}
-                            className={inputClass}
-                        >
-                            <option value="standard">Estándar Aluminio</option>
-                            <option value="premium">Premium Inoxidable</option>
-                            <option value="minimal">Minimalista Oculto</option>
-                            <option value="industrial">Industrial Reforzado</option>
-                        </select>
-                    </div>
-
-                    {/* Dimensions */}
-                    <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-sm">square_foot</span>
-                            Dimensiones (m)
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <span className="text-[10px] text-slate-400 block mb-1">Ancho (m)</span>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={(widthMm / 1000).toFixed(2)}
-                                    onChange={(e) => handleWidthChange(Math.round(Number(e.target.value) * 1000))}
-                                    className={inputClass}
-                                />
-                            </div>
-                            <div>
-                                <span className="text-[10px] text-slate-400 block mb-1">Alto (m)</span>
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    value={(heightMm / 1000).toFixed(2)}
-                                    onChange={(e) => handleHeightChange(Math.round(Number(e.target.value) * 1000))}
-                                    className={inputClass}
-                                />
-                            </div>
-                        </div>
-                        <p className="text-[10px] text-slate-400">
-                            Área Total: <strong className="text-slate-700">{((widthMm / 1000) * (heightMm / 1000)).toFixed(2)} m²</strong>
-                        </p>
-                    </div>
-
-                    {/* ── REAL-TIME QUOTE PREVIEW ─────────────── */}
-                    {pricingResult && (
-                        <div className="rounded-xl bg-slate-900 p-4 space-y-3">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cotización en Tiempo Real</p>
-                            {pricingResult.desglose.map((item, i) => (
-                                item.subtotal > 0 && (
-                                    <div key={i} className="flex justify-between text-xs">
-                                        <span className="text-slate-400">{item.rubro}</span>
-                                        <span className="font-bold text-white">
-                                            {pricingResult.moneda}{item.subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                                        </span>
-                                    </div>
-                                )
-                            ))}
-                            <div className="border-t border-slate-700 pt-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Precio de Venta</span>
-                                    <span className="text-lg font-black text-emerald-400">
-                                        {pricingResult.moneda}{pricingResult.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {!selectedElement && (
-                        <div className="text-center py-4">
-                            <p className="text-xs text-slate-400 font-medium">Añade una ventana al canvas para ver la cotización en tiempo real.</p>
-                        </div>
-                    )}
-
-                    {/* Structural Constraints */}
-                    <div className="space-y-3">
-                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-sm">warning</span>
-                            Restricciones Estructurales
-                        </label>
-                        <div className="space-y-3">
-                            <div>
-                                <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                                    <span>Peso Máx. (kg)</span>
-                                    <span className="font-bold text-primary">{maxWeight}kg</span>
-                                </div>
-                                <input
-                                    type="range" min="50" max="500" value={maxWeight}
-                                    onChange={(e) => setMaxWeight(Number(e.target.value))}
-                                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                                />
-                            </div>
-                            <div>
-                                <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                                    <span>Tolerancia</span>
-                                    <span className="font-bold text-primary">±{tolerance}mm</span>
-                                </div>
-                                <input
-                                    type="range" min="1" max="10" value={tolerance}
-                                    onChange={(e) => setTolerance(Number(e.target.value))}
-                                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Apply Changes Button */}
-                <div className="p-4 border-t border-primary/5 bg-surface-container-high/30">
-                    <button
-                        onClick={handleApplyChanges}
-                        disabled={!selectedElement}
-                        className={`w-full font-bold py-3 rounded-md text-sm shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
-                            applied
-                                ? 'bg-emerald-500 text-white shadow-emerald-500/20'
-                                : selectedElement
-                                    ? 'bg-primary text-white shadow-primary/20 hover:bg-primary/90'
-                                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                        }`}
-                    >
-                        <span className="material-symbols-outlined text-sm">{applied ? 'check_circle' : 'check'}</span>
-                        {applied ? '¡Cambios Aplicados!' : 'Aplicar Cambios'}
-                    </button>
-                    <p className="text-[10px] text-slate-400 text-center mt-2">
-                        {selectedElement
-                            ? `Ventana ${(widthMm/1000).toFixed(2)}m × ${(heightMm/1000).toFixed(2)}m · ${selectedGlassName}`
-                            : 'Selecciona un elemento en el canvas'}
-                    </p>
-                </div>
-            </aside>
-        );
-    }
-
-    // ─────────────────────────────────────────────────────────────────
-    // NAVIGATION SIDEBAR (non-designer views)
-    // ─────────────────────────────────────────────────────────────────
     return (
-        <aside className="hidden md:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface-container-low border-r border-primary/10 flex-col p-4 space-y-2 z-40">
-            {/* Header */}
-            <div className="mb-6 px-4">
-                <h3 className="font-body text-xs font-black uppercase tracking-widest text-slate-800">Menú Principal</h3>
-                <p className="text-[10px] text-slate-800 font-bold">WinDoor Pro v2.0</p>
-            </div>
+        <aside className="hidden md:flex fixed left-4 top-24 bottom-4 w-64 z-40 transition-all">
+            <div className="glass w-full h-full rounded-2xl flex flex-col border border-white/20 shadow-xl shadow-indigo-500/5 overflow-hidden">
+                <AnimatePresence mode="wait">
+                    {isDesignerView ? (
+                        <motion.div 
+                            key="designer-panel"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="flex-1 flex flex-col overflow-y-auto"
+                        >
+                            {/* Technical Header */}
+                            <div className="p-4 bg-primary/5 border-b border-primary/10">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <div className="p-1.5 bg-primary rounded-lg text-white">
+                                        <Settings size={14} />
+                                    </div>
+                                    <h3 className="text-[11px] font-black uppercase tracking-widest text-primary">Configuración</h3>
+                                </div>
+                                <p className="text-[10px] text-slate-500 font-bold">Ajustes técnicos de precisión</p>
+                            </div>
 
-            <nav className="flex-1 space-y-1">
-                {configItems.map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => onViewChange(item.id as ViewType)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer active:opacity-80 hover:translate-x-1 ${activeView === item.id
-                            ? 'bg-primary text-on-primary shadow-lg shadow-slate-900/40'
-                            : 'text-slate-800 hover:bg-slate-200'
-                        }`}
-                    >
-                        <span className="material-symbols-outlined">{item.icon}</span>
-                        {item.label}
-                    </button>
-                ))}
+                            <div className="p-4 space-y-6 flex-1">
+                                {/* Glass Type */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                        <Layers size={12} className="text-primary" />
+                                        Material de Vidrio
+                                    </label>
+                                    <select
+                                        value={glassCategory}
+                                        onChange={(e) => setGlassCategory(e.target.value)}
+                                        className={inputClass}
+                                    >
+                                        <option value="templado">Templado (Seguridad)</option>
+                                        <option value="laminado">Laminado (Protección)</option>
+                                        <option value="esmerilado">Esmerilado (Privacidad)</option>
+                                        <option value="doble">Doble Acristalamiento</option>
+                                        <option value="low-e">Low-E (Eficiencia)</option>
+                                    </select>
+                                </div>
 
-                <div className="my-4 border-t border-primary/5" />
+                                {/* Thickness Selection */}
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                        <Ruler size={12} className="text-primary" />
+                                        Espesor Recomendado
+                                    </label>
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {['6mm', '8mm', '10mm', '12mm', '15mm', '19mm'].map((t) => (
+                                            <button
+                                                key={t}
+                                                onClick={() => setThickness(t)}
+                                                className={cn(
+                                                    "py-2 rounded-lg text-[10px] font-black transition-all border",
+                                                    thickness === t
+                                                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105 z-10"
+                                                        : "bg-white text-slate-500 border-slate-100 hover:border-primary/30"
+                                                )}
+                                            >
+                                                {t}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {pricingConfig.diccionario[glassId as keyof typeof pricingConfig.diccionario] && (
+                                        <div className="flex justify-between items-center px-1">
+                                            <span className="text-[10px] text-slate-400 font-bold">{selectedGlassName}</span>
+                                            <span className="text-[10px] text-emerald-600 font-black">
+                                                {pricingConfig.moneda}{pricingConfig.diccionario[glassId as keyof typeof pricingConfig.diccionario].precio.toLocaleString()}/m²
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
 
-                {toolsItems.map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => onViewChange(item.id as ViewType)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer active:opacity-80 hover:translate-x-1 ${activeView === item.id
-                            ? 'bg-primary text-on-primary shadow-lg shadow-slate-900/40'
-                            : 'text-slate-800 hover:bg-slate-200'
-                        }`}
-                    >
-                        <span className="material-symbols-outlined">{item.icon}</span>
-                        {item.label}
-                    </button>
-                ))}
+                                {/* Dimensions */}
+                                <div className="space-y-3 pt-2">
+                                    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                        <Maximize2 size={12} className="text-primary" />
+                                        Corte de Precisión (m)
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="space-y-1">
+                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Ancho</span>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={(widthMm / 1000).toFixed(2)}
+                                                onChange={(e) => handleWidthChange(Math.round(Number(e.target.value) * 1000))}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Alto</span>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                value={(heightMm / 1000).toFixed(2)}
+                                                onChange={(e) => handleHeightChange(Math.round(Number(e.target.value) * 1000))}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg">
+                                        <Info size={12} className="text-primary" />
+                                        <p className="text-[9px] text-slate-500 font-bold">
+                                            Área Total: <span className="text-slate-900 font-black tracking-tight">{((widthMm / 1000) * (heightMm / 1000)).toFixed(2)} m²</span>
+                                        </p>
+                                    </div>
+                                </div>
 
-                <div className="mt-6 px-2">
-                    <Calendar
-                        variant="mini"
-                        onExpand={() => onViewChange('calendar')}
-                    />
-                    <p className="text-[10px] text-slate-400 text-center mt-2 font-medium">
-                        Click para expandir calendario
-                    </p>
-                </div>
-            </nav>
+                                {/* Real-time Pricing Card */}
+                                <AnimatePresence>
+                                    {pricingResult && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="rounded-2xl bg-slate-900 p-4 shadow-xl border border-white/10"
+                                        >
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Cotización Live</span>
+                                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                {pricingResult.desglose.map((item, i) => (
+                                                    item.subtotal > 0 && (
+                                                        <div key={i} className="flex justify-between text-[10px]">
+                                                            <span className="text-slate-500 font-medium">{item.rubro}</span>
+                                                            <span className="font-bold text-slate-300">
+                                                                {pricingResult.moneda}{item.subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                ))}
+                                            </div>
+                                            <div className="mt-3 pt-3 border-t border-white/10">
+                                                <div className="flex justify-between items-end">
+                                                    <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none">Total Venta</span>
+                                                    <span className="text-xl font-black text-white leading-none">
+                                                        {pricingResult.moneda}{pricingResult.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
-            {/* Footer */}
-            <div className="pt-4 border-t border-primary/5 space-y-1">
-                <button
-                    onClick={() => alert('Centro de Ayuda: Próximamente disponible')}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-slate-500 hover:bg-white/50 rounded-r-lg font-body text-sm transition-all hover:translate-x-1"
-                >
-                    <span className="material-symbols-outlined">help</span>
-                    Ayuda
-                </button>
-                <button
-                    onClick={() => alert('Manual de Usuario: Próximamente disponible')}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-slate-500 hover:bg-white/50 rounded-r-lg font-body text-sm transition-all hover:translate-x-1"
-                >
-                    <span className="material-symbols-outlined">description</span>
-                    Documentación
-                </button>
+                            {/* Technical Footer Actions */}
+                            <div className="p-4 bg-white/40 border-t border-white/20">
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleApplyChanges}
+                                    disabled={!selectedElement}
+                                    className={cn(
+                                        "w-full btn-premium shadow-xl transition-all",
+                                        applied ? "bg-emerald-500 text-white" : "bg-primary text-white",
+                                        !selectedElement && "opacity-50 grayscale cursor-not-allowed"
+                                    )}
+                                >
+                                    {applied ? <CheckCircle2 size={18} /> : <Check size={18} />}
+                                    <span className="text-sm font-bold">{applied ? 'Configuración Guardada' : 'Aplicar a Selección'}</span>
+                                </motion.button>
+                                <p className="text-[9px] text-slate-400 text-center mt-3 font-bold flex items-center justify-center gap-1">
+                                    <MousePointer2 size={10} />
+                                    {selectedElement ? 'Elemento seleccionado' : 'Selecciona un módulo en el canvas'}
+                                </p>
+                            </div>
+                        </motion.div>
+                    ) : (
+                        <motion.div 
+                            key="nav-panel"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            className="flex-1 flex flex-col p-4"
+                        >
+                            {/* Navigation Sidebar Header */}
+                            <div className="mb-8 px-2">
+                                <h3 className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">WinDoor <span className="text-slate-300">SaaS</span></h3>
+                                <p className="text-[10px] text-slate-500 font-bold">Gestión y Herramientas</p>
+                            </div>
 
-                <div className="mt-4 px-2">
-                    <button
-                        onClick={() => {
-                            const { clearCanvas, setActiveClient } = useDesignerStore.getState();
-                            clearCanvas();
-                            setActiveClient(null);
-                            onViewChange('window');
-                        }}
-                        className="w-full bg-primary text-white font-bold py-3 rounded-md text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all hover:bg-primary/90"
-                    >
-                        Crear Proyecto
-                    </button>
-                </div>
+                            <nav className="flex-1 space-y-1.5 overflow-y-auto">
+                                {menuItems.map((item) => (
+                                    <motion.button
+                                        key={item.id}
+                                        whileHover={{ x: 5 }}
+                                        onClick={() => onViewChange(item.id as ViewType)}
+                                        className={cn(
+                                            "w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all",
+                                            activeView === item.id
+                                                ? "bg-primary text-white shadow-xl shadow-primary/20"
+                                                : "text-slate-600 hover:bg-slate-100"
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <item.icon size={18} strokeWidth={activeView === item.id ? 2.5 : 2} />
+                                            {item.label}
+                                        </div>
+                                        {activeView === item.id && <ChevronRight size={14} />}
+                                    </motion.button>
+                                ))}
+
+                                <div className="my-6 border-t border-slate-100" />
+                                
+                                <div className="px-2">
+                                    <Calendar variant="mini" onExpand={() => onViewChange('calendar')} />
+                                    <p className="text-[9px] text-slate-400 text-center mt-3 font-bold flex items-center justify-center gap-1">
+                                        <Info size={10} /> Shift + C para expandir
+                                    </p>
+                                </div>
+                            </nav>
+
+                            {/* Footer Links */}
+                            <div className="pt-4 border-t border-slate-100 space-y-1">
+                                <button className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors">
+                                    <HelpCircle size={16} /> Soporte Técnico
+                                </button>
+                                <button className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors">
+                                    <FileText size={16} /> Manual de Usuario
+                                </button>
+                                
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => onViewChange('designer')}
+                                    className="w-full mt-4 btn-primary"
+                                >
+                                    <Plus size={18} strokeWidth={3} />
+                                    Nuevo Proyecto
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </aside>
     );
 };
 
 export default Sidebar;
+

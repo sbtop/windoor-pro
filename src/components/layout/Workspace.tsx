@@ -13,6 +13,31 @@ import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData
 import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useUserStore } from '../../store/userStore';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Plus, 
+    Search, 
+    Filter, 
+    ChevronRight, 
+    LayoutGrid, 
+    List, 
+    X, 
+    Edit3, 
+    FileText, 
+    Factory, 
+    Image as ImageIcon, 
+    Trash2,
+    Users,
+    TrendingUp,
+    Clock,
+    AlertCircle,
+    CheckCircle2,
+    BarChart3,
+    FolderOpen,
+    Maximize2,
+    Settings
+} from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface WorkspaceProps {
     activeView: ViewType;
@@ -145,9 +170,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'draft': return 'bg-emerald-500';
+            case 'draft': return 'bg-sky-500';
             case 'quoted': return 'bg-amber-500';
-            case 'in-production': return 'bg-blue-500';
+            case 'in-production': return 'bg-indigo-500';
+            case 'completed': return 'bg-emerald-500';
             default: return 'bg-slate-300';
         }
     };
@@ -156,7 +182,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
         switch (status) {
             case 'draft': return 'Borrador';
             case 'quoted': return 'Cotizado';
-            case 'in-production': return 'En Producción';
+            case 'in-production': return 'Producción';
+            case 'completed': return 'Finalizado';
             default: return 'Pendiente';
         }
     };
@@ -310,462 +337,303 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     };
 
     const renderDashboard = () => (
-        <div className="p-8">
-            {/* Header Section */}
-            <div className="flex justify-between items-end mb-12">
-                <div className="max-w-2xl">
-                    <h1 className="text-4xl font-headline font-bold text-primary tracking-tight mb-2">Panel de Proyectos</h1>
-                    <p className="text-secondary font-body">Gestiona instalaciones de ventanas y puertas, realiza mediciones y genera cotizaciones para contratos de clientes.</p>
-                </div>
-                <div className="flex gap-4">
-                    <button
+        <>
+            <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-4 md:p-8 space-y-8"
+            >
+            {/* Minimalist Professional Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-4">
+                <motion.div 
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    className="max-w-2xl"
+                >
+                    <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-3">
+                        Panel de <span className="text-primary italic">Proyectos</span>
+                    </h1>
+                    <p className="text-sm font-bold text-slate-500 max-w-lg leading-relaxed">
+                        Control central de instalaciones, presupuestos dinámicos y gestión de clientes con precisión técnica de grado arquitectónico.
+                    </p>
+                </motion.div>
+                
+                <div className="flex gap-3 w-full md:w-auto">
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => onViewChange?.('clients')}
-                        className="flex items-center gap-2 bg-white text-slate-800 border-2 border-slate-200 px-6 py-4 rounded-xl font-bold tracking-wide shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+                        className="flex-1 md:flex-none px-6 py-4 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold text-sm shadow-sm hover:border-slate-300 transition-all flex items-center justify-center gap-2"
                     >
-                        <span className="material-symbols-outlined">person_add</span>
-                        Nuevo Cliente
-                    </button>
-                    <button
+                        <Users size={18} />
+                        Clientes
+                    </motion.button>
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => setShowNewProjectModal(true)}
-                        className="flex items-center gap-2 bg-primary text-on-primary px-6 py-4 rounded-xl font-bold tracking-wide shadow-xl shadow-slate-900/40 hover:opacity-90 transition-all active:scale-95"
+                        className="flex-1 md:flex-none px-6 py-4 rounded-2xl bg-primary text-white font-black text-sm shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-2"
                     >
-                        <span className="material-symbols-outlined">add</span>
+                        <Plus size={20} strokeWidth={3} />
                         Nuevo Proyecto
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 
-            {/* Dashboard Stats Grid */}
-            <div className="grid grid-cols-12 gap-6 mb-12">
-                <div className="col-span-12 md:col-span-8 bg-surface-container-low p-8 rounded-xl border-l-4 border-primary">
-                    <h3 className="text-xl font-bold text-primary mb-2">Resumen Ejecutivo</h3>
-                    <p className="text-secondary">Visualiza métricas clave, controla plazos de entrega y optimiza la rentabilidad de tus instalaciones.</p>
-                </div>
-                <div className="col-span-12 md:col-span-4 bg-primary-700 text-white p-8 rounded-xl shadow-2xl shadow-indigo-950/20 relative overflow-hidden">
-                    <div className="relative z-10">
-                        <span className="text-[11px] font-black uppercase tracking-widest text-indigo-200 mb-1 block">Cotizaciones Activas</span>
-                        <h2 className="text-3xl font-headline font-bold">{projects.filter(p => p.status === 'quoted').length}</h2>
-                        <p className="text-xs text-indigo-300 font-bold mt-2">
-                            {projects.filter(p => p.status === 'draft').length} proyectos requieren actualización de medidas.
+            {/* Bento Grid Layout */}
+            <div className="grid grid-cols-12 gap-6">
+                {/* Main Hero Card */}
+                <motion.div 
+                    whileHover={{ y: -5 }}
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="col-span-12 lg:col-span-8 glass-card p-8 bg-gradient-to-br from-indigo-50/50 to-white flex flex-col justify-between min-h-[280px]"
+                >
+                    <div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full">Reporte Matinal</span>
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-800 mb-2">Visión de Operaciones</h3>
+                        <p className="text-sm font-semibold text-slate-500 max-w-md">
+                            Tienes <span className="text-primary font-black underline decoration-2">{projects.filter(p => p.status === 'in-production').length} proyectos</span> en línea de producción hoy. 
+                            El rendimiento se mantiene un <span className="text-emerald-600 font-black">+12%</span> por encima del mes pasado.
                         </p>
                     </div>
-                    <div className="absolute -right-4 -bottom-4 opacity-10">
-                        <span className="material-symbols-outlined text-[120px]" style={{ fontVariationSettings: "'wght' 100" }}>architecture</span>
+                    <div className="flex gap-4 pt-6">
+                        <button className="text-xs font-black text-primary hover:underline flex items-center gap-1 group">
+                            Ver logística <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
                     </div>
-                </div>
+                </motion.div>
+
+                {/* Performance Mini Card */}
+                <motion.div 
+                    whileHover={{ y: -5 }}
+                    initial={{ x: 20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="col-span-12 md:col-span-6 lg:col-span-4 glass-card p-8 bg-slate-900 border-none relative overflow-hidden"
+                >
+                    <div className="relative z-10">
+                        <TrendingUp className="text-emerald-400 mb-6" size={32} />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1 block">Facturación Activa</span>
+                        <h2 className="text-4xl font-black text-white mb-2">
+                            ${projects.reduce((acc, p) => acc + (p.quotation?.totales?.precioVenta || 0), 0).toLocaleString('es-MX', { maximumFractionDigits: 0 })}
+                        </h2>
+                        <p className="text-xs font-bold text-slate-400">Total acumulado en {projects.length} proyectos operativos.</p>
+                    </div>
+                    <div className="absolute -right-8 -bottom-8 opacity-10">
+                        <BarChart3 size={180} />
+                    </div>
+                </motion.div>
+
+                {/* Status Stats Grid */}
+                <motion.div 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="col-span-12 md:col-span-6 lg:col-span-4 glass-card p-6 grid grid-cols-2 gap-4"
+                >
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 group hover:border-primary/20 transition-all">
+                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Cotizados</p>
+                        <p className="text-2xl font-black text-slate-900">{projects.filter(p => p.status === 'quoted').length}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 group hover:border-primary/20 transition-all">
+                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">En Obra</p>
+                        <p className="text-2xl font-black text-slate-900">{projects.filter(p => p.status === 'in-production').length}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 group hover:border-primary/20 transition-all">
+                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Alertas</p>
+                        <p className="text-2xl font-black text-red-600">{projects.filter(p => p.status === 'draft').length}</p>
+                    </div>
+                    <div className="p-4 rounded-xl bg-primary text-white group cursor-pointer active:scale-95 transition-all">
+                        <p className="text-[10px] font-black text-white/60 uppercase mb-1">Total</p>
+                        <p className="text-2xl font-black">{projects.length}</p>
+                    </div>
+                </motion.div>
+
+                {/* Alerts / Activity Bento Box */}
+                <motion.div 
+                    whileHover={{ y: -5 }}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="col-span-12 lg:col-span-8 glass-card p-6 min-h-[200px]"
+                >
+                    <div className="flex items-center justify-between mb-6">
+                        <h4 className="font-black text-slate-800 flex items-center gap-2">
+                            <Clock size={16} className="text-primary" />
+                            Actividad Crítica
+                        </h4>
+                        <button className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-primary">Ver todas</button>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                            <div className="p-2 bg-amber-100 text-amber-600 rounded-lg"><AlertCircle size={16} /></div>
+                            <div className="flex-1">
+                                <p className="text-xs font-black text-slate-900">Proyecto Residencia Lomas <span className="text-[10px] text-slate-400 font-bold ml-2">Hace 2h</span></p>
+                                <p className="text-[11px] font-medium text-slate-500">Diferencia de medida detectada (+6mm). Requiere revisión técnica.</p>
+                            </div>
+                            <button className="text-[10px] font-black text-primary px-3 py-1 bg-primary/5 rounded-lg">Corregir</button>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
 
-            {/* Quick Stats Section */}
-            <div className="grid grid-cols-12 gap-6 mb-12">
-                <div className="col-span-12 md:col-span-4 bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-1">Total Proyectos</h4>
-                    <p className="text-2xl font-black text-slate-900">{projects.length}</p>
-                </div>
-                <div className="col-span-12 md:col-span-4 bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-1">En Producción</h4>
-                    <p className="text-2xl font-black text-blue-800">{projects.filter(p => p.status === 'in-production').length}</p>
-                </div>
-                <div className="col-span-12 md:col-span-4 bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-1">Cotizaciones Activas</h4>
-                    <p className="text-2xl font-black text-amber-800">{projects.filter(p => p.status === 'quoted').length}</p>
-                </div>
-            </div>
-
-            {/* Project List Section */}
-            <div className="bg-surface-container-low rounded-xl overflow-hidden">
-                <div className="p-6 border-b border-outline-variant/10 bg-surface-container-highest/30">
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-headline font-bold text-lg text-primary">Proyectos Activos</h3>
-                        <div className="flex gap-2">
-                            {/* View Mode Toggle */}
+            {/* Main Projects Section */}
+            <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="glass-card overflow-hidden"
+            >
+                <div className="p-6 border-b border-slate-100 bg-white/40">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                            <FolderOpen size={20} className="text-primary" />
+                            Proyectos Activos
+                        </h3>
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <div className="relative flex-1 md:w-64">
+                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    className={cn(
+                                        "w-full pl-10 pr-4 py-2 bg-white/50 border border-slate-200 rounded-xl text-sm transition-all focus:ring-2 focus:ring-primary/10",
+                                        "font-bold text-slate-700 placeholder:text-slate-400 placeholder:font-medium"
+                                    )}
+                                    placeholder="Buscar por cliente o proyecto..."
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
                             <button
                                 onClick={() => setViewMode(viewMode === 'table' ? 'cards' : 'table')}
-                                className="p-2 bg-surface-container-lowest text-slate-500 rounded-md hover:bg-white transition-colors"
-                                title={viewMode === 'table' ? 'Ver como tarjetas' : 'Ver como tabla'}
+                                className="p-2 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary transition-colors"
                             >
-                                <span className="material-symbols-outlined">
-                                    {viewMode === 'table' ? 'grid_view' : 'table_rows'}
-                                </span>
+                                {viewMode === 'table' ? <LayoutGrid size={20} /> : <List size={20} />}
                             </button>
-                        </div>
-                    </div>
-
-                    {/* Search and Filters Bar */}
-                    <div className="flex flex-col md:flex-row gap-3">
-                        {/* Search Input */}
-                        <div className="relative flex-1">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-                            <input
-                                className="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 font-bold text-slate-900 transition-all placeholder:text-slate-400 placeholder:font-medium"
-                                placeholder="Buscar por cliente, dirección o tipo de proyecto..."
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            {searchQuery && (
-                                <button
-                                    onClick={() => setSearchQuery('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                                >
-                                    <span className="material-symbols-outlined text-lg">close</span>
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Filter Button */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className={`flex items-center gap-2 px-4 py-3 border-2 rounded-xl font-bold text-sm transition-all ${
-                                    showFilters || filterStatus !== 'all' || filterType !== 'all'
-                                        ? 'bg-indigo-50 border-indigo-600 text-indigo-700'
-                                        : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300'
-                                }`}
-                            >
-                                <span className="material-symbols-outlined">tune</span>
-                                Filtros
-                                {(filterStatus !== 'all' || filterType !== 'all') && (
-                                    <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
-                                )}
-                            </button>
-
-                            {/* Filter Dropdown */}
-                            {showFilters && (
-                                <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-2xl border border-slate-200 p-4 z-10 animate-in fade-in slide-in-from-top-2 duration-200">
-                                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-3">Filtros</h4>
-
-                                    {/* Status Filter */}
-                                    <div className="mb-4">
-                                        <label className="text-xs font-bold text-slate-700 mb-2 block">Estado</label>
-                                        <select
-                                            value={filterStatus}
-                                            onChange={(e) => setFilterStatus(e.target.value)}
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                        >
-                                            <option value="all">Todos los estados</option>
-                                            <option value="draft">Borrador</option>
-                                            <option value="quoted">Cotizado</option>
-                                            <option value="in-production">En Producción</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Type Filter */}
-                                    <div className="mb-4">
-                                        <label className="text-xs font-bold text-slate-700 mb-2 block">Tipo de Proyecto</label>
-                                        <select
-                                            value={filterType}
-                                            onChange={(e) => setFilterType(e.target.value)}
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                        >
-                                            <option value="all">Todos los tipos</option>
-                                            <option value="ventana">Ventanas</option>
-                                            <option value="puerta">Puertas</option>
-                                            <option value="fachada">Fachadas</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Sort */}
-                                    <div className="mb-4">
-                                        <label className="text-xs font-bold text-slate-700 mb-2 block">Ordenar por</label>
-                                        <select
-                                            value={sortBy}
-                                            onChange={(e) => setSortBy(e.target.value)}
-                                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                                        >
-                                            <option value="date-desc">Fecha (más recientes)</option>
-                                            <option value="date-asc">Fecha (más antiguos)</option>
-                                            <option value="name-asc">Nombre (A-Z)</option>
-                                            <option value="name-desc">Nombre (Z-A)</option>
-                                            <option value="price-desc">Precio (mayor a menor)</option>
-                                            <option value="price-asc">Precio (menor a mayor)</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Clear Filters */}
-                                    <button
-                                        onClick={() => {
-                                            setFilterStatus('all');
-                                            setFilterType('all');
-                                            setSortBy('date-desc');
-                                        }}
-                                        className="w-full py-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
-                                    >
-                                        Limpiar filtros
-                                    </button>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* Table View */}
-                {viewMode === 'table' && (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="text-[11px] font-black uppercase tracking-widest text-slate-700 border-b border-slate-200 bg-slate-100">
-                                    <th className="px-8 py-5">Cliente</th>
-                                    <th className="px-8 py-5">Contacto</th>
-                                    <th className="px-8 py-5">Dirección</th>
-                                    <th className="px-8 py-5">Tipo</th>
-                                    <th className="px-8 py-5">Estado</th>
-                                    <th className="px-8 py-5 text-right">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/40">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-8 py-6 text-center">
-                                            <p className="text-indigo-400 font-bold">Cargando proyectos...</p>
-                                        </td>
+                <AnimatePresence mode="wait">
+                    {viewMode === 'table' ? (
+                        <motion.div 
+                            key="table-view"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="overflow-x-auto"
+                        >
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100">
+                                        <th className="px-8 py-4">Información Clave</th>
+                                        <th className="px-8 py-4">Ubicación</th>
+                                        <th className="px-8 py-4">Tipo</th>
+                                        <th className="px-8 py-4">Estado Logístico</th>
+                                        <th className="px-8 py-4 text-right">Detalles</th>
                                     </tr>
-                                ) : filteredProjects.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-8 py-12 text-center">
-                                            <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_open</span>
-                                            <p className="text-slate-600 font-bold">
-                                                {searchQuery ? 'No se encontraron resultados' : 'No hay proyectos guardados'}
-                                            </p>
-                                            <p className="text-sm text-slate-400 mt-1">
-                                                {searchQuery ? 'Intenta con otra búsqueda' : 'Crea una ventana para comenzar'}
-                                            </p>
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredProjects.map((project) => (
-                                        <tr key={project.id} className="group hover:bg-surface-container-high/50 transition-colors">
-                                            <td className="px-8 py-6">
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {loading ? (
+                                        <tr><td colSpan={5} className="px-8 py-10 text-center text-sm font-bold text-primary animate-pulse">Analizando base de datos...</td></tr>
+                                    ) : filteredProjects.map((project) => (
+                                        <motion.tr 
+                                            key={project.id}
+                                            layout
+                                            className="group hover:bg-slate-50/50 transition-colors"
+                                        >
+                                            <td className="px-8 py-5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded bg-secondary-container flex items-center justify-center text-primary font-bold text-xs">
+                                                    <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-primary font-black text-sm">
                                                         {project.clientName?.charAt(0) || 'C'}
                                                     </div>
-                                                    <span className="font-bold text-primary text-sm">{project.clientName || 'Sin cliente'}</span>
+                                                    <div>
+                                                        <p className="font-black text-slate-900 text-sm leading-tight">{project.clientName || 'Sin identificar'}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400">{project.projectType || 'Módulo'}</p>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 text-sm text-secondary">{project.contactPhone || '(555) 000-0000'}</td>
-                                            <td className="px-8 py-6 text-sm text-secondary">{project.siteAddress || 'Dirección no especificada'}</td>
-                                            <td className="px-8 py-6">
-                                                <span className="text-[10px] font-bold uppercase px-2 py-1 bg-tertiary-fixed text-primary rounded">
-                                                    {project.projectType || 'Ventana'}
+                                            <td className="px-8 py-5 text-sm font-bold text-slate-500 max-w-[200px] truncate">{project.siteAddress || 'No asignado'}</td>
+                                            <td className="px-8 py-5">
+                                                <span className="text-[9px] font-black uppercase px-2 py-1 bg-slate-100 text-slate-600 rounded-lg">
+                                                    {project.projectType || 'General'}
                                                 </span>
                                             </td>
-                                            <td className="px-8 py-6">
+                                            <td className="px-8 py-5">
                                                 <div className="flex items-center gap-2">
-                                                    <div className={`w-2 h-2 rounded-full ${getStatusColor(project.status)}`}></div>
-                                                    <span className="text-xs font-medium text-slate-600">{getStatusLabel(project.status)}</span>
+                                                    <div className={cn("w-2 h-2 rounded-full", getStatusColor(project.status))} />
+                                                    <span className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{getStatusLabel(project.status)}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 text-right whitespace-nowrap">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button
-                                                        onClick={() => handleAction('edit', project.id)}
-                                                        className="p-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-primary rounded-xl transition-all active:scale-90 group"
-                                                        title="Editar medidas"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">edit</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleAction('pdf', project.id)}
-                                                        className="p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-xl transition-all active:scale-90 group"
-                                                        title="Generar PDF"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">picture_as_pdf</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleAction('production', project.id)}
-                                                        className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-all active:scale-90 group"
-                                                        title="Enviar a producción"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">factory</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleAction('gallery', project.id)}
-                                                        className="p-2.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-xl transition-all active:scale-90 group"
-                                                        title="Galería de obra"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">photo_library</span>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleAction('delete', project.id)}
-                                                        className="p-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-all active:scale-90 group"
-                                                        title="Eliminar proyecto"
-                                                    >
-                                                        <span className="material-symbols-outlined text-[20px]">delete</span>
-                                                    </button>
-                                                </div>
+                                            <td className="px-8 py-5 text-right flex justify-end gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => handleAction('edit', project.id)} className="p-2 hover:bg-primary/10 text-slate-400 hover:text-primary rounded-lg transition-colors"><Edit3 size={16} /></button>
+                                                <button onClick={() => handleAction('pdf', project.id)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors"><FileText size={16} /></button>
+                                                <button onClick={() => handleAction('production', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors"><Factory size={16} /></button>
+                                                <button onClick={() => handleAction('delete', project.id)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors"><Trash2 size={16} /></button>
                                             </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {/* Cards View */}
-                {viewMode === 'cards' && (
-                    <div className="p-6">
-                        {loading ? (
-                            <div className="text-center py-12">
-                                <p className="text-indigo-400 font-bold">Cargando proyectos...</p>
-                            </div>
-                        ) : filteredProjects.length === 0 ? (
-                            <div className="text-center py-12">
-                                <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">folder_open</span>
-                                <p className="text-slate-600 font-bold">
-                                    {searchQuery ? 'No se encontraron resultados' : 'No hay proyectos guardados'}
-                                </p>
-                                <p className="text-sm text-slate-400 mt-1">
-                                    {searchQuery ? 'Intenta con otra búsqueda' : 'Crea una ventana para comenzar'}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {filteredProjects.map((project) => (
-                                    <div key={project.id} className="bg-white rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:shadow-lg transition-all group">
-                                        {/* Card Header */}
-                                        <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
-                                                    {project.clientName?.charAt(0) || 'C'}
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-slate-900 text-sm">{project.clientName || 'Sin cliente'}</h4>
-                                                    <p className="text-xs text-slate-500">{project.projectName || 'Sin nombre'}</p>
-                                                </div>
-                                            </div>
-                                            <div className={`w-3 h-3 rounded-full ${getStatusColor(project.status)}`} title={getStatusLabel(project.status)}></div>
-                                        </div>
-
-                                        {/* Card Body */}
-                                        <div className="p-4 space-y-3">
-                                            <div className="flex items-center gap-2 text-xs text-slate-600">
-                                                <span className="material-symbols-outlined text-sm">location_on</span>
-                                                <span className="truncate">{project.siteAddress || 'Dirección no especificada'}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs text-slate-600">
-                                                <span className="material-symbols-outlined text-sm">phone</span>
-                                                <span>{project.contactPhone || '(555) 000-0000'}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-xs text-slate-600">
-                                                <span className="material-symbols-outlined text-sm">category</span>
-                                                <span className="font-medium">{project.projectType || 'Ventana'}</span>
-                                            </div>
-                                            {project.quotation?.totales?.precioVenta && (
-                                                <div className="pt-3 border-t border-slate-100">
-                                                    <p className="text-xs text-slate-500">Precio de venta</p>
-                                                    <p className="text-lg font-black text-indigo-600">
-                                                        ${project.quotation.totales.precioVenta.toLocaleString()}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Card Footer */}
-                                        <div className="p-4 border-t border-slate-100 flex gap-2">
-                                            <button
-                                                onClick={() => handleAction('edit', project.id)}
-                                                className="flex-1 py-2 bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">edit</span>
-                                                Editar
-                                            </button>
-                                            <button
-                                                onClick={() => handleAction('pdf', project.id)}
-                                                className="flex-1 py-2 bg-slate-100 text-slate-700 hover:bg-indigo-100 hover:text-indigo-700 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
-                                                PDF
-                                            </button>
-                                            <button
-                                                onClick={() => handleAction('delete', project.id)}
-                                                className="py-2 px-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">delete</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Pagination */}
-                <div className="p-6 flex justify-between items-center bg-surface-container-highest/10 text-xs text-slate-500 font-medium">
-                    <span>Mostrando {filteredProjects.length} de {projects.length} proyectos</span>
-                    <div className="flex gap-2">
-                        <button className="px-3 py-1 bg-white rounded border border-outline-variant/20 hover:bg-slate-50 transition-colors">Anterior</button>
-                        <button className="px-3 py-1 bg-primary text-white rounded shadow-md hover:bg-primary/90 transition-colors">Siguiente</button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Contextual Cards */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_24px_48px_-12px_rgba(30,58,138,0.05)] border-l-4 border-secondary-container">
-                    <h4 className="font-headline font-bold text-primary mb-4">Alertas de Medición</h4>
-                    <div className="space-y-4">
-                        <div className="flex gap-4 items-start">
-                            <span className="material-symbols-outlined text-amber-500">warning</span>
-                            <div>
-                                <p className="text-sm font-bold text-on-surface">Proyecto #123: Diferencia de medidas</p>
-                                <p className="text-xs text-secondary mt-1">El ancho inferior excede el superior por 6mm. Revisión estructural recomendada.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_24px_48px_-12px_rgba(30,58,138,0.05)] border-l-4 border-primary-fixed">
-                    <h4 className="font-headline font-bold text-primary mb-4">Documentos Recientes</h4>
-                    {recentDocs.length === 0 ? (
-                        <p className="text-sm text-slate-500 text-center py-4">No hay documentos generados aún</p>
+                                        </motion.tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </motion.div>
                     ) : (
-                        <ul className="space-y-3">
-                            {recentDocs.map(doc => (
-                                <li 
-                                    key={doc.id} 
-                                    className="flex justify-between items-center group hover:bg-slate-50 p-2 rounded-lg transition-colors"
+                        <motion.div 
+                            key="card-view"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                        >
+                            {filteredProjects.map((project) => (
+                                <motion.div 
+                                    layout
+                                    key={project.id}
+                                    whileHover={{ scale: 1.02 }}
+                                    className="p-6 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all flex flex-col justify-between"
                                 >
-                                    <div 
-                                        className="flex items-center gap-2 cursor-pointer flex-1"
-                                        onClick={() => {
-                                            const project = projects.find(p => p.id === doc.projectId);
-                                            if (project) {
-                                                setSelectedProject(project);
-                                            } else {
-                                                alert('El proyecto asociado ya no existe.');
-                                            }
-                                        }}
-                                    >
-                                        <span className="material-symbols-outlined text-sm text-slate-400">print</span>
-                                        <span className="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">
-                                            {doc.name}
-                                        </span>
+                                    <div className="mb-6">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-primary font-black text-lg">
+                                                {project.clientName?.charAt(0) || 'C'}
+                                            </div>
+                                            <div className={cn("px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-sm", getStatusColor(project.status))}>
+                                                {getStatusLabel(project.status)}
+                                            </div>
+                                        </div>
+                                        <h4 className="font-black text-slate-900 mb-1 leading-tight">{project.clientName}</h4>
+                                        <p className="text-[11px] font-bold text-slate-400 truncate mb-4">{project.siteAddress}</p>
+                                        
+                                        {project.quotation?.totales?.precioVenta && (
+                                            <div className="p-3 bg-slate-50 rounded-xl mt-4">
+                                                <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Presupuesto</p>
+                                                <p className="text-xl font-black text-primary">${project.quotation.totales.precioVenta.toLocaleString()}</p>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] uppercase font-bold text-slate-400">
-                                            {new Date(doc.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
-                                        </span>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (confirm('¿Eliminar este documento?')) {
-                                                    const { deleteDocument } = usePDFStore.getState();
-                                                    deleteDocument(doc.id);
-                                                }
-                                            }}
-                                            className="p-1 text-slate-400 hover:text-red-500 transition-colors"
-                                            title="Eliminar documento"
-                                        >
-                                            <span className="material-symbols-outlined text-sm">delete</span>
-                                        </button>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => handleAction('edit', project.id)} className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-primary/10 hover:text-primary transition-all">Editar</button>
+                                        <button onClick={() => handleAction('pdf', project.id)} className="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-indigo-50 hover:text-indigo-600 transition-all"><FileText size={16} /></button>
+                                        <button onClick={() => handleAction('delete', project.id)} className="px-3 py-2 bg-red-50 text-red-600 rounded-xl font-black text-xs transition-all"><Trash2 size={16} /></button>
                                     </div>
-                                </li>
+                                </motion.div>
                             ))}
-                        </ul>
+                        </motion.div>
                     )}
+                </AnimatePresence>
+
+                <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registros: {filteredProjects.length}</span>
+                    <div className="flex gap-2">
+                        <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black text-slate-400 hover:text-slate-800 transition-colors">Anterior</button>
+                        <button className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-black text-slate-400 hover:text-slate-800 transition-colors">Siguiente</button>
+                    </div>
                 </div>
-            </div>
+            </motion.div>
+        </motion.div>
 
             {/* New Project Modal */}
             {showNewProjectModal && (
@@ -1140,13 +1008,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                             saveProject(updatedProject);
                                         }}
                                     />
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             )}
-        </div>
+        </>
     );
 
     const renderContent = () => {

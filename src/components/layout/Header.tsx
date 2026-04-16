@@ -1,6 +1,22 @@
 import React, { useState } from 'react';
 import { ViewType } from '../../types';
 import { useUserStore } from '../../store/userStore';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Bell, 
+    Settings, 
+    User, 
+    LogOut, 
+    LayoutDashboard, 
+    FolderKanban, 
+    Users, 
+    PenTool, 
+    FileText,
+    HelpCircle,
+    ChevronDown,
+    Lock
+} from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface HeaderProps {
     activeView: ViewType;
@@ -14,14 +30,13 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
     const { currentUser, logout } = useUserStore();
 
     const navItems = [
-        { id: 'home' as ViewType, label: 'Dashboard' },
-        { id: 'projects' as ViewType, label: 'Proyectos' },
-        { id: 'clients' as ViewType, label: 'Clientes' },
-        { id: 'designer' as ViewType, label: 'Diseñador' },
-        { id: 'quote' as ViewType, label: 'Cotización' },
+        { id: 'home' as ViewType, label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'projects' as ViewType, label: 'Proyectos', icon: FolderKanban },
+        { id: 'clients' as ViewType, label: 'Clientes', icon: Users },
+        { id: 'designer' as ViewType, label: 'Diseñador', icon: PenTool },
+        { id: 'quote' as ViewType, label: 'Cotización', icon: FileText },
     ];
 
-    // Mock notifications data
     const notifications = [
         { id: 1, title: 'Cambio de medidas', message: 'Proyecto #123 requiere revisión', time: '5 min', type: 'warning' },
         { id: 2, title: 'Aprobación cliente', message: 'Cotización aprobada #456', time: '1 hora', type: 'success' },
@@ -29,234 +44,185 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
     ];
 
     return (
-        <header className="fixed top-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-b border-primary/10 z-50 shadow-[0_24px_48px_-12px_rgba(30,58,138,0.08)]">
-            <div className="flex justify-between items-center h-full px-4 md:px-8">
-                {/* Logo - Click to return to dashboard */}
-                <button 
-                    onClick={() => onViewChange?.('home')}
-                    className="text-xl font-bold tracking-tighter text-primary font-headline hover:opacity-80 transition-opacity"
-                >
-                    WinDoor Pro
-                </button>
-
-                {/* Main Navigation */}
-                <nav className="hidden md:flex items-center gap-8 h-full">
-                    {navItems.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => onViewChange?.(item.id)}
-                            className={`font-headline tracking-tight font-bold uppercase text-xs h-full flex items-center border-b-2 transition-colors ${
-                                activeView === item.id
-                                    ? 'text-primary border-primary'
-                                    : 'text-slate-700 border-transparent hover:text-primary'
-                            }`}
-                        >
-                            {item.label}
-                        </button>
-                    ))}
-                </nav>
+        <header className="fixed top-4 left-4 right-4 md:left-72 md:right-8 h-16 z-50">
+            <div className="glass h-full rounded-2xl px-4 md:px-6 flex justify-between items-center border border-white/20 shadow-lg shadow-indigo-500/5">
+                {/* Logo Section */}
+                <div className="flex items-center gap-4">
+                    <button 
+                        onClick={() => onViewChange?.('home')}
+                        className="flex items-center gap-2 group transition-transform active:scale-95"
+                    >
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                            <PenTool size={18} strokeWidth={2.5} />
+                        </div>
+                        <span className="text-lg font-black tracking-tight text-slate-900 group-hover:text-primary transition-colors">
+                            WinDoor <span className="text-primary/60">Pro</span>
+                        </span>
+                    </button>
+                    
+                    <div className="h-4 w-[1px] bg-slate-200 mx-2 hidden md:block" />
+                    
+                    <div className="hidden lg:flex items-center gap-1">
+                        {navItems.map((item) => (
+                            <button
+                                key={item.id}
+                                onClick={() => onViewChange?.(item.id)}
+                                className={cn(
+                                    "px-3 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2",
+                                    activeView === item.id 
+                                        ? "bg-primary/10 text-primary" 
+                                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                                )}
+                            >
+                                <item.icon size={16} strokeWidth={activeView === item.id ? 2.5 : 2} />
+                                {item.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Right Actions */}
-                <div className="flex items-center gap-4">
-                    {/* Reportes con candado */}
-                    <button
-                        onClick={() => onViewChange?.('reports')}
-                        className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                            activeView === 'reports'
-                                ? 'bg-primary text-white shadow-lg shadow-primary/25'
-                                : 'bg-slate-200 text-slate-800 hover:bg-slate-300'
-                        }`}
+                <div className="flex items-center gap-2 md:gap-3">
+                    {/* Status Badge */}
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100"
                     >
-                        <span className="material-symbols-outlined text-sm">lock</span>
-                        Reportes
-                    </button>
+                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider">Activo</span>
+                    </motion.div>
 
-                    {/* Project Status Badge */}
-                    <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full">
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span className="text-xs font-bold uppercase tracking-wide">Activo</span>
-                    </div>
-                    
                     {/* Notifications */}
                     <div className="relative">
-                        <button 
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => {
                                 setShowNotifications(!showNotifications);
                                 setShowSettings(false);
+                                setShowUserMenu(false);
                             }}
-                            className="relative p-2 text-slate-700 hover:bg-slate-200 transition-colors rounded-full active:scale-95 duration-200"
+                            className={cn(
+                                "p-2 rounded-xl transition-all relative",
+                                showNotifications ? "bg-primary text-white shadow-lg shadow-primary/30" : "text-slate-500 hover:bg-slate-100"
+                            )}
                         >
-                            <span className="material-symbols-outlined">notifications</span>
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                            <Bell size={20} />
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+                        </motion.button>
                         
-                        {/* Notifications Dropdown */}
-                        {showNotifications && (
-                            <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
-                                <div className="p-4 border-b border-slate-100 flex justify-between items-center">
-                                    <h4 className="font-headline font-bold text-slate-800">Notificaciones</h4>
-                                    <button 
-                                        onClick={() => {
-                                            onViewChange?.('notifications');
-                                            setShowNotifications(false);
-                                        }}
-                                        className="text-xs text-primary font-medium hover:underline"
-                                    >
-                                        Ver todas
-                                    </button>
-                                </div>
-                                <div className="max-h-64 overflow-y-auto">
-                                    {notifications.map((notif) => (
-                                        <div key={notif.id} className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
-                                            <div className="flex items-start gap-3">
-                                                <span className={`material-symbols-outlined ${
-                                                    notif.type === 'warning' ? 'text-amber-500' :
-                                                    notif.type === 'success' ? 'text-emerald-500' : 'text-red-500'
-                                                }`}>
-                                                    {notif.type === 'warning' ? 'warning' :
-                                                     notif.type === 'success' ? 'check_circle' : 'error'}
-                                                </span>
-                                                <div className="flex-1">
-                                                    <p className="text-sm font-bold text-slate-800">{notif.title}</p>
-                                                    <p className="text-xs text-slate-500">{notif.message}</p>
-                                                    <p className="text-[10px] text-slate-400 mt-1">{notif.time}</p>
+                        <AnimatePresence>
+                            {showNotifications && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    className="absolute right-0 top-full mt-3 w-80 glass border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-20"
+                                >
+                                    <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white/20">
+                                        <h4 className="font-bold text-slate-800">Notificaciones</h4>
+                                        <button className="text-xs text-primary font-bold hover:underline">Ver todas</button>
+                                    </div>
+                                    <div className="max-h-80 overflow-y-auto">
+                                        {notifications.map((notif) => (
+                                            <div key={notif.id} className="p-4 border-b border-slate-50 hover:bg-white/40 transition-colors cursor-pointer group">
+                                                <div className="flex items-start gap-3">
+                                                    <div className={cn(
+                                                        "p-2 rounded-lg bg-opacity-10",
+                                                        notif.type === 'warning' ? 'bg-amber-500 text-amber-500' :
+                                                        notif.type === 'success' ? 'bg-emerald-500 text-emerald-500' : 'bg-red-500 text-red-500'
+                                                    )}>
+                                                        <Bell size={16} />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-bold text-slate-800">{notif.title}</p>
+                                                        <p className="text-xs text-slate-500 leading-relaxed">{notif.message}</p>
+                                                        <p className="text-[10px] text-slate-400 mt-1 font-semibold">{notif.time}</p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
-                    {/* Settings */}
-                    <div className="relative">
-                        <button 
+                    <div className="h-6 w-[1px] bg-slate-200 mx-1 hidden md:block" />
+
+                    {/* Settings & User Menu */}
+                    <div className="flex items-center gap-1 md:gap-2">
+                        <motion.button 
+                            whileHover={{ scale: 1.05, rotate: 15 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => {
                                 setShowSettings(!showSettings);
                                 setShowNotifications(false);
-                                setShowUserMenu(false);
                             }}
-                            className="p-2 text-slate-700 hover:bg-slate-200 transition-colors rounded-full active:scale-95 duration-200"
+                            className={cn(
+                                "p-2 rounded-xl transition-all",
+                                showSettings ? "bg-primary text-white" : "text-slate-500 hover:bg-slate-100"
+                            )}
                         >
-                            <span className="material-symbols-outlined">settings</span>
-                        </button>
+                            <Settings size={20} />
+                        </motion.button>
 
-                        {/* Settings Dropdown */}
-                        {showSettings && (
-                            <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
-                                <div className="p-3 border-b border-slate-100">
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Conectado como</p>
-                                    <p className="text-sm font-bold text-slate-800 truncate">{currentUser?.name}</p>
-                                    <p className="text-[10px] font-medium text-slate-500 truncate">{currentUser?.email}</p>
-                                </div>
-                                <button 
-                                    onClick={() => {
-                                        onViewChange?.('settings');
-                                        setShowSettings(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                                >
-                                    <span className="material-symbols-outlined text-slate-400">tune</span>
-                                    Configuración
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        onViewChange?.('settings');
-                                        setShowSettings(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                                >
-                                    <span className="material-symbols-outlined text-slate-400">tune</span>
-                                    Preferencias
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        alert('Sistema de ayuda:\n\n1. Dashboard: Gestiona proyectos y cotizaciones\n2. Diseñador: Crea ventanas y puertas personalizadas\n3. Clientes: Registra y gestiona tus clientes\n4. Calendario: Programa instalaciones y visitas\n\nPara más información contacta soporte.');
-                                        setShowSettings(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                                >
-                                    <span className="material-symbols-outlined text-slate-400">help</span>
-                                    Ayuda
-                                </button>
-                                <div className="border-t border-slate-100 p-3">
-                                    <button 
-                                        onClick={() => {
-                                            if (confirm('¿Estás seguro de cerrar sesión?')) {
-                                                logout();
-                                            }
-                                        }}
-                                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3"
-                                    >
-                                        <span className="material-symbols-outlined">logout</span>
-                                        Cerrar sesión
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* User Avatar with Profile Menu */}
-                    <div className="relative">
-                        <button 
+                        <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => {
                                 setShowUserMenu(!showUserMenu);
                                 setShowNotifications(false);
-                                setShowSettings(false);
                             }}
-                            className="w-10 h-10 rounded-full overflow-hidden border-2 border-indigo-100 bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center hover:ring-4 hover:ring-indigo-500/20 shadow-sm transition-all text-white font-bold text-sm tracking-widest"
+                            className="w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-tr from-primary to-accent p-[2px] shadow-md active:scale-95 transition-all"
                         >
-                            {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : <span className="material-symbols-outlined text-sm">person</span>}
-                        </button>
+                            <div className="w-full h-full rounded-[10px] bg-white flex items-center justify-center overflow-hidden">
+                                {currentUser?.name ? (
+                                    <span className="text-primary font-black text-xs">{currentUser.name.substring(0, 2).toUpperCase()}</span>
+                                ) : (
+                                    <User size={18} className="text-primary" />
+                                )}
+                            </div>
+                        </motion.button>
+                    </div>
 
-                        {/* User Profile Dropdown */}
+                    {/* User Dropdown */}
+                    <AnimatePresence>
                         {showUserMenu && (
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
-                                <div className="p-4 bg-gradient-to-br from-indigo-500 to-blue-600">
-                                    <div className="w-14 h-14 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-white font-bold text-lg mb-3">
-                                        {currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : <span className="material-symbols-outlined">person</span>}
-                                    </div>
-                                    <p className="text-white font-bold truncate">{currentUser?.name || 'Usuario'}</p>
-                                    <p className="text-white/80 text-xs truncate">{currentUser?.email || 'sin@email.com'}</p>
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                className="absolute right-0 top-full mt-3 w-64 glass border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-20"
+                            >
+                                <div className="p-4 bg-primary/5 text-slate-800 mb-2">
+                                    <p className="font-black text-sm">{currentUser?.name || 'Usuario'}</p>
+                                    <p className="text-[10px] text-slate-500 font-bold tracking-tight truncate">{currentUser?.email || 'sin@email.com'}</p>
                                 </div>
-                                <button 
-                                    onClick={() => {
-                                        onViewChange?.('settings');
-                                        setShowUserMenu(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                                >
-                                    <span className="material-symbols-outlined text-slate-400">account_circle</span>
-                                    Mi Perfil
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        alert('Función para cambiar contraseña próximamente');
-                                        setShowUserMenu(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3"
-                                >
-                                    <span className="material-symbols-outlined text-slate-400">lock_reset</span>
-                                    Cambiar Contraseña
-                                </button>
-                                <div className="border-t border-slate-100 p-3">
+                                <div className="p-2 space-y-1">
+                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors">
+                                        <User size={16} /> Mi Perfil
+                                    </button>
+                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors">
+                                        <Lock size={16} /> Cambiar Contraseña
+                                    </button>
+                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors">
+                                        <HelpCircle size={16} /> Ayuda
+                                    </button>
+                                    <div className="h-[1px] bg-slate-100 my-1" />
                                     <button 
                                         onClick={() => {
-                                            if (confirm('¿Estás seguro de cerrar sesión?')) {
-                                                logout();
-                                                setShowUserMenu(false);
-                                            }
+                                            if (confirm('¿Cerrar sesión?')) logout();
                                         }}
-                                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3"
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50 rounded-xl transition-colors"
                                     >
-                                        <span className="material-symbols-outlined">logout</span>
-                                        Cerrar sesión
+                                        <LogOut size={16} /> Cerrar Sesión
                                     </button>
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
-                    </div>
+                    </AnimatePresence>
                 </div>
             </div>
         </header>

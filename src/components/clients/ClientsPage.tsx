@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    UserPlus, 
     Search, 
     Phone, 
     Mail, 
@@ -10,8 +9,11 @@ import {
     Trash2, 
     MoreVertical,
     CheckCircle2,
-    X
+    X,
+    Users,
+    UserPlus
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getUserClients, saveClient, deleteClient } from '../../lib/localStorage/db';
 import { ClientData, ViewType } from '../../types';
 import { useUserStore } from '../../store/userStore';
@@ -122,100 +124,131 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
     );
 
     return (
-        <div className="p-6 md:p-12 max-w-7xl mx-auto min-h-full">
-            {/* 📋 Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div className="p-8 md:p-12 max-w-7xl mx-auto min-h-screen">
+            {/* 📋 Modern Header */}
+            <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12"
+            >
                 <div>
-                    <h3 className="text-2xl md:text-3xl font-display font-bold text-slate-900 tracking-tight">Directorio de Clientes</h3>
-                    <p className="text-slate-500 font-medium mt-1">Gestiona tu cartera y crea nuevos proyectos técnicos.</p>
+                    <h3 className="text-4xl font-black text-slate-900 tracking-tighter">Directorio Maestro</h3>
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-2 flex items-center gap-2">
+                        <Users size={14} className="text-primary" /> Cartera de Clientes Activos
+                    </p>
                 </div>
-                <button 
+                <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => setShowAddForm(true)}
-                    className="flex items-center justify-center gap-2 px-6 py-3.5 bg-primary text-on-primary rounded-2xl font-bold shadow-lg shadow-slate-900/40 transition-all active:scale-[0.98] hover:opacity-90"
+                    className="flex items-center justify-center gap-3 px-8 py-4 bg-primary text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all"
                 >
-                    <UserPlus className="w-5 h-5" />
-                    Nuevo Cliente
-                </button>
-            </div>
+                    <UserPlus size={18} />
+                    Nuevo Registro
+                </motion.button>
+            </motion.div>
 
-            {/* 🔍 Search and Filters */}
-            <div className="relative mb-8 group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+            {/* 🔍 Premium Search Bar */}
+            <div className="relative mb-12 group">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-primary transition-all" />
                 <input 
                     type="text" 
-                    placeholder="Buscar por nombre, empresa o correo..." 
-                    className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-[24px] text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all shadow-soft-sm"
+                    placeholder="Filtrar por nombre, empresa o contacto..." 
+                    className="w-full pl-16 pr-8 py-5 glass-card bg-white/40 border-white/60 rounded-[32px] text-sm font-black text-slate-700 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-xl"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            {/* 📇 Clients Grid/List */}
+            {/* 📇 Bento Grid Layout */}
             {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-64 bg-slate-100 rounded-[32px] animate-pulse"></div>
+                        <div key={i} className="h-64 bg-slate-100/50 rounded-[40px] animate-pulse"></div>
                     ))}
                 </div>
             ) : filteredClients.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[40px] text-center">
-                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-soft-lg mb-6">
-                        <Search className="w-10 h-10 text-slate-200" />
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center justify-center py-24 glass-card border-dashed border-slate-200/50 rounded-[48px] text-center"
+                >
+                    <div className="w-24 h-24 bg-white/50 rounded-[32px] flex items-center justify-center shadow-xl mb-8">
+                        <Search size={32} className="text-slate-300" />
                     </div>
-                    <p className="text-lg font-bold text-slate-900">No se encontraron clientes</p>
-                    <p className="text-slate-400 max-w-xs mt-2">Prueba con otro término o crea un nuevo cliente para empezar.</p>
-                </div>
+                    <p className="text-xl font-black text-slate-900 tracking-tight">Sin resultados</p>
+                    <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Inicia tu base de datos hoy</p>
+                </motion.div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredClients.map(client => (
-                        <div key={client.id} className="group bg-white border border-slate-100 rounded-[32px] shadow-soft-xl hover:shadow-soft-2xl transition-all duration-500 flex flex-col overflow-hidden relative">
-                            <div className="p-6 pb-4">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-500 text-xl font-bold border border-indigo-100/50">
-                                        {client.name.charAt(0)}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <AnimatePresence>
+                        {filteredClients.map((client, idx) => (
+                            <motion.div 
+                                key={client.id}
+                                layout
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="group glass-card hover:bg-white/60 shadow-xl hover:shadow-2xl transition-all duration-500 rounded-[40px] flex flex-col p-2"
+                            >
+                                <div className="p-6 pb-2 flex justify-between items-start">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-primary/20 rounded-[20px] flex items-center justify-center text-primary text-2xl font-black">
+                                            {client.name.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xl font-black text-slate-900 tracking-tighter truncate max-w-[150px]">{client.name}</h4>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{client.company || 'PARTICULAR'}</span>
+                                        </div>
                                     </div>
-                                    <button 
+                                    <motion.button 
+                                        whileHover={{ scale: 1.1, rotate: 10 }}
                                         onClick={() => handleDelete(client.id!)}
-                                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                        className="p-3 text-slate-300 hover:text-red-500 transition-colors"
                                     >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
+                                        <Trash2 size={20} />
+                                    </motion.button>
                                 </div>
-                                <h4 className="text-xl font-display font-bold text-slate-900 mb-1 group-hover:text-primary-600 transition-colors">{client.name}</h4>
-                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{client.company || 'Particular'}</p>
-                            </div>
-                            
-                            <div className="px-6 py-4 space-y-3 bg-slate-50/50 flex-1">
-                                {client.phone && (
-                                    <div className="flex items-center gap-3 text-slate-600">
-                                        <Phone className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm font-medium">{client.phone}</span>
-                                    </div>
-                                )}
-                                {client.email && (
-                                    <div className="flex items-center gap-3 text-slate-600">
-                                        <Mail className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm font-medium">{client.email}</span>
-                                    </div>
-                                )}
-                                {client.address && (
-                                    <div className="flex items-center gap-3 text-slate-600">
-                                        <MapPin className="w-4 h-4 text-slate-400" />
-                                        <span className="text-sm font-medium truncate">{client.address}</span>
-                                    </div>
-                                )}
-                            </div>
+                                
+                                <div className="m-4 p-6 space-y-4 bg-white/40 rounded-[32px] border border-white/60 flex-1">
+                                    {client.phone && (
+                                        <div className="flex items-center gap-3 text-slate-600">
+                                            <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+                                                <Phone size={14} className="text-primary" />
+                                            </div>
+                                            <span className="text-xs font-bold">{client.phone}</span>
+                                        </div>
+                                    )}
+                                    {client.email && (
+                                        <div className="flex items-center gap-3 text-slate-600">
+                                            <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+                                                <Mail size={14} className="text-primary" />
+                                            </div>
+                                            <span className="text-xs font-bold truncate max-w-[180px]">{client.email}</span>
+                                        </div>
+                                    )}
+                                    {client.address && (
+                                        <div className="flex items-center gap-3 text-slate-600">
+                                            <div className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm">
+                                                <MapPin size={14} className="text-primary" />
+                                            </div>
+                                            <span className="text-xs font-bold truncate">{client.address}</span>
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div className="p-4 bg-white border-t border-slate-50">
-                                <button 
-                                    onClick={() => handleStartProject(client)}
-                                    className="w-full py-3.5 bg-slate-900 hover:bg-primary-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:shadow-primary-700/10"
-                                >
-                                    Nuevo Proyecto <ChevronRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                                <div className="p-4 pt-0">
+                                    <motion.button 
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => handleStartProject(client)}
+                                        className="w-full py-4 bg-slate-900 hover:bg-primary text-white rounded-[24px] font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        Crear Proyecto <ChevronRight size={14} strokeWidth={3} />
+                                    </motion.button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
             )}
 
