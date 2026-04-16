@@ -157,8 +157,10 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                             whileHover={{ scale: 1.05, rotate: 15 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => {
-                                setShowSettings(!showSettings);
+                                onViewChange?.('settings');
+                                setShowSettings(false);
                                 setShowNotifications(false);
+                                setShowUserMenu(false);
                             }}
                             className={cn(
                                 "p-2 rounded-xl transition-all",
@@ -201,13 +203,31 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                     <p className="text-[10px] text-slate-500 font-bold tracking-tight truncate">{currentUser?.email || 'sin@email.com'}</p>
                                 </div>
                                 <div className="p-2 space-y-1">
-                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors">
+                                    <button 
+                                        onClick={() => {
+                                            onViewChange?.('settings');
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                    >
                                         <User size={16} /> Mi Perfil
                                     </button>
-                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors">
+                                    <button 
+                                        onClick={() => {
+                                            alert('Función de cambio de contraseña próximamente disponible');
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                    >
                                         <Lock size={16} /> Cambiar Contraseña
                                     </button>
-                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors">
+                                    <button 
+                                        onClick={() => {
+                                            alert('Centro de ayuda: Próximamente disponible');
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                    >
                                         <HelpCircle size={16} /> Ayuda
                                     </button>
                                     <div className="h-[1px] bg-slate-100 my-1" />

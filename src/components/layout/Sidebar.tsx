@@ -329,10 +329,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
 
                             {/* Footer Links */}
                             <div className="pt-4 border-t border-slate-100 space-y-1">
-                                <button className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors">
+                                <button 
+                                    onClick={() => alert('Soporte Técnico: Próximamente disponible')}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors"
+                                >
                                     <HelpCircle size={16} /> Soporte Técnico
                                 </button>
-                                <button className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors">
+                                <button 
+                                    onClick={() => alert('Manual de Usuario: Próximamente disponible')}
+                                    className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors"
+                                >
                                     <FileText size={16} /> Manual de Usuario
                                 </button>
                                 
