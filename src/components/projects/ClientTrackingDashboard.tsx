@@ -51,12 +51,15 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                 const imageDataUrl = createTechnicalDrawing(element);
                 return { element, calcResult, imageDataUrl, pricingResult };
             });
+            const isDetailed = window.confirm("¿Deseas incluir el desglose técnico de materiales, mano de obra y utilidades en el PDF?\n\n- [OK] para versión Detallada (Taller)\n- [Cancelar] para versión Básica (Ejecutiva/Cliente)");
+            
             generateMultiElementPDF(
                 elementsData,
                 project.quotation || { totales: { precioVenta: 0 } },
                 pricingConfig.diccionario,
                 companyProfile,
-                { clientName: project.clientName, projectName: project.projectName, siteAddress: project.siteAddress }
+                { clientName: project.clientName, projectName: project.projectName, siteAddress: project.siteAddress },
+                isDetailed
             );
         } catch (e) {
             alert('Error al generar el PDF.');

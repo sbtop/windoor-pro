@@ -1070,6 +1070,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                                 }
                                                             };
                                                             
+                                                            const isDetailed = window.confirm("¿Deseas incluir el desglose técnico de materiales, mano de obra y utilidades en el PDF?\n\n- [OK] para versión Detallada (Taller)\n- [Cancelar] para versión Básica (Ejecutiva/Cliente)");
+
                                                             generateMultiElementPDF(
                                                                 allElements,
                                                                 combinedPricingResult,
@@ -1079,7 +1081,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                                     clientName: selectedProject.clientName,
                                                                     projectName: selectedProject.projectName,
                                                                     siteAddress: selectedProject.siteAddress
-                                                                }
+                                                                },
+                                                                isDetailed
                                                             );
                                                             
                                                             // Guardar en Documentos Recientes

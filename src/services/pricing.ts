@@ -186,6 +186,32 @@ export const calcularCotizacionSaaS = (
     };
 };
 
+/**
+ * Combina matemáticamente un array de PricingResult en un solo total general maestreado,
+ * sumando detalladamente todos los subtotales para la consistencia del Dashboard y PDF.
+ */
+export const sumarCotizacionesSaaS = (
+    resultados: PricingResult[],
+    monedaFallback: string = '$'
+): PricingResult => {
+    return resultados.reduce((acc, curr) => {
+        return {
+            moneda: curr.moneda || acc.moneda,
+            desglose: [], // El desglose consolidado a nivel proyecto no se requiere iterar completo si no se usa
+            totales: {
+                costoDirecto: acc.totales.costoDirecto + (curr.totales?.costoDirecto || 0),
+                precioVenta: acc.totales.precioVenta + (curr.totales?.precioVenta || 0),
+                margenPorcentaje: curr.totales?.margenPorcentaje || acc.totales.margenPorcentaje,
+                gananciaBruta: acc.totales.gananciaBruta + (curr.totales?.gananciaBruta || 0)
+            }
+        };
+    }, {
+        moneda: monedaFallback,
+        desglose: [],
+        totales: { costoDirecto: 0, precioVenta: 0, margenPorcentaje: 0, gananciaBruta: 0 }
+    });
+};
+
 // Configuración Base Inicial (Rehidratable por el usuario)
 export const DEFAULT_PRICING_CONFIG: PricingConfig = {
     moneda: '$', // Por defecto a genérico internacional

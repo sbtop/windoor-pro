@@ -310,27 +310,37 @@ interface ProjectElement {
  * Genera un PDF con múltiples elementos del proyecto
  * Muestra un resumen de todos los elementos y el precio total
  */
+import { sumarCotizacionesSaaS } from './pricing';
+
 export const generateMultiElementPDF = (
     elements: ProjectElement[],
     totalPricing: PricingResult,
     diccionario: MaterialDictionary | null = null,
     branding?: BrandingInfo,
-    projectInfo?: { clientName?: string; projectName?: string; siteAddress?: string }
+    projectInfo?: { clientName?: string; projectName?: string; siteAddress?: string },
+    isDetailed: boolean = false
 ) => {
     if (elements.length === 0) return;
     
+    // Forzar consistencia matemática estricta
+    const safeTotalPricing = sumarCotizacionesSaaS(
+        elements.map(e => e.pricingResult), 
+        totalPricing?.moneda || '$'
+    );
+
     // Initialize A4 Portrait document
     const doc = new jsPDF('p', 'mm', 'a4');
     
     // ── Header Section ──────────────────────────────────────────────────────────
     const safeCompanyName = branding?.companyName || 'WinDoor SaaS';
+    const tipoReporte = isDetailed ? 'Cotización Técnica Detallada' : 'Cotización Ejecutiva';
     
     if (branding?.logoBase64) {
         try {
             doc.addImage(branding.logoBase64, 'PNG', 14, 10, 40, 20, undefined, 'FAST');
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
-            doc.text(`Cotización Profesional - ${safeCompanyName}`, 14, 36);
+            doc.text(`${tipoReporte} - ${safeCompanyName}`, 14, 36);
             doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 42);
             doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 48);
         } catch (e) {
@@ -339,7 +349,7 @@ export const generateMultiElementPDF = (
             doc.text(safeCompanyName, 14, 20);
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
-            doc.text('Cotización de Proyecto', 14, 28);
+            doc.text(tipoReporte, 14, 28);
             doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 34);
             doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 40);
         }
@@ -349,7 +359,7 @@ export const generateMultiElementPDF = (
         doc.text(safeCompanyName, 14, 20);
         doc.setFontSize(10);
         doc.setTextColor(100, 116, 139);
-        doc.text('Cotización de Proyecto', 14, 28);
+        doc.text(tipoReporte, 14, 28);
         doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 34);
         doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 40);
     }
@@ -474,7 +484,61 @@ export const generateMultiElementPDF = (
     
     doc.setFontSize(28);
     doc.setTextColor(99, 102, 241);
-    doc.text(`${totalPricing.moneda}${totalPricing.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, totalY + 18, { align: 'right' });
+    doc.text(`${safeTotalPricing.moneda}${safeTotalPricing.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, totalY + 18, { align: 'right' });
+    
+    // ── Detailed Bill of Materials (Only if isDetailed) ────────────────────────
+    if (isDetailed) {
+        doc.addPage();
+        
+        doc.setFontSize(18);
+        doc.setTextColor(30, 41, 59);
+        doc.text('Aviso Técnico: Detalles Operativos (Uso Interno)', 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Cantidades y valores operacionales consolidados de todos los elementos.', 14, 28);
+        
+        const combinedBreakdownMap = new Map<string, any>();
+        elements.forEach(item => {
+            if (item.pricingResult?.desglose) {
+                item.pricingResult.desglose.forEach(layer => {
+                    layer.items.forEach(component => {
+                        const key = `${layer.rubro}_${component.nombre}`;
+                        if (!combinedBreakdownMap.has(key)) {
+                            combinedBreakdownMap.set(key, { rubro: layer.rubro, nombre: component.nombre, cantidad: component.cantidad, unidad: component.unidad, costo: component.costoTotal });
+                        } else {
+                            const existing = combinedBreakdownMap.get(key);
+                            existing.cantidad += component.cantidad;
+                            existing.costo += component.costoTotal;
+                        }
+                    });
+                });
+            }
+        });
+
+        const breakdownRows = Array.from(combinedBreakdownMap.values()).map(b => [
+            b.rubro,
+            b.nombre,
+            `${b.cantidad.toFixed(2)} ${b.unidad}`,
+            `${safeTotalPricing.moneda}${(b.costo).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+        ]);
+
+        autoTable(doc, {
+            startY: 35,
+            head: [['Categoría', 'Concepto', 'Total Unidades', 'Importe Operativo']],
+            body: breakdownRows,
+            theme: 'grid',
+            headStyles: { fillColor: [47, 62, 70], fontSize: 9 },
+            styles: { fontSize: 8, textColor: [71, 85, 105] },
+            columnStyles: { 3: { halign: 'right' } }
+        });
+        
+        let desgloseY = (doc as any).lastAutoTable.finalY + 15;
+        doc.setFontSize(10);
+        doc.setTextColor(30, 41, 59);
+        doc.text(`Costo Directo Total: ${safeTotalPricing.moneda}${safeTotalPricing.totales.costoDirecto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, desgloseY, { align: 'right' });
+        doc.text(`Utilidad Operacional (${safeTotalPricing.totales.margenPorcentaje}%): ${safeTotalPricing.moneda}${safeTotalPricing.totales.gananciaBruta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, desgloseY + 6, { align: 'right' });
+    }
     
     // Professional footer
     doc.setFontSize(7);
