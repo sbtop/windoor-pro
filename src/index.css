@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "./styles/tablet-optimizations.css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
 
 :root {
     --sidebar-width: 280px;
@@ -39,11 +38,7 @@
 }
 
 body {
-    background-color: #fbfcfe;
-    background-image: 
-        radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
-        radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
-        radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+    background-color: #f8fafc;
     color: #0f172a;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -52,38 +47,38 @@ body {
 
 h1, h2, h3, .font-headline {
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism Utilities - Refined for Light Mode */
 @utility glass {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 @utility glass-dark {
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 .glass-card {
-    @apply glass rounded-2xl transition-all duration-300;
+    @apply glass rounded-3xl transition-all duration-300;
 }
 
 .glass-card:hover {
-    @apply border-white/50 shadow-xl shadow-indigo-500/5 -translate-y-1;
+    @apply border-white/90 shadow-2xl shadow-indigo-500/10 -translate-y-1;
 }
 
-/* Custom Scrollbar for a premium look */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -91,33 +86,37 @@ h1, h2, h3, .font-headline {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(203, 213, 225, 0.4);
+    background: rgba(99, 102, 241, 0.1);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.8);
+    background: rgba(99, 102, 241, 0.3);
 }
 
 /* Premium Button Styles */
 @utility btn-premium {
-    @apply relative overflow-hidden px-6 py-3 rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2;
+    @apply relative overflow-hidden px-8 py-4 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest text-[11px];
 }
 
 .btn-primary {
-    @apply btn-premium bg-primary text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:opacity-90;
+    @apply btn-premium bg-indigo-600 text-white shadow-xl shadow-indigo-500/20 hover:bg-indigo-700 hover:-translate-y-1;
 }
 
 .btn-secondary {
-    @apply btn-premium bg-white border border-slate-200 text-slate-800 hover:bg-slate-50 hover:border-slate-300;
+    @apply btn-premium bg-white border border-slate-200 text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50;
 }
 
-/* Utility classes */
-.blur-load {
-    filter: blur(20px);
-    animation: unblur 0.5s ease-out forwards;
+/* Auth Specifics (Maintained for Landing) */
+.auth-input {
+    @apply w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600;
 }
 
-@keyframes unblur {
-    to { filter: blur(0); }
+/* Workspace Specifics (New Light Mode) */
+.workspace-input {
+    @apply w-full bg-white border border-slate-200 rounded-2xl px-5 py-3 text-slate-900 text-sm font-bold focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400;
+}
+
+.auth-label {
+    @apply text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4;
 }

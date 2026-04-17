@@ -578,9 +578,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="glass-card overflow-hidden"
+                className="glass-card overflow-hidden bg-white shadow-xl shadow-slate-200/50"
             >
-                <div className="p-6 border-b border-slate-100 bg-white/40">
+                <div className="p-6 border-b border-slate-100 bg-slate-50/30">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
                             <FolderOpen size={20} className="text-primary" />
@@ -591,7 +591,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <input
                                     className={cn(
-                                        "w-full pl-10 pr-4 py-2 bg-white/50 border border-slate-200 rounded-xl text-sm transition-all focus:ring-2 focus:ring-primary/10",
+                                        "w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm transition-all focus:ring-2 focus:ring-primary/10",
                                         "font-bold text-slate-700 placeholder:text-slate-400 placeholder:font-medium"
                                     )}
                                     placeholder="Buscar por cliente o proyecto..."

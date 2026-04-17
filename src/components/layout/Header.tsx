@@ -119,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    className="absolute right-0 top-full mt-3 w-80 glass border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-20"
+                                    className="absolute right-0 top-full mt-3 w-80 glass border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-20"
                                 >
                                     <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white/20">
                                         <h4 className="font-bold text-slate-800">Notificaciones</h4>
@@ -127,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                     </div>
                                     <div className="max-h-80 overflow-y-auto">
                                         {notifications.map((notif) => (
-                                            <div key={notif.id} className="p-4 border-b border-slate-50 hover:bg-white/40 transition-colors cursor-pointer group">
+                                            <div key={notif.id} className="p-4 border-b border-slate-50 hover:bg-slate-50/50 transition-colors cursor-pointer group">
                                                 <div className="flex items-start gap-3">
                                                     <div className={cn(
                                                         "p-2 rounded-lg bg-opacity-10",
@@ -197,7 +197,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                className="absolute right-0 top-full mt-3 w-64 glass border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-20"
+                                className="absolute right-0 top-full mt-3 w-64 glass border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-20"
                             >
                                 <div className="p-4 bg-primary/5 text-slate-800 mb-2">
                                     <p className="font-black text-sm">{currentUser?.name || 'Usuario'}</p>
@@ -209,7 +209,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                             onViewChange?.('settings');
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                                     >
                                         <User size={16} /> Mi Perfil
                                     </button>
@@ -218,7 +218,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                             onViewChange?.('reports');
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                                     >
                                         <TrendingUp size={16} /> Reportes Financieros
                                     </button>
@@ -227,7 +227,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                             alert('Función de cambio de contraseña próximamente disponible');
                                             setShowUserMenu(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
                                     >
                                         <Lock size={16} /> Cambiar Contraseña
                                     </button>

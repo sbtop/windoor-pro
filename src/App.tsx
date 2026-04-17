@@ -18,7 +18,7 @@ const AppContent: React.FC = () => {
     }
 
     return (
-        <div className="flex h-screen bg-background overflow-hidden font-body">
+        <div className="flex h-screen bg-slate-50 overflow-hidden font-body">
             {/* 🖥️ Desktop Sidebar */}
             <Sidebar activeView={activeView} onViewChange={setActiveView} />
 

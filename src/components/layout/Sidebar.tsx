@@ -116,11 +116,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
         setTimeout(() => setApplied(false), 2000);
     };
 
-    const inputClass = "w-full px-3 py-2 bg-white/50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all";
+    const inputClass = "w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all shadow-sm";
 
     return (
         <aside className="hidden md:flex fixed left-4 top-24 bottom-4 w-64 z-40 transition-all">
-            <div className="glass w-full h-full rounded-2xl flex flex-col border border-white/20 shadow-xl shadow-indigo-500/5 overflow-hidden">
+            <div className="glass w-full h-full rounded-2xl flex flex-col border border-slate-200 shadow-xl shadow-indigo-500/5 overflow-hidden">
                 <AnimatePresence mode="wait">
                     {isDesignerView ? (
                         <motion.div 
@@ -235,7 +235,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
                                         <motion.div 
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="rounded-2xl bg-slate-900 p-4 shadow-xl border border-white/10"
+                                            className="rounded-2xl bg-slate-950 p-4 shadow-xl border border-white/10"
                                         >
                                             <div className="flex items-center justify-between mb-3">
                                                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Cotización Live</span>
