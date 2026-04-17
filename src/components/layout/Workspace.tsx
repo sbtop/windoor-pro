@@ -9,6 +9,7 @@ import Calculator from '../Calculator';
 import SettingsPage from '../SettingsPage';
 import VersionHistoryModal from '../projects/VersionHistoryModal';
 import ApprovalModal from '../projects/ApprovalModal';
+import ClientTrackingDashboard from '../projects/ClientTrackingDashboard';
 import { usePDFStore } from '../../store/pdfStore';
 import { generateTechnicalPDF } from '../../services/pdfGenerator';
 import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData, createProjectVersion } from '../../lib/localStorage/db';
@@ -38,7 +39,8 @@ import {
     Settings,
     PenTool,
     History,
-    CheckCircle
+    CheckCircle,
+    TrendingUp
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -78,6 +80,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     // Approval system
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [approvalProject, setApprovalProject] = useState<ProjectData | null>(null);
+    
+    // Client tracking dashboard
+    const [showTrackingDashboard, setShowTrackingDashboard] = useState(false);
+    const [trackingProject, setTrackingProject] = useState<ProjectData | null>(null);
 
     const { pricingConfig } = useSettingsStore();
     const { currentUser } = useUserStore();
@@ -348,6 +354,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                     setShowApprovalModal(true);
                 }
                 break;
+            case 'tracking':
+                if (project) {
+                    setTrackingProject(project);
+                    setShowTrackingDashboard(true);
+                }
+                break;
             case 'delete':
                 if (confirm('¿Estás seguro de eliminar este proyecto? Esta acción no se puede deshacer.')) {
                     setProjects(prev => prev.filter(p => p.id !== projectId));
@@ -598,6 +610,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                         ? 'hover:bg-red-100 text-red-600'
                                                         : 'hover:bg-blue-100 text-blue-600'
                                                 }`} title="Aprobación digital"><CheckCircle size={16} /></button>
+                                                <button onClick={() => handleAction('tracking', project.id)} className="p-2 hover:bg-teal-50 text-slate-400 hover:text-teal-600 rounded-lg transition-colors" title="Dashboard de seguimiento"><TrendingUp size={16} /></button>
                                                 <button onClick={() => handleAction('history', project.id)} className="p-2 hover:bg-amber-50 text-slate-400 hover:text-amber-600 rounded-lg transition-colors" title="Historial de versiones"><History size={16} /></button>
                                                 <button onClick={() => handleAction('production', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors" title="Producción"><Factory size={16} /></button>
                                                 <button onClick={() => handleAction('delete', project.id)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors" title="Eliminar"><Trash2 size={16} /></button>
@@ -652,6 +665,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                 ? 'bg-red-100 text-red-700 hover:bg-red-200'
                                                 : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                                         }`} title="Aprobación digital"><CheckCircle size={16} /></button>
+                                        <button onClick={() => handleAction('tracking', project.id)} className="px-3 py-2 bg-teal-100 text-teal-700 rounded-xl font-black text-xs hover:bg-teal-200 transition-all" title="Dashboard de seguimiento"><TrendingUp size={16} /></button>
                                         <button onClick={() => handleAction('history', project.id)} className="px-3 py-2 bg-amber-100 text-amber-700 rounded-xl font-black text-xs hover:bg-amber-200 transition-all" title="Historial de versiones"><History size={16} /></button>
                                         <button onClick={() => handleAction('delete', project.id)} className="px-3 py-2 bg-red-50 text-red-600 rounded-xl font-black text-xs transition-all"><Trash2 size={16} /></button>
                                     </div>
@@ -1136,6 +1150,18 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         // Reload projects after approval change
                         getUserProjects(userId).then(data => setProjects(data));
                     }}
+                />
+            )}
+            
+            {/* Client Tracking Dashboard */}
+            {trackingProject && (
+                <ClientTrackingDashboard
+                    isOpen={showTrackingDashboard}
+                    onClose={() => {
+                        setShowTrackingDashboard(false);
+                        setTrackingProject(null);
+                    }}
+                    project={trackingProject}
                 />
             )}
         </div>
