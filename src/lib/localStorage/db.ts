@@ -11,6 +11,15 @@
 import { ClientData } from '../../types';
 
 // ── Re-export ProjectData so callers don't need to change imports ─────────────
+export interface ProjectVersion {
+    version: number;
+    timestamp: string;
+    changes: string;
+    elements: any[];
+    quotation?: any;
+    author?: string;
+}
+
 export interface ProjectData {
     id?: string;
     userId: string;
@@ -25,6 +34,8 @@ export interface ProjectData {
     quotation?: any;
     createdAt?: string;
     updatedAt?: string;
+    versionHistory?: ProjectVersion[];
+    currentVersion?: number;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -75,8 +86,9 @@ export async function getUserProjects(userId: string): Promise<ProjectData[]> {
  * Creates or updates a project.
  * If project has no id, a new one is generated.
  * Returns the project id.
+ * Automatically creates a version when elements or quotation change.
  */
-export async function saveProject(project: ProjectData): Promise<string> {
+export async function saveProject(project: ProjectData, changes?: string): Promise<string> {
     const all = readProjects();
     const id = project.id || generateId();
     const now = new Date().toISOString();
@@ -85,6 +97,40 @@ export async function saveProject(project: ProjectData): Promise<string> {
     const updated: ProjectData = { ...project, id, updatedAt: now };
 
     if (idx >= 0) {
+        const existingProject = all[idx];
+        
+        // Check if elements or quotation changed significantly
+        const elementsChanged = JSON.stringify(existingProject.elements) !== JSON.stringify(project.elements);
+        const quotationChanged = JSON.stringify(existingProject.quotation) !== JSON.stringify(project.quotation);
+        
+        if (elementsChanged || quotationChanged) {
+            // Create a version snapshot before updating
+            const currentVersion = existingProject.currentVersion || 0;
+            const newVersion = currentVersion + 1;
+            
+            const version: ProjectVersion = {
+                version: newVersion,
+                timestamp: now,
+                changes: changes || (elementsChanged ? 'Elementos modificados' : 'Cotización actualizada'),
+                elements: JSON.parse(JSON.stringify(existingProject.elements)),
+                quotation: existingProject.quotation ? JSON.parse(JSON.stringify(existingProject.quotation)) : undefined,
+                author: 'Usuario'
+            };
+            
+            const versionHistory = existingProject.versionHistory || [];
+            versionHistory.push(version);
+            
+            // Keep only last 20 versions
+            const trimmedHistory = versionHistory.slice(-20);
+            
+            updated.versionHistory = trimmedHistory;
+            updated.currentVersion = newVersion;
+        } else {
+            // Preserve existing version history if no significant changes
+            updated.versionHistory = existingProject.versionHistory;
+            updated.currentVersion = existingProject.currentVersion;
+        }
+        
         all[idx] = updated;
     } else {
         all.push({ ...updated, createdAt: now });
@@ -112,6 +158,81 @@ export async function updateProject(id: string, changes: Partial<ProjectData>): 
         all[idx] = { ...all[idx], ...changes, updatedAt: new Date().toISOString() };
         writeProjects(all);
     }
+}
+
+/**
+ * Creates a new version snapshot of a project.
+ * Call this before making significant changes to elements or quotation.
+ */
+export async function createProjectVersion(
+    projectId: string,
+    changes: string,
+    author?: string
+): Promise<void> {
+    const all = readProjects();
+    const idx = all.findIndex((p) => p.id === projectId);
+    if (idx >= 0) {
+        const project = all[idx];
+        const currentVersion = project.currentVersion || 0;
+        const newVersion = currentVersion + 1;
+        
+        const version: ProjectVersion = {
+            version: newVersion,
+            timestamp: new Date().toISOString(),
+            changes,
+            elements: JSON.parse(JSON.stringify(project.elements)),
+            quotation: project.quotation ? JSON.parse(JSON.stringify(project.quotation)) : undefined,
+            author
+        };
+        
+        const versionHistory = project.versionHistory || [];
+        versionHistory.push(version);
+        
+        // Keep only last 20 versions to avoid storage bloat
+        const trimmedHistory = versionHistory.slice(-20);
+        
+        all[idx] = {
+            ...project,
+            versionHistory: trimmedHistory,
+            currentVersion: newVersion,
+            updatedAt: new Date().toISOString()
+        };
+        
+        writeProjects(all);
+    }
+}
+
+/**
+ * Restores a project to a specific version.
+ */
+export async function restoreProjectVersion(projectId: string, version: number): Promise<void> {
+    const all = readProjects();
+    const idx = all.findIndex((p) => p.id === projectId);
+    if (idx >= 0) {
+        const project = all[idx];
+        const versionToRestore = project.versionHistory?.find(v => v.version === version);
+        
+        if (versionToRestore) {
+            all[idx] = {
+                ...project,
+                elements: JSON.parse(JSON.stringify(versionToRestore.elements)),
+                quotation: versionToRestore.quotation ? JSON.parse(JSON.stringify(versionToRestore.quotation)) : undefined,
+                currentVersion: version,
+                updatedAt: new Date().toISOString()
+            };
+            
+            writeProjects(all);
+        }
+    }
+}
+
+/**
+ * Gets the version history for a project.
+ */
+export async function getProjectVersionHistory(projectId: string): Promise<ProjectVersion[]> {
+    const all = readProjects();
+    const project = all.find((p) => p.id === projectId);
+    return project?.versionHistory || [];
 }
 
 // ── Clients API ───────────────────────────────────────────────────────────────

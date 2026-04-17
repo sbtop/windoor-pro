@@ -7,9 +7,10 @@ import Reportes from '../Reportes';
 import Calendar from '../Calendar';
 import Calculator from '../Calculator';
 import SettingsPage from '../SettingsPage';
+import VersionHistoryModal from '../projects/VersionHistoryModal';
 import { usePDFStore } from '../../store/pdfStore';
 import { generateTechnicalPDF } from '../../services/pdfGenerator';
-import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData } from '../../lib/localStorage/db';
+import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData, createProjectVersion } from '../../lib/localStorage/db';
 import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useUserStore } from '../../store/userStore';
@@ -34,7 +35,8 @@ import {
     FolderOpen,
     Maximize2,
     Settings,
-    PenTool
+    PenTool,
+    History
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -66,6 +68,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     const [filterType, setFilterType] = useState<string>('all');
     const [sortBy, setSortBy] = useState<string>('date-desc');
     const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+    
+    // Version history
+    const [showVersionHistory, setShowVersionHistory] = useState(false);
+    const [versionHistoryProject, setVersionHistoryProject] = useState<ProjectData | null>(null);
 
     const { pricingConfig } = useSettingsStore();
     const { currentUser } = useUserStore();
@@ -324,6 +330,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
             case 'gallery':
                 if (project) setSelectedProject(project);
                 break;
+            case 'history':
+                if (project) {
+                    setVersionHistoryProject(project);
+                    setShowVersionHistory(true);
+                }
+                break;
             case 'delete':
                 if (confirm('¿Estás seguro de eliminar este proyecto? Esta acción no se puede deshacer.')) {
                     setProjects(prev => prev.filter(p => p.id !== projectId));
@@ -567,6 +579,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                 <button onClick={() => handleAction('edit', project.id)} className="p-2 hover:bg-primary/10 text-slate-400 hover:text-primary rounded-lg transition-colors" title="Editar datos"><Edit3 size={16} /></button>
                                                 <button onClick={() => handleAction('design', project.id)} className="p-2 hover:bg-purple-50 text-slate-400 hover:text-purple-600 rounded-lg transition-colors" title="Abrir diseñador"><PenTool size={16} /></button>
                                                 <button onClick={() => handleAction('pdf', project.id)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors" title="Generar PDF"><FileText size={16} /></button>
+                                                <button onClick={() => handleAction('history', project.id)} className="p-2 hover:bg-amber-50 text-slate-400 hover:text-amber-600 rounded-lg transition-colors" title="Historial de versiones"><History size={16} /></button>
                                                 <button onClick={() => handleAction('production', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors" title="Producción"><Factory size={16} /></button>
                                                 <button onClick={() => handleAction('delete', project.id)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors" title="Eliminar"><Trash2 size={16} /></button>
                                             </td>
@@ -613,6 +626,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                         <button onClick={() => handleAction('edit', project.id)} className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-primary/10 hover:text-primary transition-all">Editar</button>
                                         <button onClick={() => handleAction('design', project.id)} className="px-3 py-2 bg-purple-100 text-purple-700 rounded-xl font-black text-xs hover:bg-purple-200 transition-all"><PenTool size={16} /></button>
                                         <button onClick={() => handleAction('pdf', project.id)} className="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-indigo-50 hover:text-indigo-600 transition-all"><FileText size={16} /></button>
+                                        <button onClick={() => handleAction('history', project.id)} className="px-3 py-2 bg-amber-100 text-amber-700 rounded-xl font-black text-xs hover:bg-amber-200 transition-all" title="Historial de versiones"><History size={16} /></button>
                                         <button onClick={() => handleAction('delete', project.id)} className="px-3 py-2 bg-red-50 text-red-600 rounded-xl font-black text-xs transition-all"><Trash2 size={16} /></button>
                                     </div>
                                 </motion.div>
@@ -1060,6 +1074,23 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     return (
         <div className="h-full w-full bg-surface overflow-y-auto custom-scrollbar">
             {renderContent()}
+            
+            {/* Version History Modal */}
+            {versionHistoryProject && (
+                <VersionHistoryModal
+                    isOpen={showVersionHistory}
+                    onClose={() => {
+                        setShowVersionHistory(false);
+                        setVersionHistoryProject(null);
+                    }}
+                    projectId={versionHistoryProject.id || ''}
+                    projectName={versionHistoryProject.projectName || versionHistoryProject.clientName || 'Proyecto'}
+                    onRestore={() => {
+                        // Reload projects after restore
+                        getUserProjects(userId).then(data => setProjects(data));
+                    }}
+                />
+            )}
         </div>
     );
 };
