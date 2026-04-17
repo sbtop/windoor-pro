@@ -20,6 +20,20 @@ export interface ProjectVersion {
     author?: string;
 }
 
+export interface ApprovalRecord {
+    id: string;
+    timestamp: string;
+    quotationData: any;
+    status: 'pending' | 'approved' | 'rejected';
+    clientName: string;
+    clientEmail?: string;
+    clientSignature?: string; // Base64 signature
+    approvedAt?: string;
+    rejectedAt?: string;
+    rejectionReason?: string;
+    sentBy?: string;
+}
+
 export interface ProjectData {
     id?: string;
     userId: string;
@@ -36,6 +50,8 @@ export interface ProjectData {
     updatedAt?: string;
     versionHistory?: ProjectVersion[];
     currentVersion?: number;
+    approvalHistory?: ApprovalRecord[];
+    currentApproval?: ApprovalRecord;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -233,6 +249,123 @@ export async function getProjectVersionHistory(projectId: string): Promise<Proje
     const all = readProjects();
     const project = all.find((p) => p.id === projectId);
     return project?.versionHistory || [];
+}
+
+/**
+ * Sends a quotation for client approval.
+ */
+export async function sendForApproval(
+    projectId: string,
+    clientEmail?: string,
+    sentBy?: string
+): Promise<string> {
+    const all = readProjects();
+    const idx = all.findIndex((p) => p.id === projectId);
+    if (idx >= 0) {
+        const project = all[idx];
+        
+        const approval: ApprovalRecord = {
+            id: generateId(),
+            timestamp: new Date().toISOString(),
+            quotationData: project.quotation ? JSON.parse(JSON.stringify(project.quotation)) : null,
+            status: 'pending',
+            clientName: project.clientName,
+            clientEmail,
+            sentBy
+        };
+        
+        const approvalHistory = project.approvalHistory || [];
+        approvalHistory.push(approval);
+        
+        all[idx] = {
+            ...project,
+            approvalHistory,
+            currentApproval: approval,
+            status: 'quoted',
+            updatedAt: new Date().toISOString()
+        };
+        
+        writeProjects(all);
+        return approval.id;
+    }
+    throw new Error('Project not found');
+}
+
+/**
+ * Approves a quotation with client signature.
+ */
+export async function approveQuotation(
+    projectId: string,
+    approvalId: string,
+    signature: string,
+    clientEmail?: string
+): Promise<void> {
+    const all = readProjects();
+    const idx = all.findIndex((p) => p.id === projectId);
+    if (idx >= 0) {
+        const project = all[idx];
+        const approvalIndex = project.approvalHistory?.findIndex(a => a.id === approvalId);
+        
+        if (approvalIndex !== undefined && approvalIndex >= 0) {
+            const approval = project.approvalHistory![approvalIndex];
+            approval.status = 'approved';
+            approval.clientSignature = signature;
+            approval.clientEmail = clientEmail || approval.clientEmail;
+            approval.approvedAt = new Date().toISOString();
+            
+            all[idx] = {
+                ...project,
+                approvalHistory: project.approvalHistory,
+                currentApproval: approval,
+                status: 'in-production',
+                updatedAt: new Date().toISOString()
+            };
+            
+            writeProjects(all);
+        }
+    }
+}
+
+/**
+ * Rejects a quotation with reason.
+ */
+export async function rejectQuotation(
+    projectId: string,
+    approvalId: string,
+    reason: string
+): Promise<void> {
+    const all = readProjects();
+    const idx = all.findIndex((p) => p.id === projectId);
+    if (idx >= 0) {
+        const project = all[idx];
+        const approvalIndex = project.approvalHistory?.findIndex(a => a.id === approvalId);
+        
+        if (approvalIndex !== undefined && approvalIndex >= 0) {
+            const approval = project.approvalHistory![approvalIndex];
+            approval.status = 'rejected';
+            approval.rejectionReason = reason;
+            approval.rejectedAt = new Date().toISOString();
+            
+            all[idx] = {
+                ...project,
+                approvalHistory: project.approvalHistory,
+                currentApproval: approval,
+                status: 'quoted',
+                updatedAt: new Date().toISOString()
+            };
+            
+            writeProjects(all);
+        }
+    }
+}
+
+/**
+ * Gets approval history for a project.
+ */
+export async function getApprovalHistory(projectId: string): Promise<ApprovalRecord[]> {
+    const all = readProjects();
+    const project = all.find((p) => p.id === projectId);
+    return project?.approvalHistory || [];
 }
 
 // ── Clients API ───────────────────────────────────────────────────────────────
