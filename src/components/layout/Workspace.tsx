@@ -10,6 +10,7 @@ import SettingsPage from '../SettingsPage';
 import VersionHistoryModal from '../projects/VersionHistoryModal';
 import ApprovalModal from '../projects/ApprovalModal';
 import ClientTrackingDashboard from '../projects/ClientTrackingDashboard';
+import WhatsAppShareModal from '../projects/WhatsAppShareModal';
 import { usePDFStore } from '../../store/pdfStore';
 import { generateTechnicalPDF } from '../../services/pdfGenerator';
 import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData, createProjectVersion } from '../../lib/localStorage/db';
@@ -40,7 +41,8 @@ import {
     PenTool,
     History,
     CheckCircle,
-    TrendingUp
+    TrendingUp,
+    MessageCircle
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -84,6 +86,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     // Client tracking dashboard
     const [showTrackingDashboard, setShowTrackingDashboard] = useState(false);
     const [trackingProject, setTrackingProject] = useState<ProjectData | null>(null);
+    
+    // WhatsApp integration
+    const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+    const [whatsappProject, setWhatsappProject] = useState<ProjectData | null>(null);
 
     const { pricingConfig } = useSettingsStore();
     const { currentUser } = useUserStore();
@@ -360,6 +366,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                     setShowTrackingDashboard(true);
                 }
                 break;
+            case 'whatsapp':
+                if (project) {
+                    setWhatsappProject(project);
+                    setShowWhatsAppModal(true);
+                }
+                break;
             case 'delete':
                 if (confirm('¿Estás seguro de eliminar este proyecto? Esta acción no se puede deshacer.')) {
                     setProjects(prev => prev.filter(p => p.id !== projectId));
@@ -603,6 +615,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                 <button onClick={() => handleAction('edit', project.id)} className="p-2 hover:bg-primary/10 text-slate-400 hover:text-primary rounded-lg transition-colors" title="Editar datos"><Edit3 size={16} /></button>
                                                 <button onClick={() => handleAction('design', project.id)} className="p-2 hover:bg-purple-50 text-slate-400 hover:text-purple-600 rounded-lg transition-colors" title="Abrir diseñador"><PenTool size={16} /></button>
                                                 <button onClick={() => handleAction('pdf', project.id)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors" title="Generar PDF"><FileText size={16} /></button>
+                                                <button onClick={() => handleAction('whatsapp', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors" title="Enviar por WhatsApp"><MessageCircle size={16} /></button>
                                                 <button onClick={() => handleAction('approve', project.id)} className={`p-2 rounded-lg transition-colors ${
                                                     project.currentApproval?.status === 'approved' 
                                                         ? 'hover:bg-emerald-100 text-emerald-600' 
@@ -610,7 +623,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                         ? 'hover:bg-red-100 text-red-600'
                                                         : 'hover:bg-blue-100 text-blue-600'
                                                 }`} title="Aprobación digital"><CheckCircle size={16} /></button>
-                                                <button onClick={() => handleAction('tracking', project.id)} className="p-2 hover:bg-teal-50 text-slate-400 hover:text-teal-600 rounded-lg transition-colors" title="Dashboard de seguimiento"><TrendingUp size={16} /></button>
                                                 <button onClick={() => handleAction('history', project.id)} className="p-2 hover:bg-amber-50 text-slate-400 hover:text-amber-600 rounded-lg transition-colors" title="Historial de versiones"><History size={16} /></button>
                                                 <button onClick={() => handleAction('production', project.id)} className="p-2 hover:bg-emerald-50 text-slate-400 hover:text-emerald-600 rounded-lg transition-colors" title="Producción"><Factory size={16} /></button>
                                                 <button onClick={() => handleAction('delete', project.id)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-600 rounded-lg transition-colors" title="Eliminar"><Trash2 size={16} /></button>
@@ -658,6 +670,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                         <button onClick={() => handleAction('edit', project.id)} className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-primary/10 hover:text-primary transition-all">Editar</button>
                                         <button onClick={() => handleAction('design', project.id)} className="px-3 py-2 bg-purple-100 text-purple-700 rounded-xl font-black text-xs hover:bg-purple-200 transition-all"><PenTool size={16} /></button>
                                         <button onClick={() => handleAction('pdf', project.id)} className="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-black text-xs hover:bg-indigo-50 hover:text-indigo-600 transition-all"><FileText size={16} /></button>
+                                        <button onClick={() => handleAction('whatsapp', project.id)} className="px-3 py-2 bg-emerald-100 text-emerald-700 rounded-xl font-black text-xs hover:bg-emerald-200 transition-all" title="Enviar por WhatsApp"><MessageCircle size={16} /></button>
                                         <button onClick={() => handleAction('approve', project.id)} className={`px-3 py-2 rounded-xl font-black text-xs transition-all ${
                                             project.currentApproval?.status === 'approved' 
                                                 ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
@@ -665,7 +678,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                 ? 'bg-red-100 text-red-700 hover:bg-red-200'
                                                 : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                                         }`} title="Aprobación digital"><CheckCircle size={16} /></button>
-                                        <button onClick={() => handleAction('tracking', project.id)} className="px-3 py-2 bg-teal-100 text-teal-700 rounded-xl font-black text-xs hover:bg-teal-200 transition-all" title="Dashboard de seguimiento"><TrendingUp size={16} /></button>
                                         <button onClick={() => handleAction('history', project.id)} className="px-3 py-2 bg-amber-100 text-amber-700 rounded-xl font-black text-xs hover:bg-amber-200 transition-all" title="Historial de versiones"><History size={16} /></button>
                                         <button onClick={() => handleAction('delete', project.id)} className="px-3 py-2 bg-red-50 text-red-600 rounded-xl font-black text-xs transition-all"><Trash2 size={16} /></button>
                                     </div>
@@ -1162,6 +1174,19 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         setTrackingProject(null);
                     }}
                     project={trackingProject}
+                />
+            )}
+            
+            {/* WhatsApp Share Modal */}
+            {whatsappProject && (
+                <WhatsAppShareModal
+                    isOpen={showWhatsAppModal}
+                    onClose={() => {
+                        setShowWhatsAppModal(false);
+                        setWhatsappProject(null);
+                    }}
+                    project={whatsappProject}
+                    clientPhone={whatsappProject.contactPhone}
                 />
             )}
         </div>
