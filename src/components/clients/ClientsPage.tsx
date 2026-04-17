@@ -14,7 +14,7 @@ import {
     UserPlus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getUserClients, saveClient, deleteClient } from '../../lib/localStorage/db';
+import { getUserClients, saveClient, deleteClient, saveProject } from '../../lib/localStorage/db';
 import { ClientData, ViewType } from '../../types';
 import { useUserContext } from '../../context/UserContext';
 import { useDesignerStore } from '../../store/designerStore';
@@ -91,9 +91,26 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
             );
             
             if (shouldCreateProject) {
+                // Create a project automatically with the client data
+                const projectId = await saveProject({
+                    userId,
+                    clientName: newClient.name as string,
+                    projectName: `Proyecto ${newClient.name}`,
+                    siteAddress: newClient.address,
+                    contactPhone: newClient.phone,
+                    projectType: 'Ventana',
+                    status: 'draft',
+                    elements: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                });
+                
+                // Set active client and clear canvas
                 setActiveClient(newClientWithId as ClientData);
                 clearCanvas();
-                onViewChange('window');
+                
+                // Navigate to designer with the new project
+                onViewChange('designer');
             }
         } catch (error) {
             console.error("Error saving client:", error);
@@ -111,10 +128,32 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
         }
     };
 
-    const handleStartProject = (client: ClientData) => {
-        clearCanvas();
-        setActiveClient(client);
-        onViewChange('window');
+    const handleStartProject = async (client: ClientData) => {
+        try {
+            // Create a project automatically with the client data
+            await saveProject({
+                userId,
+                clientName: client.name,
+                projectName: `Proyecto ${client.name}`,
+                siteAddress: client.address,
+                contactPhone: client.phone,
+                projectType: 'Ventana',
+                status: 'draft',
+                elements: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            });
+            
+            // Set active client and clear canvas
+            setActiveClient(client);
+            clearCanvas();
+            
+            // Navigate to designer
+            onViewChange('designer');
+        } catch (error) {
+            console.error("Error creating project:", error);
+            alert("Error al crear proyecto");
+        }
     };
 
     const filteredClients = clients.filter(c => 
