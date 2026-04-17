@@ -103,19 +103,39 @@ const DesignerPage: React.FC = () => {
         setIsSaving(true);
         console.log("DEBUG: Iniciando guardado...", { activeProjectId, cName, pName });
         try {
-            // 1. Mapeo de Cotización
             let finalQuotation = undefined;
-            const firstElement = elements[0];
 
-            if (firstElement) {
-                const calcResult = calcularMaterialesVentana({
-                    ancho: firstElement.width,
-                    alto: firstElement.height,
-                    tipo: (firstElement.openingType as any) || 'corrediza',
-                    hojas: firstElement.panels.length,
-                    glassType: firstElement.glassType
-                });
-                finalQuotation = calcularCotizacionSaaS(calcResult, pricingConfig);
+            if (elements.length > 0) {
+                try {
+                    const elementsData = elements.map(el => {
+                        const width = Number(el.width) || 0;
+                        const height = Number(el.height) || 0;
+                        const calcResult = calcularMaterialesVentana({
+                            ancho: width,
+                            alto: height,
+                            tipo: (el.openingType as any) || 'corrediza',
+                            hojas: el.panels?.length || 1,
+                            glassType: el.glassType
+                        });
+                        const pr = calcularCotizacionSaaS(calcResult, pricingConfig);
+                        return { calcResult, pricingResult: pr };
+                    });
+
+                    finalQuotation = elementsData.reduce((acc, item) => {
+                        return {
+                            moneda: pricingConfig.moneda || '$',
+                            desglose: [], // Detalle agrupado puede omitirse en DB si no se requiere global
+                            totales: {
+                                costoDirecto: (acc.totales?.costoDirecto || 0) + (item.pricingResult.totales.costoDirecto || 0),
+                                precioVenta: (acc.totales?.precioVenta || 0) + (item.pricingResult.totales.precioVenta || 0),
+                                margenPorcentaje: item.pricingResult.totales.margenPorcentaje,
+                                gananciaBruta: (acc.totales?.gananciaBruta || 0) + (item.pricingResult.totales.gananciaBruta || 0)
+                            }
+                        };
+                    }, { totales: { costoDirecto: 0, precioVenta: 0, margenPorcentaje: 0, gananciaBruta: 0 } });
+                } catch (err) {
+                    console.error("Error calculando cotización combinada:", err);
+                }
             }
 
             const projectData: ProjectData = {
