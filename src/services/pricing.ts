@@ -41,6 +41,11 @@ export interface MaterialDictionary {
 export interface PricingConfig {
     moneda: string;             // ej. '$', 'MXN', 'COP', '€'
     margenGanancia: number;     // Profit margin as a decimal (e.g. 0.40 for 40%)
+    costosOperativos: {
+        manoObraPorcentaje: number; // Porcentaje sobre materiales (ej. 0.15 = 15%)
+        instalacionFija: number;    // Monto fijo por elemento
+        transporteFijo: number;     // Monto fijo por elemento (flete proporcional)
+    };
     diccionario: MaterialDictionary;
 }
 
@@ -91,10 +96,11 @@ export const calcularCotizacionSaaS = (
     const breakdown: CostDesglose[] = [
         { rubro: 'Perfiles de Aluminio', items: [], subtotal: 0 },
         { rubro: 'Cristales', items: [], subtotal: 0 },
-        { rubro: 'Herrajes y Accesorios', items: [], subtotal: 0 }
+        { rubro: 'Herrajes y Accesorios', items: [], subtotal: 0 },
+        { rubro: 'Costos Operativos', items: [], subtotal: 0 }
     ];
 
-    let costoDirecto = 0;
+    let costoMateriales = 0;
 
     // Procesar todos los perfiles (Calculated in ML)
     const todosLosPerfiles = [
@@ -109,7 +115,7 @@ export const calcularCotizacionSaaS = (
             const costo = Number((p.totalLinealM * mat.precio).toFixed(2));
             breakdown[0].items.push({ nombre: mat.nombre, cantidad: p.totalLinealM, unidad: mat.unidad, costoTotal: costo });
             breakdown[0].subtotal += costo;
-            costoDirecto += costo;
+            costoMateriales += costo;
         }
     });
 
@@ -121,7 +127,7 @@ export const calcularCotizacionSaaS = (
                 const costo = Number((c.m2 * mat.precio).toFixed(2));
                 breakdown[1].items.push({ nombre: mat.nombre, cantidad: c.m2, unidad: mat.unidad, costoTotal: costo });
                 breakdown[1].subtotal += costo;
-                costoDirecto += costo;
+                costoMateriales += costo;
             }
         });
     } else {
@@ -133,7 +139,7 @@ export const calcularCotizacionSaaS = (
                 const costo = Number((areaM2 * mat.precio).toFixed(2));
                 breakdown[1].items.push({ nombre: mat.nombre, cantidad: areaM2, unidad: mat.unidad, costoTotal: costo });
                 breakdown[1].subtotal += costo;
-                costoDirecto += costo;
+                costoMateriales += costo;
             }
         }
     }
@@ -145,11 +151,25 @@ export const calcularCotizacionSaaS = (
             const costo = Number((a.cantidad * mat.precio).toFixed(2));
             breakdown[2].items.push({ nombre: mat.nombre, cantidad: a.cantidad, unidad: mat.unidad, costoTotal: costo });
             breakdown[2].subtotal += costo;
-            costoDirecto += costo;
+            costoMateriales += costo;
         }
     });
 
-    // 4. Mapeo Financiero
+    // 4. Operativos y Logística
+    const configOps = config.costosOperativos || { manoObraPorcentaje: 0.15, instalacionFija: 300, transporteFijo: 200 };
+    
+    const costoManoObra = costoMateriales * (configOps.manoObraPorcentaje || 0);
+    const costoInstalacion = configOps.instalacionFija || 0;
+    const costoTransporte = configOps.transporteFijo || 0;
+
+    if (costoManoObra > 0) breakdown[3].items.push({ nombre: `Mano de Obra (${(configOps.manoObraPorcentaje * 100).toFixed(0)}% del material)`, cantidad: 1, unidad: 'global', costoTotal: costoManoObra });
+    if (costoInstalacion > 0) breakdown[3].items.push({ nombre: 'Instalación y Montaje', cantidad: 1, unidad: 'global', costoTotal: costoInstalacion });
+    if (costoTransporte > 0) breakdown[3].items.push({ nombre: 'Logística y Transporte', cantidad: 1, unidad: 'global', costoTotal: costoTransporte });
+
+    breakdown[3].subtotal = costoManoObra + costoInstalacion + costoTransporte;
+
+    // 5. Mapeo Financiero Total
+    const costoDirecto = costoMateriales + breakdown[3].subtotal;
     const margenGanancia = config.margenGanancia || 0.40;
     const gananciaBruta = costoDirecto * margenGanancia;
     const precioVenta = costoDirecto + gananciaBruta;
@@ -170,6 +190,11 @@ export const calcularCotizacionSaaS = (
 export const DEFAULT_PRICING_CONFIG: PricingConfig = {
     moneda: '$', // Por defecto a genérico internacional
     margenGanancia: 0.40, // 40%
+    costosOperativos: {
+        manoObraPorcentaje: 0.15, // 15% del costo de materiales
+        instalacionFija: 300,     // $300 base por elemento
+        transporteFijo: 200       // $200 de flete por elemento
+    },
     diccionario: {
         // Perfiles
         jamba: { nombre: 'Jamba (Vertical)', precio: 120, unidad: 'ml' },

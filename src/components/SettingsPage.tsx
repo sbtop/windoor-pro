@@ -196,11 +196,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
                 </motion.div>
 
                 {/* 💰 GLOBALES FINANCIEROS */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <motion.div 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-5 bg-slate-900 rounded-[48px] p-10 text-white shadow-2xl relative overflow-hidden"
+                        className="bg-slate-900 rounded-[48px] p-10 text-white shadow-2xl relative overflow-hidden"
                     >
                         <div className="absolute top-[-40px] right-[-40px] w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
                         <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-10 flex items-center gap-3">
@@ -237,31 +237,82 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="mt-8 pt-8 border-t border-white/10 relative z-10">
+                            <div className="flex items-center gap-2 mb-4">
+                                <div className="w-2 h-2 rounded-full bg-primary" />
+                                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Cálculo Proyectado a 10,000 unidades en Materiales</h5>
+                            </div>
+                            
+                            <div className="grid grid-cols-3 gap-4 items-center bg-white/5 border border-white/10 rounded-[32px] p-6 text-white text-center">
+                                <div>
+                                    <p className="text-[9px] font-black text-slate-500 uppercase mb-1">Costo Material</p>
+                                    <p className="font-black text-lg">{localConfig.moneda}10k</p>
+                                </div>
+                                <div>
+                                    <p className="text-[9px] font-black text-emerald-500 uppercase mb-1">Margen ({Number(localConfig.margenGanancia * 100).toFixed(0)}%)</p>
+                                    <p className="font-black text-emerald-400">+{localConfig.moneda}{(10000 * localConfig.margenGanancia).toLocaleString()}</p>
+                                </div>
+                                <div className="border-l border-white/10">
+                                    <p className="text-[9px] font-black text-primary uppercase mb-1">Venta Estimada</p>
+                                    <p className="font-black text-primary text-xl">{(10000 * (1 + localConfig.margenGanancia)).toLocaleString()}</p>
+                                </div>
+                            </div>
+                            <p className="text-[9px] text-slate-500 text-center mt-3 font-semibold">* Ejemplo sin sumar Costos Operativos logísticos.</p>
+                        </div>
                     </motion.div>
                     
                     <motion.div 
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="lg:col-span-7 glass-card bg-white/60 rounded-[48px] p-10 shadow-xl border-white/80 flex flex-col justify-center"
+                        className="glass-card bg-white/60 rounded-[48px] p-10 shadow-xl border-white/80"
                     >
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="w-2 h-2 rounded-full bg-primary" />
-                            <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Cálculo Proyectado</h5>
-                        </div>
-                        <p className="text-sm font-bold text-slate-700 mb-8 leading-relaxed">Ejemplo de una orden con costo técnico de 10,000 unidades.</p>
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em] mb-10 flex items-center gap-3">
+                            <Building2 size={18} className="text-primary" />
+                            Costos Operativos Globales
+                        </h4>
                         
-                        <div className="grid grid-cols-3 gap-4 items-center p-8 bg-slate-900 rounded-[32px] text-white">
-                            <div>
-                                <p className="text-[9px] font-black text-slate-500 uppercase mb-1">Costo Neto</p>
-                                <p className="text-xl font-black">{localConfig.moneda}10k</p>
+                        <div className="space-y-6">
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-center justify-between gap-6">
+                                <div>
+                                    <h5 className="text-sm font-black text-slate-900 mb-1">Mano de Obra (%)</h5>
+                                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Porcentaje sobre el costo de materiales</p>
+                                </div>
+                                <input 
+                                    type="number" 
+                                    value={Number(((localConfig.costosOperativos?.manoObraPorcentaje || 0.15) * 100).toFixed(1))}
+                                    onChange={(e) => setLocalConfig({...localConfig, costosOperativos: { ...localConfig.costosOperativos, manoObraPorcentaje: Number(e.target.value) / 100 } as any})}
+                                    step="0.1" max="100" min="0"
+                                    className="w-24 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-black text-slate-900 text-center"
+                                />
                             </div>
-                            <div className="text-center">
-                                <p className="text-[9px] font-black text-emerald-500 uppercase mb-1">Plus ({Number(localConfig.margenGanancia*100).toFixed(0)}%)</p>
-                                <p className="text-xl font-black text-emerald-400">+{localConfig.moneda}{(10000 * localConfig.margenGanancia).toLocaleString()}</p>
+
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-center justify-between gap-6">
+                                <div>
+                                    <h5 className="text-sm font-black text-slate-900 mb-1">Costo Instalación ({localConfig.moneda})</h5>
+                                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Por cada ventana instalada</p>
+                                </div>
+                                <input 
+                                    type="number" 
+                                    value={localConfig.costosOperativos?.instalacionFija ?? 300}
+                                    onChange={(e) => setLocalConfig({...localConfig, costosOperativos: { ...localConfig.costosOperativos, instalacionFija: Number(e.target.value) } as any})}
+                                    min="0"
+                                    className="w-28 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-black text-emerald-600 text-center"
+                                />
                             </div>
-                            <div className="text-right">
-                                <p className="text-[9px] font-black text-primary uppercase mb-1">Venta Sugerida</p>
-                                <p className="text-2xl font-black text-primary">{localConfig.moneda}{(10000 * (1 + localConfig.margenGanancia)).toLocaleString()}</p>
+
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-center justify-between gap-6">
+                                <div>
+                                    <h5 className="text-sm font-black text-slate-900 mb-1">Transporte y Flete ({localConfig.moneda})</h5>
+                                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Monto plano por fabricación base</p>
+                                </div>
+                                <input 
+                                    type="number" 
+                                    value={localConfig.costosOperativos?.transporteFijo ?? 200}
+                                    onChange={(e) => setLocalConfig({...localConfig, costosOperativos: { ...localConfig.costosOperativos, transporteFijo: Number(e.target.value) } as any})}
+                                    min="0"
+                                    className="w-28 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-black text-primary text-center"
+                                />
                             </div>
                         </div>
                     </motion.div>
