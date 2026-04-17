@@ -14,7 +14,8 @@ import {
     FileText,
     HelpCircle,
     ChevronDown,
-    Lock
+    Lock,
+    TrendingUp
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -211,6 +212,15 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                         className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
                                     >
                                         <User size={16} /> Mi Perfil
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            onViewChange?.('reports');
+                                            setShowUserMenu(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
+                                    >
+                                        <TrendingUp size={16} /> Reportes Financieros
                                     </button>
                                     <button 
                                         onClick={() => {

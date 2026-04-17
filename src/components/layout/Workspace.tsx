@@ -4,6 +4,7 @@ import DesignerPage from '../designer/DesignerPage';
 import ClientsPage from '../clients/ClientsPage';
 import ProjectGallery from '../projects/ProjectGallery';
 import Reportes from '../Reportes';
+import QuotationsView from '../quotations/QuotationsView';
 import Calendar from '../Calendar';
 import Calculator from '../Calculator';
 import SettingsPage from '../SettingsPage';
@@ -1142,11 +1143,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 case 'pdf':
                 case 'reports':
                     return <Reportes />;
+                case 'quote':
+                    return <QuotationsView />;
                 case 'calculator':
                     return <Calculator />;
                 case 'settings':
                     return <SettingsPage onViewChange={onViewChange || (() => {})} />;
-                case 'quote':
                 case 'projects':
                 case 'home':
                 case 'notifications':
