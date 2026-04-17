@@ -17,6 +17,11 @@ import {
     Share2
 } from 'lucide-react';
 import { ProjectData } from '../../lib/localStorage/db';
+import { generateMultiElementPDF, createTechnicalDrawing } from '../../services/pdfGenerator';
+import { calcularMaterialesVentana } from '../../services/manufacturing';
+import { calcularCotizacionSaaS } from '../../services/pricing';
+import { useSettingsStore } from '../../store/settingsStore';
+import SupportModal from '../layout/SupportModal';
 
 interface ClientTrackingDashboardProps {
     isOpen: boolean;
@@ -30,6 +35,41 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
     project 
 }) => {
     const [timeline, setTimeline] = useState<any[]>([]);
+    const [showSupportModal, setShowSupportModal] = useState(false);
+    const [clipboardToast, setClipboardToast] = useState(false);
+    const { pricingConfig } = useSettingsStore();
+
+    const handleDownloadPDF = () => {
+        if (!project.elements || project.elements.length === 0) {
+            alert('Este proyecto no tiene elementos para generar un PDF.');
+            return;
+        }
+        try {
+            const elementsData = project.elements.map((element: any) => {
+                const calcResult = calcularMaterialesVentana(element);
+                const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
+                const imageDataUrl = createTechnicalDrawing(element);
+                return { element, calcResult, imageDataUrl, pricingResult };
+            });
+            generateMultiElementPDF(
+                elementsData,
+                project.quotation || { totales: { precioVenta: 0 } },
+                pricingConfig.diccionario,
+                null,
+                { clientName: project.clientName, projectName: project.projectName, siteAddress: project.siteAddress }
+            );
+        } catch (e) {
+            alert('Error al generar el PDF.');
+        }
+    };
+
+    const handleShare = () => {
+        const text = `WinDoor Pro — Seguimiento de Proyecto\nCliente: ${project.clientName}\nProyecto: ${project.projectName || 'Sin nombre'}\nEstado: ${project.status}\nTotal: $${project.quotation?.totales?.precioVenta?.toLocaleString() || 'Pendiente'}`;
+        navigator.clipboard.writeText(text).then(() => {
+            setClipboardToast(true);
+            setTimeout(() => setClipboardToast(false), 2500);
+        });
+    };
 
     useEffect(() => {
         if (project) {
@@ -125,6 +165,7 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
     if (!isOpen || !project) return null;
 
     return (
+        <>
         <AnimatePresence>
             <motion.div
                 initial={{ opacity: 0 }}
@@ -260,15 +301,24 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                         {/* Action Buttons */}
                         <div className="mt-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                             <div className="flex flex-wrap gap-3">
-                                <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100 transition-colors">
+                                <button 
+                                    onClick={handleDownloadPDF}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100 transition-colors"
+                                >
                                     <Download size={16} />
                                     Descargar PDF
                                 </button>
-                                <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100 transition-colors">
+                                <button 
+                                    onClick={handleShare}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100 transition-colors"
+                                >
                                     <Share2 size={16} />
                                     Compartir
                                 </button>
-                                <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-black hover:bg-primary/90 transition-colors">
+                                <button 
+                                    onClick={() => setShowSupportModal(true)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl text-xs font-black hover:bg-primary/90 transition-colors"
+                                >
                                     <Mail size={16} />
                                     Contactar Soporte
                                 </button>
@@ -278,7 +328,17 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                 </motion.div>
             </motion.div>
         </AnimatePresence>
-    );
+
+        {/* Support Modal */}
+        <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
+
+        {/* Clipboard Toast */}
+        {clipboardToast && (
+            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3.5 rounded-2xl shadow-2xl text-sm font-black text-white bg-emerald-600 flex items-center gap-2 animate-in slide-in-from-bottom-4 duration-300">
+                ✓ Copiado al portapapeles
+            </div>
+        )}
+    </>);
 };
 
 export default ClientTrackingDashboard;

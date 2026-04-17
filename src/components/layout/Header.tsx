@@ -15,9 +15,11 @@ import {
     HelpCircle,
     ChevronDown,
     Lock,
-    TrendingUp
+    TrendingUp,
+    CheckCheck
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import SupportModal from './SupportModal';
 
 interface HeaderProps {
     activeView: ViewType;
@@ -28,6 +30,8 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showSupportModal, setShowSupportModal] = useState(false);
+    const [notificationsRead, setNotificationsRead] = useState(false);
     const { currentUser, logout } = useUserContext();
 
     const navItems = [
@@ -45,6 +49,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
     ];
 
     return (
+        <>
         <header className="fixed top-4 left-4 right-4 md:left-72 md:right-8 h-16 z-50">
             <div className="glass h-full rounded-2xl px-4 md:px-6 flex justify-between items-center border border-white/20 shadow-lg shadow-indigo-500/5">
                 {/* Logo Section */}
@@ -110,7 +115,9 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                             )}
                         >
                             <Bell size={20} />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+                            {!notificationsRead && (
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+                            )}
                         </motion.button>
                         
                         <AnimatePresence>
@@ -123,7 +130,12 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                 >
                                     <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white/20">
                                         <h4 className="font-bold text-slate-800">Notificaciones</h4>
-                                        <button className="text-xs text-primary font-bold hover:underline">Ver todas</button>
+                                        <button 
+                                            onClick={() => { setNotificationsRead(true); setShowNotifications(false); }}
+                                            className="text-xs text-primary font-bold hover:underline flex items-center gap-1"
+                                        >
+                                            <CheckCheck size={12} /> Marcar leídas
+                                        </button>
                                     </div>
                                     <div className="max-h-80 overflow-y-auto">
                                         {notifications.map((notif) => (
@@ -224,7 +236,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                     </button>
                                     <button 
                                         onClick={() => {
-                                            alert('Función de cambio de contraseña próximamente disponible');
+                                            onViewChange?.('settings');
                                             setShowUserMenu(false);
                                         }}
                                         className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
@@ -233,12 +245,12 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                                     </button>
                                     <button 
                                         onClick={() => {
-                                            alert('Centro de ayuda: Próximamente disponible');
+                                            setShowSupportModal(true);
                                             setShowUserMenu(false);
                                         }}
                                         className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-white/40 rounded-xl transition-colors"
                                     >
-                                        <HelpCircle size={16} /> Ayuda
+                                        <HelpCircle size={16} /> Ayuda & Soporte
                                     </button>
                                     <div className="h-[1px] bg-slate-100 my-1" />
                                     <button 
@@ -256,7 +268,9 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                 </div>
             </div>
         </header>
-    );
+
+        <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
+    </>);
 };
 
 export default Header;

@@ -77,6 +77,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     const [filterType, setFilterType] = useState<string>('all');
     const [sortBy, setSortBy] = useState<string>('date-desc');
     const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3500);
+    };
     
     // Version history
     const [showVersionHistory, setShowVersionHistory] = useState(false);
@@ -289,7 +295,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     };
 
     // Handle action menu actions
-    const handleAction = (action: string, projectId: string | undefined) => {
+    const handleAction = async (action: string, projectId: string | undefined) => {
         if (!projectId) return;
         setActiveActionMenu(null);
         const project = projects.find(p => p.id === projectId);
@@ -391,12 +397,18 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 }
                 break;
             case 'production':
-                console.log('Enviar a producción:', projectId);
-                alert('Proyecto enviado a producción');
+                if (project && confirm(`¿Enviar "${project.projectName || project.clientName}" a producción?`)) {
+                    await updateProject(projectId, { status: 'in-production' });
+                    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status: 'in-production' } : p));
+                    showToast(`✓ Proyecto enviado a producción`);
+                }
                 break;
             case 'finish':
-                console.log('Finalizar proyecto:', projectId);
-                alert('Proyecto finalizado');
+                if (project && confirm(`¿Marcar "${project.projectName || project.clientName}" como completado?`)) {
+                    await updateProject(projectId, { status: 'completed' });
+                    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, status: 'completed' } : p));
+                    showToast(`✓ Proyecto marcado como completado`);
+                }
                 break;
             case 'gallery':
                 if (project) setSelectedProject(project);
@@ -1242,6 +1254,13 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                     project={whatsappProject}
                     clientPhone={whatsappProject.contactPhone}
                 />
+            )}
+
+            {/* Toast Notification */}
+            {toast && (
+                <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-6 py-3.5 rounded-2xl shadow-2xl text-sm font-black text-white flex items-center gap-3 animate-in slide-in-from-bottom-4 duration-300 ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
+                    <span>{toast.message}</span>
+                </div>
             )}
         </div>
     );

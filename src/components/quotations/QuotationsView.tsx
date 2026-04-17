@@ -19,6 +19,10 @@ import {
 import { getUserProjects, ProjectData } from '../../lib/localStorage/db';
 import { useUserContext } from '../../context/UserContext';
 import { cn } from '../../lib/utils';
+import { generateMultiElementPDF, createTechnicalDrawing } from '../../services/pdfGenerator';
+import { calcularMaterialesVentana } from '../../services/manufacturing';
+import { calcularCotizacionSaaS } from '../../services/pricing';
+import { useSettingsStore } from '../../store/settingsStore';
 
 const QuotationsView: React.FC = () => {
     const [quotations, setQuotations] = useState<ProjectData[]>([]);
@@ -26,8 +30,44 @@ const QuotationsView: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
     const [selectedQuotation, setSelectedQuotation] = useState<ProjectData | null>(null);
+    const [clipboardToast, setClipboardToast] = useState(false);
     const { currentUser } = useUserContext();
+    const { pricingConfig } = useSettingsStore();
     const userId = currentUser?.userId || 'unknown';
+
+    const showClipboardToast = () => {
+        setClipboardToast(true);
+        setTimeout(() => setClipboardToast(false), 2500);
+    };
+
+    const handleDownloadPDF = (quotation: ProjectData) => {
+        if (!quotation.elements || quotation.elements.length === 0) {
+            alert('Este proyecto no tiene elementos para generar el PDF.');
+            return;
+        }
+        try {
+            const elementsData = quotation.elements.map((element: any) => {
+                const calcResult = calcularMaterialesVentana(element);
+                const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
+                const imageDataUrl = createTechnicalDrawing(element);
+                return { element, calcResult, imageDataUrl, pricingResult };
+            });
+            generateMultiElementPDF(
+                elementsData,
+                quotation.quotation || { totales: { precioVenta: 0 } },
+                pricingConfig.diccionario,
+                null,
+                { clientName: quotation.clientName, projectName: quotation.projectName, siteAddress: quotation.siteAddress }
+            );
+        } catch (e) {
+            alert('Error al generar el PDF.');
+        }
+    };
+
+    const handleShare = (quotation: ProjectData) => {
+        const text = `WinDoor Pro — Cotización\nCliente: ${quotation.clientName}\nProyecto: ${quotation.projectName || 'Sin nombre'}\nTotal: $${quotation.quotation?.totales?.precioVenta?.toLocaleString() || 0}`;
+        navigator.clipboard.writeText(text).then(showClipboardToast);
+    };
 
     useEffect(() => {
         loadQuotations();
@@ -234,12 +274,14 @@ const QuotationsView: React.FC = () => {
                                     Ver Detalle
                                 </button>
                                 <button
+                                    onClick={() => handleDownloadPDF(quotation)}
                                     className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-black hover:bg-slate-200 transition-colors flex items-center gap-2"
                                 >
                                     <Download size={14} />
                                     PDF
                                 </button>
                                 <button
+                                    onClick={() => handleShare(quotation)}
                                     className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-black hover:bg-slate-200 transition-colors flex items-center gap-2"
                                 >
                                     <Share2 size={14} />
@@ -344,7 +386,10 @@ const QuotationsView: React.FC = () => {
                                 >
                                     Cerrar
                                 </button>
-                                <button className="flex-1 py-3 bg-primary text-white rounded-xl font-black text-sm shadow-xl shadow-primary/20 flex items-center justify-center gap-2">
+                                <button 
+                                    onClick={() => selectedQuotation && handleDownloadPDF(selectedQuotation)}
+                                    className="flex-1 py-3 bg-primary text-white rounded-xl font-black text-sm shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                                >
                                     <Download size={18} />
                                     Descargar PDF
                                 </button>
@@ -353,6 +398,13 @@ const QuotationsView: React.FC = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Clipboard Toast */}
+            {clipboardToast && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-6 py-3.5 rounded-2xl shadow-2xl text-sm font-black text-white bg-emerald-600 flex items-center gap-2 animate-in slide-in-from-bottom-4 duration-300">
+                    ✓ Copiado al portapapeles
+                </div>
+            )}
         </div>
     );
 };
