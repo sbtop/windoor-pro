@@ -12,8 +12,10 @@ import ApprovalModal from '../projects/ApprovalModal';
 import ClientTrackingDashboard from '../projects/ClientTrackingDashboard';
 import WhatsAppShareModal from '../projects/WhatsAppShareModal';
 import { usePDFStore } from '../../store/pdfStore';
-import { generateTechnicalPDF } from '../../services/pdfGenerator';
+import { generateTechnicalPDF, generateMultiElementPDF, createTechnicalDrawing } from '../../services/pdfGenerator';
 import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData, createProjectVersion } from '../../lib/localStorage/db';
+import { calcularMaterialesVentana } from '../../services/manufacturing';
+import { calcularCotizacionSaaS } from '../../services/pricing';
 import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useUserStore } from '../../store/userStore';
@@ -324,17 +326,64 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 break;
             case 'pdf':
                 console.log('Generar PDF:', projectId);
-                // Save PDF to store
-                if (project) {
-                    const { addDocument } = usePDFStore.getState();
-                    addDocument({
-                        name: `Cotizacion_${project.clientName}_${Date.now()}.pdf`,
-                        type: 'cotizacion',
-                        projectId: project.id,
-                        projectName: project.projectType || 'Proyecto',
-                        clientName: project.clientName || 'Sin cliente'
-                    });
-                    alert('PDF generado y guardado en Documentos Recientes');
+                // Generate professional quotation PDF
+                if (project && project.elements && project.elements.length > 0) {
+                    try {
+                        const { pricingConfig } = useSettingsStore.getState();
+                        
+                        // Calculate materials and pricing for each element
+                        const elementsData = project.elements.map((element: any) => {
+                            const calcResult = calcularMaterialesVentana(element);
+                            const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
+                            const imageDataUrl = createTechnicalDrawing(element);
+                            
+                            return {
+                                element,
+                                calcResult,
+                                imageDataUrl,
+                                pricingResult
+                            };
+                        });
+                        
+                        // Calculate total pricing
+                        const totalCalcResult = elementsData.reduce((acc, item) => {
+                            return {
+                                ...acc,
+                                totales: {
+                                    ...acc.totales,
+                                    precioVenta: acc.totales.precioVenta + item.pricingResult.totales.precioVenta
+                                }
+                            };
+                        }, { totales: { precioVenta: 0 } });
+                        
+                        // Generate PDF
+                        generateMultiElementPDF(
+                            elementsData,
+                            totalCalcResult as any,
+                            pricingConfig.diccionario,
+                            null,
+                            {
+                                clientName: project.clientName,
+                                projectName: project.projectName,
+                                siteAddress: project.siteAddress
+                            }
+                        );
+                        
+                        // Also save to store
+                        const { addDocument } = usePDFStore.getState();
+                        addDocument({
+                            name: `Cotizacion_${project.clientName}_${Date.now()}.pdf`,
+                            type: 'cotizacion',
+                            projectId: project.id,
+                            projectName: project.projectType || 'Proyecto',
+                            clientName: project.clientName || 'Sin cliente'
+                        });
+                    } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        alert('Error al generar el PDF. Por favor intenta nuevamente.');
+                    }
+                } else {
+                    alert('El proyecto no tiene elementos. Agrega elementos en el diseñador antes de generar la cotización.');
                 }
                 break;
             case 'production':
