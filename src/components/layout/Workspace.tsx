@@ -19,7 +19,7 @@ import { calcularMaterialesVentana } from '../../services/manufacturing';
 import { calcularCotizacionSaaS } from '../../services/pricing';
 import { useDesignerStore } from '../../store/designerStore';
 import { useSettingsStore } from '../../store/settingsStore';
-import { useUserStore } from '../../store/userStore';
+import { useUserContext } from '../../context/UserContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Plus, 
@@ -95,7 +95,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     const [whatsappProject, setWhatsappProject] = useState<ProjectData | null>(null);
 
     const { pricingConfig } = useSettingsStore();
-    const { currentUser } = useUserStore();
+    const { currentUser } = useUserContext();
     const userId = currentUser?.userId || 'unknown';
 
     // PDF documents from store
@@ -254,7 +254,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
 
     // Handle new project creation
     const handleCreateProject = () => {
-        const { clearCanvas, setActiveClient } = useDesignerStore.getState();
+        const { clearCanvas, setActiveClient, setActiveProjectId } = useDesignerStore.getState();
 
         // Prepare designer for new project
         clearCanvas();
@@ -278,6 +278,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
         };
         saveProject(project).then(id => {
             setProjects(prev => [...prev, { ...project, id }]);
+            setActiveProjectId(id);
         });
 
         setShowNewProjectModal(false);
@@ -312,9 +313,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
             case 'design':
                 console.log('Abrir diseñador:', projectId, project);
                 if (project) {
-                    const { setElements, setActiveClient } = useDesignerStore.getState();
+                    const { setElements, setActiveClient, setActiveProjectId } = useDesignerStore.getState();
                     // Cargar elementos del proyecto en el diseñador
                     setElements(project.elements || []);
+                    // Establecer ID del proyecto
+                    setActiveProjectId(projectId);
                     // Establecer cliente activo
                     setActiveClient({
                         name: project.clientName || '',

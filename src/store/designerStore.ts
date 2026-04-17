@@ -6,6 +6,7 @@ interface DesignerState {
     elements: DesignElement[];
     selectedId: string | null;
     activeClient: ClientData | null;
+    activeProjectId: string | null;
 
     // Selectores de conveniencia
     selectedElement: () => DesignElement | null;
@@ -18,6 +19,7 @@ interface DesignerState {
     setElements: (elements: DesignElement[]) => void;
     clearCanvas: () => void;
     setActiveClient: (client: ClientData | null) => void;
+    setActiveProjectId: (id: string | null) => void;
 }
 
 /**
@@ -29,6 +31,7 @@ export const useDesignerStore = create<DesignerState>((set, get) => ({
     elements: [],
     selectedId: null,
     activeClient: null,
+    activeProjectId: null,
 
     // Devolver el elemento actualmente seleccionado
     selectedElement: () => {
@@ -72,9 +75,16 @@ export const useDesignerStore = create<DesignerState>((set, get) => ({
     setElements: (elements) => set({ elements }),
 
     // Limpiar lienzo
-    clearCanvas: () => set({ elements: [], selectedId: null }),
+    clearCanvas: () => set({ 
+        elements: [], 
+        selectedId: null, 
+        activeProjectId: null 
+    }),
 
     // Gestión de cliente activo
     setActiveClient: (client) => set({ activeClient: client }),
+
+    // Gestión de proyecto activo
+    setActiveProjectId: (id) => set({ activeProjectId: id }),
 }));
 

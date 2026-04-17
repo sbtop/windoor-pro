@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ViewType } from '../../types';
 import { useDesignerStore } from '../../store/designerStore';
+import { useUserContext } from '../../context/UserContext';
 import { useSettingsStore } from '../../store/settingsStore';
 import { calcularMaterialesVentana } from '../../services/manufacturing';
 import { calcularCotizacionSaaS } from '../../services/pricing';
@@ -60,6 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
     const [showManualModal, setShowManualModal] = useState(false);
 
     const { elements, selectedId, updateElement } = useDesignerStore();
+    const { currentUser, logout } = useUserContext();
     const { pricingConfig } = useSettingsStore();
 
     const selectedElement = selectedId

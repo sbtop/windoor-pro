@@ -17,7 +17,7 @@ import {
     X
 } from 'lucide-react';
 import { getUserProjects, ProjectData } from '../../lib/localStorage/db';
-import { useUserStore } from '../../store/userStore';
+import { useUserContext } from '../../context/UserContext';
 import { cn } from '../../lib/utils';
 
 const QuotationsView: React.FC = () => {
@@ -26,7 +26,7 @@ const QuotationsView: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
     const [selectedQuotation, setSelectedQuotation] = useState<ProjectData | null>(null);
-    const { currentUser } = useUserStore();
+    const { currentUser } = useUserContext();
     const userId = currentUser?.userId || 'unknown';
 
     useEffect(() => {

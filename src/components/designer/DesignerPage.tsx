@@ -22,6 +22,8 @@ const DesignerPage: React.FC = () => {
         updateElement,
         deleteElement,
         selectElement,
+        activeProjectId,
+        setActiveProjectId,
         selectedElement: getSelected
     } = useDesignerStore();
 
@@ -83,19 +85,29 @@ const DesignerPage: React.FC = () => {
             return;
         }
 
-        const pName = prompt("Nombre del Proyecto:", "Mi Proyecto WinDoor");
-        if (!pName) return;
+        let pName = "Mi Proyecto WinDoor";
+        let cName = activeClient ? activeClient.name : "Cliente Mostrador";
 
-        const cName = activeClient ? activeClient.name : (prompt("Nombre del Cliente:", "Cliente Mostrador") || "Cliente Mostrador");
+        // Si no hay ID de proyecto activo, pedimos el nombre (es un proyecto nuevo manual)
+        if (!activeProjectId) {
+            const inputName = prompt("Nombre del Proyecto:", pName);
+            if (!inputName) return;
+            pName = inputName;
+            
+            if (!activeClient) {
+                const inputClient = prompt("Nombre del Cliente:", cName);
+                if (inputClient) cName = inputClient;
+            }
+        }
 
         setIsSaving(true);
+        console.log("DEBUG: Iniciando guardado...", { activeProjectId, cName, pName });
         try {
-            // 1. Mapeo de Cotización: Buscamos el primer elemento (ventana o puerta) para el resumen
+            // 1. Mapeo de Cotización
             let finalQuotation = undefined;
             const firstElement = elements[0];
 
             if (firstElement) {
-                // Cálculo de materiales (usamos el motor de ventana como base para puertas también por ahora)
                 const calcResult = calcularMaterialesVentana({
                     ancho: firstElement.width,
                     alto: firstElement.height,
@@ -106,7 +118,8 @@ const DesignerPage: React.FC = () => {
                 finalQuotation = calcularCotizacionSaaS(calcResult, pricingConfig);
             }
 
-            const newProject: ProjectData = {
+            const projectData: ProjectData = {
+                id: activeProjectId || undefined,
                 userId: currentUser?.userId || "unknown-user",
                 clientName: cName,
                 projectName: pName,
@@ -115,15 +128,21 @@ const DesignerPage: React.FC = () => {
                 quotation: finalQuotation
             };
 
-            // 2. Limpieza de datos (Firestore no permite 'undefined')
-            const cleanProjectData = JSON.parse(JSON.stringify(newProject));
-
+            const cleanProjectData = JSON.parse(JSON.stringify(projectData));
+            console.log("DEBUG: Guardando en db.ts...", cleanProjectData);
+            
             const docId = await saveProject(cleanProjectData);
-            alert(`¡Proyecto Guardado con éxito!`);
+            console.log("DEBUG: Guardado exitoso con ID:", docId);
+            
+            // Si era un proyecto nuevo, guardamos el ID para futuras actualizaciones de esta sesión
+            if (!activeProjectId) {
+                setActiveProjectId(docId);
+            }
+            
+            alert(`¡Proyecto guardado con éxito!`);
         } catch (error: any) {
-            console.error("DEBUG LOCAL SAVE:", error);
-            const errorMsg = error?.message || "Error desconocido";
-            alert(`Error al guardar: ${errorMsg}`);
+            console.error("DEBUG LOCAL SAVE ERROR:", error);
+            alert(`Error al guardar: ${error?.message || "Error desconocido"}`);
         } finally {
             setIsSaving(false);
         }

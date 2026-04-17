@@ -39,7 +39,7 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
         notes: ''
     });
 
-    const { setActiveClient, clearCanvas } = useDesignerStore();
+    const { setActiveClient, clearCanvas, setActiveProjectId } = useDesignerStore();
     const { currentUser } = useUserContext();
     const userId = currentUser?.userId || 'unknown';
 
@@ -108,6 +108,7 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
                 // Set active client and clear canvas
                 setActiveClient(newClientWithId as ClientData);
                 clearCanvas();
+                setActiveProjectId(projectId);
                 
                 // Navigate to designer with the new project
                 onViewChange('designer');
@@ -130,8 +131,10 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
 
     const handleStartProject = async (client: ClientData) => {
         try {
-            // Create a project automatically with the client data
-            await saveProject({
+            // Set active client and clear canvas
+            setActiveClient(client);
+            clearCanvas();
+            const projectId = await saveProject({
                 userId,
                 clientName: client.name,
                 projectName: `Proyecto ${client.name}`,
@@ -143,10 +146,7 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ onViewChange }) => {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             });
-            
-            // Set active client and clear canvas
-            setActiveClient(client);
-            clearCanvas();
+            setActiveProjectId(projectId);
             
             // Navigate to designer
             onViewChange('designer');
