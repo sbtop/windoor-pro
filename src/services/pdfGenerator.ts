@@ -284,7 +284,9 @@ export const generateTechnicalPDF = (
 
     doc.setFontSize(28);
     doc.setTextColor(99, 102, 241); // indigo-500
-    doc.text(`${pricingResult.moneda}${pricingResult.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, finalY + 4, { align: 'right' });
+    const moneda = pricingResult?.moneda || '$';
+    const precio = pricingResult?.totales?.precioVenta || 0;
+    doc.text(`${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, finalY + 4, { align: 'right' });
 
     doc.setFontSize(7);
     doc.setTextColor(148, 163, 184); // slate-400
@@ -362,14 +364,21 @@ export const generateMultiElementPDF = (
     doc.text(`Resumen del Proyecto (${elements.length} elementos)`, 14, 55);
     
     // Create summary table of all elements
-    const summaryData = elements.map((item, index) => [
-        `${index + 1}`,
-        item.element.type === 'window' ? 'Ventana' : 'Puerta',
-        `${Math.round(item.element.width)}x${Math.round(item.element.height)}mm`,
-        (item.element as any).openingType || 'corrediza',
-        item.element.panels.length.toString(),
-        `${item.pricingResult.moneda}${item.pricingResult.totales.precioVenta.toLocaleString()}`
-    ]);
+    const summaryData = elements.map((item, index) => {
+        const precio = item.pricingResult?.totales?.precioVenta || 0;
+        const width = Number(item.element.width) || 0;
+        const height = Number(item.element.height) || 0;
+        const moneda = item.pricingResult?.moneda || '$';
+        
+        return [
+            `${index + 1}`,
+            item.element.type === 'window' ? 'Ventana' : 'Puerta',
+            `${Math.round(width)}x${Math.round(height)}mm`,
+            (item.element as any).openingType || 'corrediza',
+            (item.element.panels?.length || 1).toString(),
+            `${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        ];
+    });
     
     autoTable(doc, {
         startY: 60,
@@ -430,10 +439,15 @@ export const generateMultiElementPDF = (
         doc.text(`${i + 1}. ${item.element.type === 'window' ? 'Vent' : 'Puer'}`, x + 3, y + itemHeight - 14);
         doc.setFontSize(7);
         doc.setTextColor(100, 116, 139);
-        const medidas = `${Math.round(item.element.width)}x${Math.round(item.element.height)}`;
+        const width = Number(item.element.width) || 0;
+        const height = Number(item.element.height) || 0;
+        const medidas = `${Math.round(width)}x${Math.round(height)}`;
         doc.text(`${medidas}mm`, x + 3, y + itemHeight - 7);
         doc.setTextColor(99, 102, 241);
-        doc.text(`${item.pricingResult.moneda}${item.pricingResult.totales.precioVenta.toLocaleString()}`, x + 3, y + itemHeight - 1);
+        
+        const moneda = item.pricingResult?.moneda || '$';
+        const precio = item.pricingResult?.totales?.precioVenta || 0;
+        doc.text(`${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, x + 3, y + itemHeight - 1);
     }
     
     // Calculate final Y position

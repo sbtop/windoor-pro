@@ -49,12 +49,14 @@ export interface CalculationResult {
  * Basado en reglas estándar de carpintería de aluminio.
  */
 export const calcularMaterialesVentana = (params: CalculationInput & { glassType?: string }): CalculationResult => {
-    const { ancho, alto, tipo, hojas, glassType = 'vidrio_6mm' } = params;
+    const { tipo, hojas, glassType = 'vidrio_6mm' } = params;
+    const ancho = Number(params.ancho) || 0;
+    const alto = Number(params.alto) || 0;
 
     // 1. Descuentos estándar (pueden parametrizarse en el futuro)
     const DESCUENTO_MARCO = 40; // mm por lado para el marco
-    const VANO_ANCHO = ancho - (DESCUENTO_MARCO * 2);
-    const VANO_ALTO = alto - (DESCUENTO_MARCO * 2);
+    const VANO_ANCHO = Math.max(0, ancho - (DESCUENTO_MARCO * 2));
+    const VANO_ALTO = Math.max(0, alto - (DESCUENTO_MARCO * 2));
 
     const result: CalculationResult = {
         resumen: {
