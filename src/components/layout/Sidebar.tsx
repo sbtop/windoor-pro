@@ -29,6 +29,8 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import Calendar from '../Calendar';
+import SupportModal from './SupportModal';
+import UserManualModal from './UserManualModal';
 
 interface SidebarProps {
     activeView: ViewType;
@@ -52,6 +54,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
     const [maxWeight, setMaxWeight] = useState(150);
     const [tolerance, setTolerance] = useState(2);
     const [applied, setApplied] = useState(false);
+    
+    // Modal states
+    const [showSupportModal, setShowSupportModal] = useState(false);
+    const [showManualModal, setShowManualModal] = useState(false);
 
     const { elements, selectedId, updateElement } = useDesignerStore();
     const { pricingConfig } = useSettingsStore();
@@ -330,13 +336,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
                             {/* Footer Links */}
                             <div className="pt-4 border-t border-slate-100 space-y-1">
                                 <button 
-                                    onClick={() => alert('Soporte Técnico: Próximamente disponible')}
+                                    onClick={() => setShowSupportModal(true)}
                                     className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors"
                                 >
                                     <HelpCircle size={16} /> Soporte Técnico
                                 </button>
                                 <button 
-                                    onClick={() => alert('Manual de Usuario: Próximamente disponible')}
+                                    onClick={() => setShowManualModal(true)}
                                     className="w-full flex items-center gap-3 px-4 py-2 text-[11px] font-bold text-slate-400 hover:text-slate-800 transition-colors"
                                 >
                                     <FileText size={16} /> Manual de Usuario
@@ -356,6 +362,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
                     )}
                 </AnimatePresence>
             </div>
+            
+            {/* Modals */}
+            <SupportModal isOpen={showSupportModal} onClose={() => setShowSupportModal(false)} />
+            <UserManualModal isOpen={showManualModal} onClose={() => setShowManualModal(false)} />
         </aside>
     );
 };
