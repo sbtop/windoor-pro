@@ -29,7 +29,7 @@ const DesignerPage: React.FC = () => {
 
     const selectedElement = getSelected();
     const activeClient = useDesignerStore(s => s.activeClient);
-    const { pricingConfig } = useSettingsStore();
+    const { pricingConfig, companyProfile } = useSettingsStore();
     const { currentUser } = useUserContext();
 
     // 🎨 Local UI State
@@ -76,7 +76,7 @@ const DesignerPage: React.FC = () => {
 
         const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
 
-        generateTechnicalPDF(selectedElement, calcResult, imageDataUrl, pricingResult, pricingConfig.diccionario);
+        generateTechnicalPDF(selectedElement, calcResult, imageDataUrl, pricingResult, pricingConfig.diccionario, companyProfile);
     };
 
     const handleSaveCloud = async () => {

@@ -37,7 +37,7 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
     const [timeline, setTimeline] = useState<any[]>([]);
     const [showSupportModal, setShowSupportModal] = useState(false);
     const [clipboardToast, setClipboardToast] = useState(false);
-    const { pricingConfig } = useSettingsStore();
+    const { pricingConfig, companyProfile } = useSettingsStore();
 
     const handleDownloadPDF = () => {
         if (!project.elements || project.elements.length === 0) {
@@ -55,7 +55,7 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                 elementsData,
                 project.quotation || { totales: { precioVenta: 0 } },
                 pricingConfig.diccionario,
-                null,
+                companyProfile,
                 { clientName: project.clientName, projectName: project.projectName, siteAddress: project.siteAddress }
             );
         } catch (e) {

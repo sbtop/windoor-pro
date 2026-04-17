@@ -32,7 +32,7 @@ const QuotationsView: React.FC = () => {
     const [selectedQuotation, setSelectedQuotation] = useState<ProjectData | null>(null);
     const [clipboardToast, setClipboardToast] = useState(false);
     const { currentUser } = useUserContext();
-    const { pricingConfig } = useSettingsStore();
+    const { pricingConfig, companyProfile } = useSettingsStore();
     const userId = currentUser?.userId || 'unknown';
 
     const showClipboardToast = () => {
@@ -56,7 +56,7 @@ const QuotationsView: React.FC = () => {
                 elementsData,
                 quotation.quotation || { totales: { precioVenta: 0 } },
                 pricingConfig.diccionario,
-                null,
+                companyProfile,
                 { clientName: quotation.clientName, projectName: quotation.projectName, siteAddress: quotation.siteAddress }
             );
         } catch (e) {

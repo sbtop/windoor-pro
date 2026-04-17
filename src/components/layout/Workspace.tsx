@@ -100,7 +100,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
     const [whatsappProject, setWhatsappProject] = useState<ProjectData | null>(null);
 
-    const { pricingConfig } = useSettingsStore();
+    const { pricingConfig, companyProfile } = useSettingsStore();
     const { currentUser } = useUserContext();
     const userId = currentUser?.userId || 'unknown';
 
@@ -371,7 +371,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                             elementsData,
                             totalCalcResult as any,
                             pricingConfig.diccionario,
-                            null,
+                            companyProfile,
                             {
                                 clientName: project.clientName,
                                 projectName: project.projectName,
@@ -1019,7 +1019,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                             console.log('Funciones importadas correctamente');
                                                             
                                                             // USAR CONFIGURACIÓN DEL STORE (no localStorage directo)
-                                                            const { pricingConfig: storeConfig } = useSettingsStore.getState();
+                                                            const { pricingConfig: storeConfig, companyProfile } = useSettingsStore.getState();
                                                             const pricingConfig = storeConfig?.diccionario ? storeConfig : DEFAULT_PRICING_CONFIG;
                                                             console.log('pricingConfig usado:', pricingConfig);
                                                             
@@ -1074,7 +1074,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                                 allElements,
                                                                 combinedPricingResult,
                                                                 pricingConfig.diccionario,
-                                                                null,
+                                                                companyProfile,
                                                                 {
                                                                     clientName: selectedProject.clientName,
                                                                     projectName: selectedProject.projectName,

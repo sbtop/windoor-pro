@@ -4,6 +4,11 @@ import { DesignElement } from '../types';
 import { CalculationResult } from './manufacturing';
 import { PricingResult, MaterialDictionary } from './pricing';
 
+export interface BrandingInfo {
+    companyName: string;
+    logoBase64: string | null;
+}
+
 /**
  * Creates a technical drawing of a window/door element
  * Returns a data URL of the canvas image
@@ -139,16 +144,17 @@ export const generateTechnicalPDF = (
     imageDataUrl: string,
     pricingResult: PricingResult,
     diccionario: MaterialDictionary | null = null,
-    logoUrl: string | null = null
+    branding?: BrandingInfo
 ) => {
-    // Initialize A4 Portrait document
     const doc = new jsPDF('p', 'mm', 'a4');
 
     // ── Header Section ──────────────────────────────────────────────────────────
-    if (logoUrl) {
+    const safeCompanyName = branding?.companyName || 'WinDoor SaaS';
+    
+    if (branding?.logoBase64) {
         // Add custom logo
         try {
-            doc.addImage(logoUrl, 'PNG', 14, 10, 40, 20, undefined, 'FAST');
+            doc.addImage(branding.logoBase64, 'PNG', 14, 10, 40, 20, undefined, 'FAST');
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
             doc.text('Plano Técnico y Cotización de Materiales', 14, 36);
@@ -158,7 +164,7 @@ export const generateTechnicalPDF = (
             // Fallback to text if logo fails
             doc.setFontSize(22);
             doc.setTextColor(30, 41, 59);
-            doc.text('WinDoor SaaS', 14, 20);
+            doc.text(safeCompanyName, 14, 20);
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
             doc.text('Plano Técnico y Cotización de Materiales', 14, 28);
@@ -169,7 +175,7 @@ export const generateTechnicalPDF = (
         // Default text header
         doc.setFontSize(22);
         doc.setTextColor(30, 41, 59); // Tailwind slate-800
-        doc.text('WinDoor SaaS', 14, 20);
+        doc.text(safeCompanyName, 14, 20);
         doc.setFontSize(10);
         doc.setTextColor(100, 116, 139); // Tailwind slate-500
         doc.text('Plano Técnico y Cotización de Materiales', 14, 28);
@@ -282,7 +288,7 @@ export const generateTechnicalPDF = (
 
     doc.setFontSize(7);
     doc.setTextColor(148, 163, 184); // slate-400
-    doc.text('DOCUMENTO GENERADO AUTOMÁTICAMENTE POR EL SISTEMA WINDOOR SAAS.', 14, 280);
+    doc.text(`DOCUMENTO GENERADO AUTOMÁTICAMENTE POR ${safeCompanyName.toUpperCase()}.`, 14, 280);
     doc.text('* Precios sujetos a cambio sin previo aviso. Incluye IVA e instalación básica. Las medidas son responsabilidad del cliente final.', 196, finalY + 12, { align: 'right' });
 
     // ── Export ───────────────────────────────────────────────────────────────────
@@ -306,7 +312,7 @@ export const generateMultiElementPDF = (
     elements: ProjectElement[],
     totalPricing: PricingResult,
     diccionario: MaterialDictionary | null = null,
-    logoUrl: string | null = null,
+    branding?: BrandingInfo,
     projectInfo?: { clientName?: string; projectName?: string; siteAddress?: string }
 ) => {
     if (elements.length === 0) return;
@@ -315,18 +321,20 @@ export const generateMultiElementPDF = (
     const doc = new jsPDF('p', 'mm', 'a4');
     
     // ── Header Section ──────────────────────────────────────────────────────────
-    if (logoUrl) {
+    const safeCompanyName = branding?.companyName || 'WinDoor SaaS';
+    
+    if (branding?.logoBase64) {
         try {
-            doc.addImage(logoUrl, 'PNG', 14, 10, 40, 20, undefined, 'FAST');
+            doc.addImage(branding.logoBase64, 'PNG', 14, 10, 40, 20, undefined, 'FAST');
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
-            doc.text('Cotización de Proyecto - WinDoor SaaS', 14, 36);
+            doc.text(`Cotización Profesional - ${safeCompanyName}`, 14, 36);
             doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 42);
             doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 48);
         } catch (e) {
             doc.setFontSize(22);
             doc.setTextColor(30, 41, 59);
-            doc.text('WinDoor SaaS', 14, 20);
+            doc.text(safeCompanyName, 14, 20);
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139);
             doc.text('Cotización de Proyecto', 14, 28);
@@ -336,7 +344,7 @@ export const generateMultiElementPDF = (
     } else {
         doc.setFontSize(22);
         doc.setTextColor(30, 41, 59);
-        doc.text('WinDoor SaaS', 14, 20);
+        doc.text(safeCompanyName, 14, 20);
         doc.setFontSize(10);
         doc.setTextColor(100, 116, 139);
         doc.text('Cotización de Proyecto', 14, 28);
@@ -460,7 +468,7 @@ export const generateMultiElementPDF = (
     doc.text('Esta cotización tiene una validez de 15 días calendario.', 14, 275);
     doc.text('Precios sujetos a cambio sin previo aviso. Incluye IVA, materiales e instalación básica.', 14, 280);
     doc.text('Medidas finales serán verificadas en sitio antes de la fabricación.', 14, 285);
-    doc.text(`${new Date().getFullYear()} WinDoor SaaS - Cotización Profesional`, 196, 285, { align: 'right' });
+    doc.text(`${new Date().getFullYear()} ${safeCompanyName} - Cotización Profesional`, 196, 285, { align: 'right' });
     
     // Export
     const safeClientName = (projectInfo?.clientName || 'Proyecto').toLowerCase().replace(/\s+/g, '_').substring(0, 30);
