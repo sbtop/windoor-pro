@@ -28,11 +28,9 @@ import {
     Image as ImageIcon, 
     Trash2,
     Users,
-    TrendingUp,
     Clock,
     AlertCircle,
     CheckCircle2,
-    BarChart3,
     FolderOpen,
     Maximize2,
     Settings,
@@ -421,27 +419,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         <button className="text-xs font-black text-primary hover:underline flex items-center gap-1 group">
                             Ver logística <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>
-                    </div>
-                </motion.div>
-
-                {/* Performance Mini Card */}
-                <motion.div 
-                    whileHover={{ y: -5 }}
-                    initial={{ x: 20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="col-span-12 md:col-span-6 lg:col-span-4 glass-card p-8 bg-slate-900 border-none relative overflow-hidden"
-                >
-                    <div className="relative z-10">
-                        <TrendingUp className="text-emerald-400 mb-6" size={32} />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1 block">Facturación Activa</span>
-                        <h2 className="text-4xl font-black text-white mb-2">
-                            ${projects.reduce((acc, p) => acc + (p.quotation?.totales?.precioVenta || 0), 0).toLocaleString('es-MX', { maximumFractionDigits: 0 })}
-                        </h2>
-                        <p className="text-xs font-bold text-slate-400">Total acumulado en {projects.length} proyectos operativos.</p>
-                    </div>
-                    <div className="absolute -right-8 -bottom-8 opacity-10">
-                        <BarChart3 size={180} />
                     </div>
                 </motion.div>
 
