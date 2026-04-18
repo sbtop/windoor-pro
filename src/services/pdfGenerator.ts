@@ -324,6 +324,7 @@ export const generateMultiElementPDF = (
     isDetailed: boolean = false,
     ivaRate: number = 0.16
 ) => {
+    console.log('generateMultiElementPDF - ivaRate recibido:', ivaRate);
     if (elements.length === 0) return;
 
     // Forzar consistencia matemática estricta
@@ -524,6 +525,8 @@ export const generateMultiElementPDF = (
     const subtotal = safeTotalPricing.totales.precioVenta;
     const iva = subtotal * ivaRate;
     const total = subtotal + iva;
+
+    console.log('PDF Totals - Subtotal:', subtotal, 'IVA Rate:', ivaRate, 'IVA:', iva, 'Total:', total);
 
     // Totals box
     doc.setDrawColor(226, 232, 240);

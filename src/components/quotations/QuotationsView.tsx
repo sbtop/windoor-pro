@@ -46,6 +46,10 @@ const QuotationsView: React.FC = () => {
             return;
         }
         try {
+            // Debug: Verificar valor del IVA
+            console.log('pricingConfig:', pricingConfig);
+            console.log('IVA desde config:', pricingConfig.iva);
+
             // Always recalculate for PDF to ensure current pricing is used
             const elementsData = quotation.elements.map((element: any) => {
                 const calcResult = calcularMaterialesVentana(element);
@@ -65,6 +69,9 @@ const QuotationsView: React.FC = () => {
                 }
             };
 
+            const ivaRate = pricingConfig.iva || 0.16;
+            console.log('IVA rate usado:', ivaRate);
+
             generateMultiElementPDF(
                 elementsData,
                 totalPricing,
@@ -72,10 +79,11 @@ const QuotationsView: React.FC = () => {
                 companyProfile,
                 { clientName: quotation.clientName, projectName: quotation.projectName, siteAddress: quotation.siteAddress },
                 isDetailed,
-                pricingConfig.iva || 0.16
+                ivaRate
             );
         } catch (e) {
             alert('Error al generar el PDF.');
+            console.error(e);
         }
     };
 
