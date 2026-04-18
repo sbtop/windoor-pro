@@ -393,7 +393,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                 clientName: project.clientName,
                                 projectName: project.projectName,
                                 siteAddress: project.siteAddress
-                            }
+                            },
+                            false,
+                            pricingConfig.iva || 0.16
                         );
                         
                         // Also save to store

@@ -47,6 +47,7 @@ export interface PricingConfig {
         transporteFijo: number;     // Monto fijo por elemento (flete proporcional)
     };
     diccionario: MaterialDictionary;
+    iva: number;                // IVA como decimal (ej. 0.16 para 16%)
 }
 
 export interface CostDesglose {
@@ -221,6 +222,7 @@ export const DEFAULT_PRICING_CONFIG: PricingConfig = {
         instalacionFija: 300,     // $300 base por elemento
         transporteFijo: 200       // $200 de flete por elemento
     },
+    iva: 0.16, // 16% por defecto
     diccionario: {
         // Perfiles
         jamba: { nombre: 'Jamba (Vertical)', precio: 120, unidad: 'ml' },

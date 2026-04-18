@@ -321,7 +321,8 @@ export const generateMultiElementPDF = (
     diccionario: MaterialDictionary | null = null,
     branding?: BrandingInfo,
     projectInfo?: { clientName?: string; projectName?: string; siteAddress?: string },
-    isDetailed: boolean = false
+    isDetailed: boolean = false,
+    ivaRate: number = 0.16
 ) => {
     if (elements.length === 0) return;
 
@@ -445,9 +446,82 @@ export const generateMultiElementPDF = (
     
     let currentY = (doc as any).lastAutoTable.finalY + 15;
 
+    // ── Technical Drawings Section ───────────────────────────────────────────────
+    doc.setFontSize(12);
+    doc.setTextColor(30, 41, 59);
+    doc.setFont(undefined, 'bold');
+    doc.text('Planos Técnicos', 14, currentY);
+    doc.setFont(undefined, 'normal');
+    currentY += 8;
+
+    // Show all elements - 3 per row, compact layout
+    const itemsPerRow = 3;
+    const itemWidth = 58;
+    const itemHeight = 52;
+    const spacing = 6;
+    const itemsPerPage = 9; // 3 rows x 3 columns = 9 items per page
+
+    for (let i = 0; i < elements.length; i++) {
+        // Add new page if needed (every 9 items)
+        if (i > 0 && i % itemsPerPage === 0) {
+            doc.addPage();
+            currentY = 30;
+        }
+
+        const item = elements[i];
+        const pageIndex = i % itemsPerPage;
+        const row = Math.floor(pageIndex / itemsPerRow);
+        const col = pageIndex % itemsPerRow;
+        const x = 14 + col * (itemWidth + spacing);
+        const y = currentY + row * (itemHeight + 18);
+
+        // Draw item box
+        doc.setDrawColor(226, 232, 240);
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(x, y, itemWidth, itemHeight, 2, 2, 'FD');
+
+        // Add image
+        try {
+            doc.addImage(item.imageDataUrl, 'PNG', x + 3, y + 3, itemWidth - 6, itemHeight - 20, undefined, 'FAST');
+        } catch (e) {
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`${i + 1}`, x + itemWidth/2, y + itemHeight/2, { align: 'center' });
+        }
+
+        // Element info below image - compact
+        doc.setFontSize(8);
+        doc.setTextColor(30, 41, 59);
+        doc.text(`${i + 1}. ${item.element.type === 'window' ? 'Vent' : 'Puer'}`, x + 3, y + itemHeight - 14);
+        doc.setFontSize(7);
+        doc.setTextColor(100, 116, 139);
+        const width = Number(item.element.width) || 0;
+        const height = Number(item.element.height) || 0;
+        const medidas = `${Math.round(width)}x${Math.round(height)}`;
+        doc.text(`${medidas}mm`, x + 3, y + itemHeight - 7);
+        doc.setTextColor(99, 102, 241);
+
+        const moneda = item.pricingResult?.moneda || '$';
+        const precio = item.pricingResult?.totales?.precioVenta || 0;
+        doc.text(`${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, x + 3, y + itemHeight - 1);
+    }
+
+    // Calculate final Y position
+    const lastPageIndex = (elements.length - 1) % itemsPerPage;
+    const lastRow = Math.floor(lastPageIndex / itemsPerRow);
+    let totalY = currentY + ((lastRow + 1) * (itemHeight + 18)) + 15;
+
+    // Add new page for total if it doesn't fit
+    if (totalY > 240) {
+        doc.addPage();
+        totalY = 40;
+    }
+
+    currentY = totalY;
+
     // ── Totals Section ─────────────────────────────────────────────────────────
     const subtotal = safeTotalPricing.totales.costoDirecto + safeTotalPricing.totales.gananciaBruta;
-    const iva = subtotal * 0.16;
+    const iva = subtotal * ivaRate;
     const total = subtotal + iva;
 
     // Totals box
@@ -459,7 +533,7 @@ export const generateMultiElementPDF = (
     doc.setTextColor(71, 85, 105);
     doc.setFont(undefined, 'normal');
     doc.text('Subtotal:', 122, currentY + 8);
-    doc.text('IVA (16%):', 122, currentY + 16);
+    doc.text(`IVA (${(ivaRate * 100).toFixed(0)}%):`, 122, currentY + 16);
     doc.setFont(undefined, 'bold');
     doc.text('TOTAL:', 122, currentY + 28);
 

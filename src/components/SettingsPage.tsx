@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, CheckCircle2, RefreshCw, Ruler, Box, Package, User, Building2, Globe, ShieldCheck, Mail, Upload, X, MapPin, Phone } from 'lucide-react';
+import { Settings, Save, CheckCircle2, RefreshCw, Ruler, Box, Package, User, Building2, Globe, ShieldCheck, Mail, Upload, X, MapPin, Phone, Percent } from 'lucide-react';
 import { ViewType } from '../types';
 import { useSettingsStore } from '../store/settingsStore';
 import { MaterialDictionary } from '../services/pricing';
@@ -220,6 +220,25 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
                                         onChange={(e) => setLocalProfile(prev => ({ ...prev, phone: e.target.value }))}
                                         className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-50 rounded-2xl font-black text-slate-900 outline-none focus:border-primary transition-all"
                                         placeholder="+52 55 1234 5678"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2 pt-4 border-t border-slate-100">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 block">
+                                    IVA (%)
+                                </label>
+                                <div className="relative group">
+                                    <Percent className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary transition-colors" />
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        max="100"
+                                        value={(localConfig.iva || 0.16) * 100}
+                                        onChange={(e) => setLocalConfig(prev => ({ ...prev, iva: (parseFloat(e.target.value) || 0) / 100 }))}
+                                        className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-50 rounded-2xl font-black text-slate-900 outline-none focus:border-primary transition-all"
+                                        placeholder="16"
                                     />
                                 </div>
                             </div>
