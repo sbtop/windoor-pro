@@ -6,12 +6,16 @@ export interface CompanyProfile {
     companyName: string;
     logoBase64: string | null;
     email: string;
+    address: string;
+    phone: string;
 }
 
 const DEFAULT_COMPANY_PROFILE: CompanyProfile = {
     companyName: 'WinDoor',
     logoBase64: null,
     email: '',
+    address: '',
+    phone: '',
 };
 
 interface SettingsState {

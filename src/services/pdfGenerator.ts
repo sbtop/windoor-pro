@@ -7,6 +7,9 @@ import { PricingResult, MaterialDictionary } from './pricing';
 export interface BrandingInfo {
     companyName: string;
     logoBase64: string | null;
+    address: string;
+    phone: string;
+    email: string;
 }
 
 /**
@@ -321,183 +324,170 @@ export const generateMultiElementPDF = (
     isDetailed: boolean = false
 ) => {
     if (elements.length === 0) return;
-    
+
     // Forzar consistencia matemática estricta
     const safeTotalPricing = sumarCotizacionesSaaS(
-        elements.map(e => e.pricingResult), 
+        elements.map(e => e.pricingResult),
         totalPricing?.moneda || '$'
     );
 
     // Initialize A4 Portrait document
     const doc = new jsPDF('p', 'mm', 'a4');
-    
+
     // ── Header Section ──────────────────────────────────────────────────────────
     const safeCompanyName = branding?.companyName || 'WinDoor SaaS';
-    const tipoReporte = isDetailed ? 'Cotización Técnica Detallada' : 'Cotización Ejecutiva';
-    
+    const tipoReporte = isDetailed ? 'Cotización Técnica Detallada' : 'Cotización';
+    const quoteNumber = `COT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000)}`;
+
+    // Logo and company info on left
     if (branding?.logoBase64) {
         try {
-            doc.addImage(branding.logoBase64, 'PNG', 14, 10, 40, 20, undefined, 'FAST');
-            doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139);
-            doc.text(`${tipoReporte} - ${safeCompanyName}`, 14, 36);
-            doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 42);
-            doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 48);
+            doc.addImage(branding.logoBase64, 'PNG', 14, 10, 35, 18, undefined, 'FAST');
         } catch (e) {
-            doc.setFontSize(22);
-            doc.setTextColor(30, 41, 59);
-            doc.text(safeCompanyName, 14, 20);
-            doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139);
-            doc.text(tipoReporte, 14, 28);
-            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 34);
-            doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 40);
+            // Fallback if logo fails
         }
-    } else {
-        doc.setFontSize(22);
-        doc.setTextColor(30, 41, 59);
-        doc.text(safeCompanyName, 14, 20);
-        doc.setFontSize(10);
-        doc.setTextColor(100, 116, 139);
-        doc.text(tipoReporte, 14, 28);
-        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 34);
-        doc.text(`Cliente: ${projectInfo?.clientName || 'Sin cliente'}`, 14, 40);
     }
-    
-    // Top Divider
+
+    // Company name
+    doc.setFontSize(16);
+    doc.setTextColor(30, 41, 59);
+    doc.setFont(undefined, 'bold');
+    doc.text(safeCompanyName, 14, 35);
+    doc.setFont(undefined, 'normal');
+
+    // Company contact info
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Dirección: ${branding?.address || 'Dirección no configurada'}`, 14, 40);
+    doc.text(`Teléfono: ${branding?.phone || 'Teléfono no configurado'}`, 14, 44);
+    doc.text(`Email: ${branding?.email || 'Email no configurado'}`, 14, 48);
+
+    // Quote info on right
+    doc.setFontSize(10);
+    doc.setTextColor(30, 41, 59);
+    doc.setFont(undefined, 'bold');
+    doc.text(tipoReporte, 196, 20, { align: 'right' });
+    doc.setFont(undefined, 'normal');
+    doc.text(`No. ${quoteNumber}`, 196, 26, { align: 'right' });
+    doc.text(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, 196, 32, { align: 'right' });
+
+    // Client info section
     doc.setDrawColor(226, 232, 240);
-    doc.line(14, 45, 196, 45);
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(14, 55, 182, 20, 2, 2, 'FD');
+
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.setFont(undefined, 'bold');
+    doc.text('CLIENTE', 18, 62);
+    doc.setFont(undefined, 'normal');
+    doc.text(projectInfo?.clientName || 'Sin cliente', 18, 68);
+
+    doc.setFont(undefined, 'bold');
+    doc.text('DIRECCIÓN', 100, 62);
+    doc.setFont(undefined, 'normal');
+    doc.text(projectInfo?.siteAddress || 'Sin dirección', 100, 68);
+
+    // Divider line
+    doc.setDrawColor(99, 102, 241);
+    doc.setLineWidth(0.5);
+    doc.line(14, 80, 196, 80);
+    doc.setLineWidth(0.3);
     
     // ── Summary Section ─────────────────────────────────────────────────────────
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.setTextColor(30, 41, 59);
-    doc.text(`Resumen del Proyecto (${elements.length} elementos)`, 14, 55);
-    
+    doc.setFont(undefined, 'bold');
+    doc.text('Detalle de Elementos', 14, 90);
+    doc.setFont(undefined, 'normal');
+
     // Create summary table of all elements
     const summaryData = elements.map((item, index) => {
         const precio = item.pricingResult?.totales?.precioVenta || 0;
         const width = Number(item.element.width) || 0;
         const height = Number(item.element.height) || 0;
         const moneda = item.pricingResult?.moneda || '$';
-        
+        const tipo = item.element.type === 'window' ? 'Ventana' : item.element.type === 'door' ? 'Puerta' : item.element.type === 'facade' ? 'Fachada' : 'Elemento';
+        const apertura = (item.element as any).openingType || 'Fija';
+        const hojas = (item.element.panels?.length || 1).toString();
+
         return [
             `${index + 1}`,
-            item.element.type === 'window' ? 'Ventana' : 'Puerta',
+            tipo,
             `${Math.round(width)}x${Math.round(height)}mm`,
-            (item.element as any).openingType || 'corrediza',
-            (item.element.panels?.length || 1).toString(),
+            apertura,
+            hojas,
+            '1',
+            `${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             `${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
         ];
     });
-    
+
     autoTable(doc, {
-        startY: 60,
-        head: [['#', 'Tipo', 'Medidas', 'Apertura', 'Hojas', 'Precio']],
+        startY: 95,
+        head: [['Código', 'Descripción', 'Medidas', 'Apertura', 'Hojas', 'Cantidad', 'Precio Unit.', 'Subtotal']],
         body: summaryData,
         theme: 'grid',
-        headStyles: { fillColor: [99, 102, 241], fontSize: 9 },
+        headStyles: { fillColor: [99, 102, 241], fontSize: 8, font: 'bold' },
         styles: { fontSize: 8, textColor: [71, 85, 105] },
+        columnStyles: {
+            0: { cellWidth: 15 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 15 },
+            5: { cellWidth: 15 },
+            6: { halign: 'right', cellWidth: 30 },
+            7: { halign: 'right', cellWidth: 30 }
+        },
         margin: { left: 14, right: 14 }
     });
     
-    let currentY = (doc as any).lastAutoTable.finalY + 10;
-    
-    // ── Detailed Elements Section ───────────────────────────────────────────────
-    doc.setFontSize(14);
-    doc.setTextColor(30, 41, 59);
-    doc.text('Detalle de Elementos', 14, currentY);
-    currentY += 8;
-    
-    // Show all elements - 3 per row, compact layout
-    const itemsPerRow = 3;
-    const itemWidth = 58;
-    const itemHeight = 52;
-    const spacing = 6;
-    const itemsPerPage = 9; // 3 rows x 3 columns = 9 items per page
-    
-    for (let i = 0; i < elements.length; i++) {
-        // Add new page if needed (every 9 items)
-        if (i > 0 && i % itemsPerPage === 0) {
-            doc.addPage();
-            currentY = 30;
-        }
-        
-        const item = elements[i];
-        const pageIndex = i % itemsPerPage;
-        const row = Math.floor(pageIndex / itemsPerRow);
-        const col = pageIndex % itemsPerRow;
-        const x = 14 + col * (itemWidth + spacing);
-        const y = currentY + row * (itemHeight + 18);
-        
-        // Draw item box
-        doc.setDrawColor(226, 232, 240);
-        doc.setFillColor(248, 250, 252);
-        doc.roundedRect(x, y, itemWidth, itemHeight, 2, 2, 'FD');
-        
-        // Add image
-        try {
-            doc.addImage(item.imageDataUrl, 'PNG', x + 3, y + 3, itemWidth - 6, itemHeight - 20, undefined, 'FAST');
-        } catch (e) {
-            doc.setFontSize(8);
-            doc.setTextColor(148, 163, 184);
-            doc.text(`${i + 1}`, x + itemWidth/2, y + itemHeight/2, { align: 'center' });
-        }
-        
-        // Element info below image - compact
-        doc.setFontSize(8);
-        doc.setTextColor(30, 41, 59);
-        doc.text(`${i + 1}. ${item.element.type === 'window' ? 'Vent' : 'Puer'}`, x + 3, y + itemHeight - 14);
-        doc.setFontSize(7);
-        doc.setTextColor(100, 116, 139);
-        const width = Number(item.element.width) || 0;
-        const height = Number(item.element.height) || 0;
-        const medidas = `${Math.round(width)}x${Math.round(height)}`;
-        doc.text(`${medidas}mm`, x + 3, y + itemHeight - 7);
-        doc.setTextColor(99, 102, 241);
-        
-        const moneda = item.pricingResult?.moneda || '$';
-        const precio = item.pricingResult?.totales?.precioVenta || 0;
-        doc.text(`${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, x + 3, y + itemHeight - 1);
-    }
-    
-    // Calculate final Y position
-    const lastPageIndex = (elements.length - 1) % itemsPerPage;
-    const lastRow = Math.floor(lastPageIndex / itemsPerRow);
-    let totalY = currentY + ((lastRow + 1) * (itemHeight + 18)) + 15;
-    
-    // Add new page for total if it doesn't fit
-    if (totalY > 240) {
-        doc.addPage();
-        totalY = 40;
-    }
-    
-    // ── Total Pricing Section ────────────────────────────────────────────────────
-    
-    // Professional pricing box for client
-    doc.setDrawColor(99, 102, 241);
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(100, totalY - 5, 96, 32, 3, 3, 'FD');
-    
-    doc.setFontSize(11);
+    let currentY = (doc as any).lastAutoTable.finalY + 15;
+
+    // ── Totals Section ─────────────────────────────────────────────────────────
+    const subtotal = safeTotalPricing.totales.costoDirecto + safeTotalPricing.totales.gananciaBruta;
+    const iva = subtotal * 0.16;
+    const total = subtotal + iva;
+
+    // Totals box
+    doc.setDrawColor(226, 232, 240);
+    doc.setFillColor(255, 255, 255);
+    doc.roundedRect(120, currentY, 76, 40, 2, 2, 'FD');
+
+    doc.setFontSize(9);
     doc.setTextColor(71, 85, 105);
-    doc.text('TOTAL DEL PROYECTO', 196, totalY + 4, { align: 'right' });
-    
-    doc.setFontSize(28);
+    doc.setFont(undefined, 'normal');
+    doc.text('Subtotal:', 122, currentY + 8);
+    doc.text('IVA (16%):', 122, currentY + 16);
+    doc.setFont(undefined, 'bold');
+    doc.text('TOTAL:', 122, currentY + 28);
+
+    doc.setFont(undefined, 'normal');
+    doc.text(`${safeTotalPricing.moneda}${subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, currentY + 8, { align: 'right' });
+    doc.text(`${safeTotalPricing.moneda}${iva.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, currentY + 16, { align: 'right' });
+
+    doc.setFontSize(16);
     doc.setTextColor(99, 102, 241);
-    doc.text(`${safeTotalPricing.moneda}${safeTotalPricing.totales.precioVenta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, totalY + 18, { align: 'right' });
+    doc.setFont(undefined, 'bold');
+    doc.text(`${safeTotalPricing.moneda}${total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, currentY + 28, { align: 'right' });
+
+    currentY += 55;
     
     // ── Detailed Bill of Materials (Only if isDetailed) ────────────────────────
     if (isDetailed) {
         doc.addPage();
-        
-        doc.setFontSize(18);
+
+        doc.setFontSize(16);
         doc.setTextColor(30, 41, 59);
-        doc.text('Aviso Técnico: Detalles Operativos (Uso Interno)', 14, 20);
-        
-        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text('Detalle Técnico de Materiales', 14, 20);
+        doc.setFont(undefined, 'normal');
+
+        doc.setFontSize(9);
         doc.setTextColor(100, 116, 139);
-        doc.text('Cantidades y valores operacionales consolidados de todos los elementos.', 14, 28);
-        
+        doc.text('Cantidades y costos de materiales consolidados de todos los elementos.', 14, 28);
+
         const combinedBreakdownMap = new Map<string, any>();
         elements.forEach(item => {
             if (item.pricingResult?.desglose) {
@@ -525,31 +515,64 @@ export const generateMultiElementPDF = (
 
         autoTable(doc, {
             startY: 35,
-            head: [['Categoría', 'Concepto', 'Total Unidades', 'Importe Operativo']],
+            head: [['Categoría', 'Material', 'Cantidad', 'Costo']],
             body: breakdownRows,
             theme: 'grid',
-            headStyles: { fillColor: [47, 62, 70], fontSize: 9 },
+            headStyles: { fillColor: [99, 102, 241], fontSize: 9, font: 'bold' },
             styles: { fontSize: 8, textColor: [71, 85, 105] },
-            columnStyles: { 3: { halign: 'right' } }
+            columnStyles: { 3: { halign: 'right' } },
+            margin: { left: 14, right: 14 }
         });
-        
+
         let desgloseY = (doc as any).lastAutoTable.finalY + 15;
         doc.setFontSize(10);
         doc.setTextColor(30, 41, 59);
-        doc.text(`Costo Directo Total: ${safeTotalPricing.moneda}${safeTotalPricing.totales.costoDirecto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, desgloseY, { align: 'right' });
-        doc.text(`Utilidad Operacional (${safeTotalPricing.totales.margenPorcentaje}%): ${safeTotalPricing.moneda}${safeTotalPricing.totales.gananciaBruta.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, desgloseY + 6, { align: 'right' });
+        doc.setFont(undefined, 'bold');
+        doc.text(`Costo de Materiales: ${safeTotalPricing.moneda}${safeTotalPricing.totales.costoDirecto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, desgloseY, { align: 'right' });
+        // NO mostrar utilidad/ganancia al cliente
     }
-    
-    // Professional footer
+
+    // ── Conditions Section ─────────────────────────────────────────────────────
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.setFont(undefined, 'bold');
+    doc.text('CONDICIONES:', 14, currentY);
+    doc.setFont(undefined, 'normal');
+
+    const conditions = [
+        '• Esta cotización tiene una validez de 15 días calendario.',
+        '• Precios sujetos a cambio sin previo aviso.',
+        '• Incluye IVA, materiales e instalación básica.',
+        '• Medidas finales serán verificadas en sitio antes de la fabricación.',
+        '• 50% de anticipo para iniciar fabricación.',
+        '• Saldo contra entrega e instalación.'
+    ];
+
+    let conditionY = currentY + 6;
+    conditions.forEach(condition => {
+        doc.text(condition, 14, conditionY);
+        conditionY += 5;
+    });
+
+    // ── Signature Section ───────────────────────────────────────────────────────
+    const signatureY = conditionY + 15;
+
+    doc.setDrawColor(226, 232, 240);
+    doc.line(14, signatureY, 70, signatureY);
+    doc.line(120, signatureY, 176, signatureY);
+
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.text('Firma del Cliente', 42, signatureY + 5, { align: 'center' });
+    doc.text('Firma de la Empresa', 148, signatureY + 5, { align: 'center' });
+
+    // ── Footer ─────────────────────────────────────────────────────────────────
     doc.setFontSize(7);
     doc.setTextColor(148, 163, 184);
-    doc.text('Esta cotización tiene una validez de 15 días calendario.', 14, 275);
-    doc.text('Precios sujetos a cambio sin previo aviso. Incluye IVA, materiales e instalación básica.', 14, 280);
-    doc.text('Medidas finales serán verificadas en sitio antes de la fabricación.', 14, 285);
     doc.text(`${new Date().getFullYear()} ${safeCompanyName} - Cotización Profesional`, 196, 285, { align: 'right' });
-    
+
     // Export
-    const safeClientName = (projectInfo?.clientName || 'Proyecto').toLowerCase().replace(/\s+/g, '_').substring(0, 30);
-    const safeTitle = `Plano_Tecnico_${safeClientName}_${elements.length}items`.toLowerCase();
-    doc.save(`${safeTitle}.pdf`);
+    const safeClientName = (projectInfo?.clientName || 'Proyecto').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+    const fileName = `Cotizacion_${safeClientName}_${quoteNumber}.pdf`;
+    doc.save(fileName);
 };
