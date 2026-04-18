@@ -325,13 +325,18 @@ export const generateMultiElementPDF = (
     ivaRate: number = 0.16
 ) => {
     console.log('generateMultiElementPDF - ivaRate recibido:', ivaRate);
+    console.log('generateMultiElementPDF - totalPricing recibido:', totalPricing);
     if (elements.length === 0) return;
 
-    // Forzar consistencia matemática estricta
-    const safeTotalPricing = sumarCotizacionesSaaS(
-        elements.map(e => e.pricingResult),
-        totalPricing?.moneda || '$'
-    );
+    // Use totalPricing directly if it has valid totals, otherwise recalculate
+    const safeTotalPricing = (totalPricing?.totales?.precioVenta && totalPricing.totales.precioVenta > 0)
+        ? totalPricing
+        : sumarCotizacionesSaaS(
+            elements.map(e => e.pricingResult),
+            totalPricing?.moneda || '$'
+        );
+
+    console.log('generateMultiElementPDF - safeTotalPricing usado:', safeTotalPricing);
 
     // Initialize A4 Portrait document
     const doc = new jsPDF('p', 'mm', 'a4');
