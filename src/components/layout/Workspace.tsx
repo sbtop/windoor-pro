@@ -329,41 +329,14 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         // Use saved quotation if available, otherwise recalculate
                         let elementsData;
                         let totalCalcResult;
-                        
+
                         if (project.quotation && project.quotation.totales) {
-                            // Use saved quotation - distribute total among elements for PDF
-                            const totalPrecio = project.quotation.totales.precioVenta;
-                            const pricePerElement = totalPrecio / project.elements.length;
-                            
-                            elementsData = project.elements.map((element: any) => {
-                                const calcResult = calcularMaterialesVentana(element);
-                                const imageDataUrl = createTechnicalDrawing(element);
-                                
-                                return {
-                                    element,
-                                    calcResult,
-                                    imageDataUrl,
-                                    pricingResult: {
-                                        moneda: pricingConfig.moneda,
-                                        desglose: [],
-                                        totales: {
-                                            costoDirecto: pricePerElement * 0.7,
-                                            precioVenta: pricePerElement,
-                                            margenPorcentaje: 30,
-                                            gananciaBruta: pricePerElement * 0.3
-                                        }
-                                    }
-                                };
-                            });
-                            
-                            totalCalcResult = project.quotation;
-                        } else {
-                            // Recalculate if no saved quotation
+                            // Use saved quotation - recalculate with current config but use saved total as reference
                             elementsData = project.elements.map((element: any) => {
                                 const calcResult = calcularMaterialesVentana(element);
                                 const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
                                 const imageDataUrl = createTechnicalDrawing(element);
-                                
+
                                 return {
                                     element,
                                     calcResult,
@@ -371,7 +344,24 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                     pricingResult
                                 };
                             });
-                            
+
+                            // Use saved quotation total to ensure consistency
+                            totalCalcResult = project.quotation;
+                        } else {
+                            // Recalculate if no saved quotation
+                            elementsData = project.elements.map((element: any) => {
+                                const calcResult = calcularMaterialesVentana(element);
+                                const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
+                                const imageDataUrl = createTechnicalDrawing(element);
+
+                                return {
+                                    element,
+                                    calcResult,
+                                    imageDataUrl,
+                                    pricingResult
+                                };
+                            });
+
                             totalCalcResult = elementsData.reduce((acc, item) => {
                                 return {
                                     ...acc,
@@ -1109,7 +1099,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                                                                     projectName: selectedProject.projectName,
                                                                     siteAddress: selectedProject.siteAddress
                                                                 },
-                                                                isDetailed
+                                                                isDetailed,
+                                                                pricingConfig.iva || 0.16
                                                             );
                                                             
                                                             // Guardar en Documentos Recientes

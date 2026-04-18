@@ -520,7 +520,8 @@ export const generateMultiElementPDF = (
     currentY = totalY;
 
     // ── Totals Section ─────────────────────────────────────────────────────────
-    const subtotal = safeTotalPricing.totales.costoDirecto + safeTotalPricing.totales.gananciaBruta;
+    // Usar precioVenta como subtotal (ya incluye costo directo + ganancia)
+    const subtotal = safeTotalPricing.totales.precioVenta;
     const iva = subtotal * ivaRate;
     const total = subtotal + iva;
 

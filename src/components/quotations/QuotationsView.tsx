@@ -46,6 +46,7 @@ const QuotationsView: React.FC = () => {
             return;
         }
         try {
+            // Always recalculate for PDF to ensure current pricing is used
             const elementsData = quotation.elements.map((element: any) => {
                 const calcResult = calcularMaterialesVentana(element);
                 const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
@@ -53,14 +54,25 @@ const QuotationsView: React.FC = () => {
                 return { element, calcResult, imageDataUrl, pricingResult };
             });
             const isDetailed = window.confirm("¿Deseas incluir el desglose técnico de materiales, mano de obra y utilidades en el PDF?\n\n- [OK] para versión Detallada (Taller)\n- [Cancelar] para versión Básica (Ejecutiva/Cliente)");
-            
+
+            // Use saved quotation total if available, otherwise use calculated total
+            const totalPricing = quotation.quotation || {
+                totales: {
+                    precioVenta: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.precioVenta, 0),
+                    costoDirecto: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.costoDirecto, 0),
+                    gananciaBruta: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.gananciaBruta, 0),
+                    margenPorcentaje: pricingConfig.margenGanancia * 100
+                }
+            };
+
             generateMultiElementPDF(
                 elementsData,
-                quotation.quotation || { totales: { precioVenta: 0 } },
+                totalPricing,
                 pricingConfig.diccionario,
                 companyProfile,
                 { clientName: quotation.clientName, projectName: quotation.projectName, siteAddress: quotation.siteAddress },
-                isDetailed
+                isDetailed,
+                pricingConfig.iva || 0.16
             );
         } catch (e) {
             alert('Error al generar el PDF.');

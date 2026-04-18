@@ -40,11 +40,12 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
     const { pricingConfig, companyProfile } = useSettingsStore();
 
     const handleDownloadPDF = () => {
-        if (!project.elements || project.elements.length === 0) {
-            alert('Este proyecto no tiene elementos para generar un PDF.');
+        if (!project || !project.elements || project.elements.length === 0) {
+            alert('Este proyecto no tiene elementos para generar el PDF.');
             return;
         }
         try {
+            // Always recalculate for PDF to ensure current pricing is used
             const elementsData = project.elements.map((element: any) => {
                 const calcResult = calcularMaterialesVentana(element);
                 const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
@@ -52,14 +53,25 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                 return { element, calcResult, imageDataUrl, pricingResult };
             });
             const isDetailed = window.confirm("¿Deseas incluir el desglose técnico de materiales, mano de obra y utilidades en el PDF?\n\n- [OK] para versión Detallada (Taller)\n- [Cancelar] para versión Básica (Ejecutiva/Cliente)");
-            
+
+            // Use saved quotation total if available, otherwise use calculated total
+            const totalPricing = project.quotation || {
+                totales: {
+                    precioVenta: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.precioVenta, 0),
+                    costoDirecto: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.costoDirecto, 0),
+                    gananciaBruta: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.gananciaBruta, 0),
+                    margenPorcentaje: pricingConfig.margenGanancia * 100
+                }
+            };
+
             generateMultiElementPDF(
                 elementsData,
-                project.quotation || { totales: { precioVenta: 0 } },
+                totalPricing,
                 pricingConfig.diccionario,
                 companyProfile,
                 { clientName: project.clientName, projectName: project.projectName, siteAddress: project.siteAddress },
-                isDetailed
+                isDetailed,
+                pricingConfig.iva || 0.16
             );
         } catch (e) {
             alert('Error al generar el PDF.');
