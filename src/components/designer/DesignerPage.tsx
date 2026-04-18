@@ -145,7 +145,8 @@ const DesignerPage: React.FC = () => {
                 projectName: pName,
                 status: "draft",
                 elements: elements,
-                quotation: finalQuotation
+                quotation: finalQuotation,
+                updatedAt: new Date().toISOString()
             };
 
             const cleanProjectData = JSON.parse(JSON.stringify(projectData));
@@ -158,6 +159,9 @@ const DesignerPage: React.FC = () => {
             if (!activeProjectId) {
                 setActiveProjectId(docId);
             }
+            
+            // Emit event to notify workspace to reload projects
+            window.dispatchEvent(new CustomEvent('project-saved'));
             
             alert(`¡Proyecto guardado con éxito!`);
         } catch (error: any) {

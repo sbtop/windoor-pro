@@ -124,6 +124,20 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
         }
     }, [activeView, userId]);
 
+    // Reload projects when coming back from designer
+    useEffect(() => {
+        const handleDesignerSave = () => {
+            if (activeView === 'projects' || activeView === 'home') {
+                getUserProjects(userId).then(data => {
+                    setProjects(data);
+                });
+            }
+        };
+
+        window.addEventListener('project-saved', handleDesignerSave);
+        return () => window.removeEventListener('project-saved', handleDesignerSave);
+    }, [activeView, userId]);
+
     // Close action menu when clicking outside
     useEffect(() => {
         const handleClickOutside = () => setActiveActionMenu(null);
