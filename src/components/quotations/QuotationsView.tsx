@@ -50,16 +50,19 @@ const QuotationsView: React.FC = () => {
             console.log('pricingConfig:', pricingConfig);
             console.log('IVA desde config:', pricingConfig.iva);
 
-            // Always recalculate for PDF to ensure current pricing is used
+            // Use saved quotation if available to ensure consistency
+            const useSavedQuotation = quotation.quotation && quotation.quotation.totales;
+
             const elementsData = quotation.elements.map((element: any) => {
                 const calcResult = calcularMaterialesVentana(element);
                 const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
                 const imageDataUrl = createTechnicalDrawing(element);
                 return { element, calcResult, imageDataUrl, pricingResult };
             });
+
             const isDetailed = window.confirm("¿Deseas incluir el desglose técnico de materiales, mano de obra y utilidades en el PDF?\n\n- [OK] para versión Detallada (Taller)\n- [Cancelar] para versión Básica (Ejecutiva/Cliente)");
 
-            // Use saved quotation total if available, otherwise use calculated total
+            // Use saved quotation total if available
             const totalPricing = quotation.quotation || {
                 totales: {
                     precioVenta: elementsData.reduce((sum, item) => sum + item.pricingResult.totales.precioVenta, 0),
@@ -71,6 +74,9 @@ const QuotationsView: React.FC = () => {
 
             const ivaRate = pricingConfig.iva || 0.16;
             console.log('IVA rate usado:', ivaRate);
+            console.log('Cotización guardada:', quotation.quotation);
+            console.log('Usando cotización guardada:', useSavedQuotation);
+            console.log('TotalPricing usado:', totalPricing);
 
             generateMultiElementPDF(
                 elementsData,

@@ -45,6 +45,9 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
             return;
         }
         try {
+            console.log('ClientTracking - pricingConfig:', pricingConfig);
+            console.log('ClientTracking - IVA desde config:', pricingConfig.iva);
+
             // Always recalculate for PDF to ensure current pricing is used
             const elementsData = project.elements.map((element: any) => {
                 const calcResult = calcularMaterialesVentana(element);
@@ -64,6 +67,11 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                 }
             };
 
+            const ivaRate = pricingConfig.iva || 0.16;
+            console.log('ClientTracking - IVA rate usado:', ivaRate);
+            console.log('ClientTracking - Cotización guardada:', project.quotation);
+            console.log('ClientTracking - TotalPricing usado:', totalPricing);
+
             generateMultiElementPDF(
                 elementsData,
                 totalPricing,
@@ -71,10 +79,11 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
                 companyProfile,
                 { clientName: project.clientName, projectName: project.projectName, siteAddress: project.siteAddress },
                 isDetailed,
-                pricingConfig.iva || 0.16
+                ivaRate
             );
         } catch (e) {
             alert('Error al generar el PDF.');
+            console.error(e);
         }
     };
 
