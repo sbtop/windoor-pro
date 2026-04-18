@@ -216,7 +216,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 project.projectName?.toLowerCase().includes(searchQuery.toLowerCase());
 
             // Status filter
-            const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
+            const matchesStatus = filterStatus === 'all' ||
+                (filterStatus === 'active' && (project.status === 'quoted' || project.status === 'in-production')) ||
+                project.status === filterStatus;
 
             // Type filter
             const matchesType = filterType === 'all' || project.projectType === filterType;
@@ -545,9 +547,9 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         </p>
                     </div>
                     <div className="flex gap-4 pt-6">
-                        <button 
+                        <button
                             onClick={() => {
-                                setFilterStatus('in-production');
+                                setFilterStatus('active');
                                 setShowFilters(true);
                             }}
                             className="text-xs font-black text-primary hover:underline flex items-center gap-1 group"
