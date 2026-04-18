@@ -13,6 +13,7 @@ import {
     DollarSign
 } from 'lucide-react';
 import { sendForApproval, approveQuotation, rejectQuotation, ApprovalRecord } from '../../lib/localStorage/db';
+import { useSettingsStore } from '../../store/settingsStore';
 
 interface ApprovalModalProps {
     isOpen: boolean;
@@ -37,6 +38,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
     currentApproval,
     onApprovalChange
 }) => {
+    const { companyProfile } = useSettingsStore();
     const [mode, setMode] = useState<'send' | 'approve' | 'reject'>('send');
     const [email, setEmail] = useState(clientEmail || '');
     const [signature, setSignature] = useState('');
@@ -122,6 +124,23 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
         setLoading(true);
         try {
             await sendForApproval(projectId, email, 'Usuario');
+            
+            // Generate mailto link for email client
+            const subject = encodeURIComponent(`Cotización para Aprobación - ${projectName}`);
+            const signature = companyProfile.email ? `\n\n--\n${companyProfile.companyName}\n${companyProfile.email}` : '';
+            const body = encodeURIComponent(
+                `Hola ${clientName},\n\n` +
+                `Te enviamos la cotización para tu aprobación:\n\n` +
+                `Proyecto: ${projectName}\n` +
+                `Total: ${formatCurrency(quotation?.totales?.precioVenta || 0)}\n\n` +
+                `Por favor revisa y aprueba la cotización en el sistema.\n\n` +
+                `Saludos.${signature}`
+            );
+            const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+            
+            // Open email client
+            window.open(mailtoLink, '_blank');
+            
             onApprovalChange?.();
             onClose();
         } catch (error) {

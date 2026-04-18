@@ -166,12 +166,28 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
                                 </label>
                                 <div className="relative group">
                                     <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary transition-colors" />
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={localProfile.companyName}
                                         onChange={(e) => setLocalProfile(prev => ({ ...prev, companyName: e.target.value }))}
                                         className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-50 rounded-2xl font-black text-slate-900 outline-none focus:border-primary transition-all"
                                         placeholder="Nombre que verán los clientes"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2 pt-4 border-t border-slate-100">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 block">
+                                    Email de Salida (para cotizaciones)
+                                </label>
+                                <div className="relative group">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary transition-colors" />
+                                    <input
+                                        type="email"
+                                        value={localProfile.email || ''}
+                                        onChange={(e) => setLocalProfile(prev => ({ ...prev, email: e.target.value }))}
+                                        className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-50 rounded-2xl font-black text-slate-900 outline-none focus:border-primary transition-all"
+                                        placeholder="tu@email.com"
                                     />
                                 </div>
                             </div>

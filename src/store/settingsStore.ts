@@ -5,11 +5,13 @@ import { PricingConfig, DEFAULT_PRICING_CONFIG } from '../services/pricing';
 export interface CompanyProfile {
     companyName: string;
     logoBase64: string | null;
+    email: string;
 }
 
 const DEFAULT_COMPANY_PROFILE: CompanyProfile = {
     companyName: 'WinDoor',
     logoBase64: null,
+    email: '',
 };
 
 interface SettingsState {
