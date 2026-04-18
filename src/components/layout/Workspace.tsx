@@ -112,41 +112,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
             setLoading(true);
             getUserProjects(userId)
                 .then(data => {
-                    if (data.length === 0) {
-                        // Create professional mock data for first-time use
-                        const mockData: ProjectData[] = [
-                            {
-                                id: 'proj-1',
-                                userId: userId,
-                                clientName: 'Residencia Lomas',
-                                projectName: 'Fachada Principal Vidrio',
-                                siteAddress: 'Paseo de la Reforma 1234, CDMX',
-                                projectType: 'fachada',
-                                status: 'in-production',
-                                elements: [ { id: 'w1', type: 'window', width: 2000, height: 1500, panels: [{ id: 'p1', widthRatio: 0.5 }, { id: 'p2', widthRatio: 0.5 }], material: 'aluminio', x: 100, y: 100, selected: false } ],
-                                sitePhotos: [],
-                                quotation: { totales: { precioVenta: 45000, costoDirecto: 30000, gananciaBruta: 15000, margenPorcentaje: 33 } } as any
-                            },
-                            {
-                                id: 'proj-2',
-                                userId: userId,
-                                clientName: 'Apartamentos Skyview',
-                                projectName: 'Instalación Ventanas Piso 12',
-                                siteAddress: 'Av. Insurgentes Sur 800, CDMX',
-                                projectType: 'ventana',
-                                status: 'quoted',
-                                elements: [ { id: 'w2', type: 'window', width: 1200, height: 1200, panels: [{ id: 'p3', widthRatio: 1.0 }], material: 'upvc', x: 200, y: 200, selected: false } ],
-                                sitePhotos: [],
-                                quotation: { totales: { precioVenta: 12500, costoDirecto: 8000, gananciaBruta: 4500, margenPorcentaje: 36 } } as any
-                            }
-                        ];
-                        // Save mock data so they persist from now on
-                        Promise.all(mockData.map(p => saveProject(p))).then(() => {
-                            setProjects(mockData);
-                        });
-                    } else {
-                        setProjects(data);
-                    }
+                    setProjects(data);
                 })
                 .catch(err => console.error("Error cargando proyectos", err))
                 .finally(() => setLoading(false));
@@ -576,13 +542,8 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         <button className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-primary">Ver todas</button>
                     </div>
                     <div className="space-y-4">
-                        <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                            <div className="p-2 bg-amber-100 text-amber-600 rounded-lg"><AlertCircle size={16} /></div>
-                            <div className="flex-1">
-                                <p className="text-xs font-black text-slate-900">Proyecto Residencia Lomas <span className="text-[10px] text-slate-400 font-bold ml-2">Hace 2h</span></p>
-                                <p className="text-[11px] font-medium text-slate-500">Diferencia de medida detectada (+6mm). Requiere revisión técnica.</p>
-                            </div>
-                            <button className="text-[10px] font-black text-primary px-3 py-1 bg-primary/5 rounded-lg">Corregir</button>
+                        <div className="flex items-center justify-center p-6 rounded-xl bg-slate-50 border border-slate-100">
+                            <p className="text-xs font-medium text-slate-400">Sin actividad crítica registrada</p>
                         </div>
                     </div>
                 </motion.div>

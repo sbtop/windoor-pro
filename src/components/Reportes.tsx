@@ -133,10 +133,10 @@ const Reportes: React.FC = () => {
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300">Ingresos del Mes</span>
                     </div>
-                    <div className="text-4xl font-black tracking-tighter mb-2">{moneda}42.8k</div>
-                    <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                    <div className="text-4xl font-black tracking-tighter mb-2">{moneda}0</div>
+                    <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest">
                         <TrendingUp size={14} />
-                        <span>Mejora +12.5%</span>
+                        <span>Sin datos</span>
                     </div>
                 </motion.div>
 
@@ -154,10 +154,10 @@ const Reportes: React.FC = () => {
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Utilidad Neta</span>
                     </div>
-                    <div className="text-4xl font-black text-slate-900 tracking-tighter mb-2">{moneda}18.4k</div>
-                    <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                    <div className="text-4xl font-black text-slate-900 tracking-tighter mb-2">{moneda}0</div>
+                    <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest">
                         <Sparkles size={14} />
-                        <span>Sano +8.3%</span>
+                        <span>Sin datos</span>
                     </div>
                 </motion.div>
 
@@ -174,7 +174,7 @@ const Reportes: React.FC = () => {
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Carga Operativa</span>
                     </div>
-                    <div className="text-4xl font-black text-slate-900 tracking-tighter mb-2">14</div>
+                    <div className="text-4xl font-black text-slate-900 tracking-tighter mb-2">0</div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Órdenes en proceso</p>
                 </motion.div>
 
@@ -191,9 +191,9 @@ const Reportes: React.FC = () => {
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Margen Global</span>
                     </div>
-                    <div className="text-4xl font-black text-slate-900 tracking-tighter mb-2">43%</div>
-                    <div className="flex items-center gap-2 text-primary text-[10px] font-black uppercase tracking-widest">
-                         Meta: 40%
+                    <div className="text-4xl font-black text-slate-900 tracking-tighter mb-2">0%</div>
+                    <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                         Sin datos
                     </div>
                 </motion.div>
             </div>
@@ -217,21 +217,21 @@ const Reportes: React.FC = () => {
 
                 <div className="flex items-end gap-6 md:gap-12 h-64 px-4 overflow-x-auto custom-scrollbar">
                     {[
-                        { mes: 'JUN', ingreso: 32500, color: 'bg-indigo-500' },
-                        { mes: 'JUL', ingreso: 35800, color: 'bg-indigo-500' },
-                        { mes: 'AGO', ingreso: 34100, color: 'bg-indigo-500' },
-                        { mes: 'SEP', ingreso: 38900, color: 'bg-primary' },
-                        { mes: 'OCT', ingreso: 42850, color: 'bg-primary shadow-xl shadow-primary/30' },
+                        { mes: 'JUN', ingreso: 0, color: 'bg-slate-300' },
+                        { mes: 'JUL', ingreso: 0, color: 'bg-slate-300' },
+                        { mes: 'AGO', ingreso: 0, color: 'bg-slate-300' },
+                        { mes: 'SEP', ingreso: 0, color: 'bg-slate-300' },
+                        { mes: 'OCT', ingreso: 0, color: 'bg-slate-300' },
                     ].map((data, i) => (
                         <div key={data.mes} className="flex-1 flex flex-col items-center gap-4 min-w-[60px]">
                             <motion.div 
                                 initial={{ height: 0 }}
-                                animate={{ height: `${(data.ingreso / 50000) * 100}%` }}
+                                animate={{ height: '4px' }}
                                 transition={{ duration: 1, delay: 0.5 + (i * 0.1) }}
-                                className={`w-full max-w-[40px] ${data.color} rounded-2xl relative group cursor-pointer`}
+                                className={`w-full max-w-[40px] ${data.color} rounded-2xl relative group`}
                             >
                                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-black py-1 px-3 rounded-lg pointer-events-none">
-                                    {moneda}{data.ingreso.toLocaleString()}
+                                    {moneda}0
                                 </div>
                             </motion.div>
                             <span className="text-[11px] font-black text-slate-400 tracking-widest">{data.mes}</span>
