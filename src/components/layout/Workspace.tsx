@@ -14,7 +14,7 @@ import ClientTrackingDashboard from '../projects/ClientTrackingDashboard';
 import WhatsAppShareModal from '../projects/WhatsAppShareModal';
 import { usePDFStore } from '../../store/pdfStore';
 import { generateTechnicalPDF, generateMultiElementPDF, createTechnicalDrawing } from '../../services/pdfGenerator';
-import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData, createProjectVersion } from '../../lib/localStorage/db';
+import { getUserProjects, saveProject, deleteProject, updateProject, ProjectData, createProjectVersion, calculatePerformanceChange } from '../../lib/localStorage/db';
 import { calcularMaterialesVentana } from '../../services/manufacturing';
 import { calcularCotizacionSaaS } from '../../services/pricing';
 import { useDesignerStore } from '../../store/designerStore';
@@ -78,6 +78,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     const [sortBy, setSortBy] = useState<string>('date-desc');
     const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [performance, setPerformance] = useState<{ percentage: number; direction: 'up' | 'down' | 'neutral' } | null>(null);
 
     const showToast = (message: string, type: 'success' | 'error' = 'success') => {
         setToast({ message, type });
@@ -113,6 +114,10 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
             getUserProjects(userId)
                 .then(data => {
                     setProjects(data);
+                    // Calculate performance change
+                    calculatePerformanceChange(userId).then(perf => {
+                        setPerformance(perf);
+                    });
                 })
                 .catch(err => console.error("Error cargando proyectos", err))
                 .finally(() => setLoading(false));
@@ -490,12 +495,25 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                         </div>
                         <h3 className="text-2xl font-black text-slate-800 mb-2">Visión de Operaciones</h3>
                         <p className="text-sm font-semibold text-slate-500 max-w-md">
-                            Tienes <span className="text-primary font-black underline decoration-2">{projects.filter(p => p.status === 'in-production').length} proyectos</span> en línea de producción hoy. 
-                            El rendimiento se mantiene un <span className="text-emerald-600 font-black">+12%</span> por encima del mes pasado.
+                            Tienes <span className="text-primary font-black underline decoration-2">{projects.filter(p => p.status === 'in-production').length} proyectos</span> en línea de producción hoy.
+                            {performance ? (
+                                <span className={`font-black ${performance.direction === 'up' ? 'text-emerald-600' : performance.direction === 'down' ? 'text-red-600' : 'text-slate-600'}`}>
+                                    {performance.direction === 'up' ? '+' : performance.direction === 'down' ? '-' : ''}{performance.percentage.toFixed(1)}%
+                                </span>
+                            ) : (
+                                <span className="text-slate-400 font-black">Sin datos históricos</span>
+                            )}
+                            {' '}comparado con el mes pasado.
                         </p>
                     </div>
                     <div className="flex gap-4 pt-6">
-                        <button className="text-xs font-black text-primary hover:underline flex items-center gap-1 group">
+                        <button 
+                            onClick={() => {
+                                setFilterStatus('in-production');
+                                setShowFilters(true);
+                            }}
+                            className="text-xs font-black text-primary hover:underline flex items-center gap-1 group"
+                        >
                             Ver logística <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                     </div>

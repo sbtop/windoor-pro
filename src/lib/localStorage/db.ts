@@ -57,11 +57,111 @@ export interface ProjectData {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const PROJECTS_KEY = 'windoor-projects-v2';
 const CLIENTS_KEY  = 'windoor-clients-v2';
+const METRICS_KEY  = 'windoor-metrics-v1';
 
 const generateId = (): string => {
     const hex = () => Math.floor(Math.random() * 0xFFFF).toString(16).padStart(4, '0');
     return `${hex()}${hex()}-${hex()}-${hex()}`;
 };
+
+export interface MonthlyMetrics {
+    year: number;
+    month: number;
+    totalProjects: number;
+    inProduction: number;
+    quoted: number;
+    completed: number;
+    totalRevenue: number;
+    timestamp: string;
+}
+
+function readMetrics(): MonthlyMetrics[] {
+    try {
+        return JSON.parse(localStorage.getItem(METRICS_KEY) || '[]');
+    } catch {
+        return [];
+    }
+}
+
+function writeMetrics(data: MonthlyMetrics[]): void {
+    localStorage.setItem(METRICS_KEY, JSON.stringify(data));
+}
+
+/**
+ * Records monthly metrics for analytics
+ */
+export async function recordMonthlyMetrics(userId: string): Promise<void> {
+    const all = readProjects();
+    const userProjects = all.filter((p) => p.userId === userId);
+    
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    const metrics: MonthlyMetrics = {
+        year: currentYear,
+        month: currentMonth,
+        totalProjects: userProjects.length,
+        inProduction: userProjects.filter(p => p.status === 'in-production').length,
+        quoted: userProjects.filter(p => p.status === 'quoted').length,
+        completed: userProjects.filter(p => p.status === 'completed').length,
+        totalRevenue: userProjects.reduce((sum, p) => sum + (p.quotation?.totales?.precioVenta || 0), 0),
+        timestamp: now.toISOString()
+    };
+    
+    const existingMetrics = readMetrics();
+    const existingIndex = existingMetrics.findIndex(
+        m => m.year === currentYear && m.month === currentMonth
+    );
+    
+    if (existingIndex >= 0) {
+        existingMetrics[existingIndex] = metrics;
+    } else {
+        existingMetrics.push(metrics);
+    }
+    
+    writeMetrics(existingMetrics);
+}
+
+/**
+ * Gets monthly metrics for a specific month
+ */
+export async function getMonthlyMetrics(year: number, month: number): Promise<MonthlyMetrics | null> {
+    const metrics = readMetrics();
+    return metrics.find(m => m.year === year && m.month === month) || null;
+}
+
+/**
+ * Calculates performance change compared to previous month
+ */
+export async function calculatePerformanceChange(userId: string): Promise<{ percentage: number; direction: 'up' | 'down' | 'neutral' } | null> {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    
+    // Get current month metrics
+    await recordMonthlyMetrics(userId);
+    const currentMetrics = await getMonthlyMetrics(currentYear, currentMonth);
+    
+    if (!currentMetrics || currentMetrics.inProduction === 0) {
+        return null;
+    }
+    
+    // Get previous month metrics
+    const prevDate = new Date(currentYear, currentMonth - 1, 1);
+    const prevYear = prevDate.getFullYear();
+    const prevMonth = prevDate.getMonth();
+    const prevMetrics = await getMonthlyMetrics(prevYear, prevMonth);
+    
+    if (!prevMetrics || prevMetrics.inProduction === 0) {
+        return { percentage: 0, direction: 'neutral' };
+    }
+    
+    const change = ((currentMetrics.inProduction - prevMetrics.inProduction) / prevMetrics.inProduction) * 100;
+    const direction = change > 0 ? 'up' : change < 0 ? 'down' : 'neutral';
+    
+    return { percentage: Math.abs(change), direction };
+}
 
 function readProjects(): ProjectData[] {
     try {

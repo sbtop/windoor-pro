@@ -3,19 +3,18 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 
-// Clean up localStorage to remove example data
-const cleanLocalStorage = () => {
+// Clean up example data only once
+const CLEANUP_FLAG = 'windoor-cleanup-v1';
+if (!localStorage.getItem(CLEANUP_FLAG)) {
     const PROJECTS_KEY = 'windoor-projects-v2';
     const CLIENTS_KEY = 'windoor-clients-v2';
     
-    // Clear projects and clients to ensure clean start
     localStorage.removeItem(PROJECTS_KEY);
     localStorage.removeItem(CLIENTS_KEY);
     
-    console.log('🧹 LocalStorage cleaned - Ready for production');
-};
-
-cleanLocalStorage();
+    localStorage.setItem(CLEANUP_FLAG, 'true');
+    console.log('🧹 Example data cleaned - Ready for production');
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
