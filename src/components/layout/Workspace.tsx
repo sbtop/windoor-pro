@@ -72,7 +72,6 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
     });
 
     // Advanced filters
-    const [showFilters, setShowFilters] = useState(false);
     const [filterStatus, setFilterStatus] = useState<string>('all');
     const [filterType, setFilterType] = useState<string>('all');
     const [sortBy, setSortBy] = useState<string>('date-desc');
@@ -216,9 +215,7 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                 project.projectName?.toLowerCase().includes(searchQuery.toLowerCase());
 
             // Status filter
-            const matchesStatus = filterStatus === 'all' ||
-                (filterStatus === 'active' && (project.status === 'quoted' || project.status === 'in-production')) ||
-                project.status === filterStatus;
+            const matchesStatus = filterStatus === 'all' || project.status === filterStatus;
 
             // Type filter
             const matchesType = filterType === 'all' || project.projectType === filterType;
@@ -549,8 +546,11 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                     <div className="flex gap-4 pt-6">
                         <button
                             onClick={() => {
-                                setFilterStatus('active');
-                                setShowFilters(true);
+                                setFilterStatus('all');
+                                const projectsSection = document.querySelector('[data-section="projects"]');
+                                if (projectsSection) {
+                                    projectsSection.scrollIntoView({ behavior: 'smooth' });
+                                }
                             }}
                             className="text-xs font-black text-primary hover:underline flex items-center gap-1 group"
                         >
@@ -608,11 +608,12 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
             </div>
 
             {/* Main Projects Section */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
                 className="glass-card overflow-hidden bg-white shadow-xl shadow-slate-200/50"
+                data-section="projects"
             >
                 <div className="p-6 border-b border-slate-100 bg-slate-50/30">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
