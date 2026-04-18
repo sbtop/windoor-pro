@@ -613,9 +613,18 @@ export const generateMultiElementPDF = (
         doc.setFont(undefined, 'bold');
         doc.text(`Costo de Materiales: ${safeTotalPricing.moneda}${safeTotalPricing.totales.costoDirecto.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, desgloseY, { align: 'right' });
         // NO mostrar utilidad/ganancia al cliente
+
+        // Update currentY after detailed materials table
+        currentY = desgloseY + 10;
     }
 
     // ── Conditions Section ─────────────────────────────────────────────────────
+    // Add new page if conditions and signature won't fit
+    if (currentY > 230) {
+        doc.addPage();
+        currentY = 20;
+    }
+
     doc.setFontSize(8);
     doc.setTextColor(71, 85, 105);
     doc.setFont(undefined, 'bold');
