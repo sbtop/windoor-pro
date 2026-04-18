@@ -326,30 +326,62 @@ const Workspace: React.FC<WorkspaceProps> = ({ activeView, onViewChange }) => {
                     try {
                         const { pricingConfig } = useSettingsStore.getState();
                         
-                        // Calculate materials and pricing for each element
-                        const elementsData = project.elements.map((element: any) => {
-                            const calcResult = calcularMaterialesVentana(element);
-                            const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
-                            const imageDataUrl = createTechnicalDrawing(element);
-                            
-                            return {
-                                element,
-                                calcResult,
-                                imageDataUrl,
-                                pricingResult
-                            };
-                        });
+                        // Use saved quotation if available, otherwise recalculate
+                        let elementsData;
+                        let totalCalcResult;
                         
-                        // Calculate total pricing
-                        const totalCalcResult = elementsData.reduce((acc, item) => {
-                            return {
-                                ...acc,
-                                totales: {
-                                    ...acc.totales,
-                                    precioVenta: acc.totales.precioVenta + item.pricingResult.totales.precioVenta
-                                }
-                            };
-                        }, { totales: { precioVenta: 0 } });
+                        if (project.quotation && project.quotation.totales) {
+                            // Use saved quotation - distribute total among elements for PDF
+                            const totalPrecio = project.quotation.totales.precioVenta;
+                            const pricePerElement = totalPrecio / project.elements.length;
+                            
+                            elementsData = project.elements.map((element: any) => {
+                                const calcResult = calcularMaterialesVentana(element);
+                                const imageDataUrl = createTechnicalDrawing(element);
+                                
+                                return {
+                                    element,
+                                    calcResult,
+                                    imageDataUrl,
+                                    pricingResult: {
+                                        moneda: pricingConfig.moneda,
+                                        desglose: [],
+                                        totales: {
+                                            costoDirecto: pricePerElement * 0.7,
+                                            precioVenta: pricePerElement,
+                                            margenPorcentaje: 30,
+                                            gananciaBruta: pricePerElement * 0.3
+                                        }
+                                    }
+                                };
+                            });
+                            
+                            totalCalcResult = project.quotation;
+                        } else {
+                            // Recalculate if no saved quotation
+                            elementsData = project.elements.map((element: any) => {
+                                const calcResult = calcularMaterialesVentana(element);
+                                const pricingResult = calcularCotizacionSaaS(calcResult, pricingConfig);
+                                const imageDataUrl = createTechnicalDrawing(element);
+                                
+                                return {
+                                    element,
+                                    calcResult,
+                                    imageDataUrl,
+                                    pricingResult
+                                };
+                            });
+                            
+                            totalCalcResult = elementsData.reduce((acc, item) => {
+                                return {
+                                    ...acc,
+                                    totales: {
+                                        ...acc.totales,
+                                        precioVenta: acc.totales.precioVenta + item.pricingResult.totales.precioVenta
+                                    }
+                                };
+                            }, { totales: { precioVenta: 0 } });
+                        }
                         
                         // Generate PDF
                         generateMultiElementPDF(
