@@ -52,7 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
                 }),
         }),
         {
-            name: 'windoor-settings-v4', // bumped to v4 to init company defaults cleanly
+            name: 'windoor-settings-v5', // bumped to v5 to add IVA field
         }
     )
 );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, CheckCircle2, RefreshCw, Ruler, Box, Package, User, Building2, Globe, ShieldCheck, Mail, Upload, X, MapPin, Phone, Percent } from 'lucide-react';
+import { Settings, Save, CheckCircle2, RefreshCw, Ruler, Box, Package, User, Building2, Globe, ShieldCheck, Mail, Upload, X, MapPin, Phone } from 'lucide-react';
 import { ViewType } from '../types';
 import { useSettingsStore } from '../store/settingsStore';
 import { MaterialDictionary } from '../services/pricing';
@@ -226,25 +226,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
 
                             <div className="space-y-2 pt-4 border-t border-slate-100">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 block">
-                                    IVA (%)
-                                </label>
-                                <div className="relative group">
-                                    <Percent className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-primary transition-colors" />
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                        value={(localConfig.iva || 0.16) * 100}
-                                        onChange={(e) => setLocalConfig(prev => ({ ...prev, iva: (parseFloat(e.target.value) || 0) / 100 }))}
-                                        className="w-full pl-12 pr-6 py-4 bg-white border-2 border-slate-50 rounded-2xl font-black text-slate-900 outline-none focus:border-primary transition-all"
-                                        placeholder="16"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 pt-4 border-t border-slate-100">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2 block">
                                     Tu Nombre de Usuario
                                 </label>
                                 <div className="relative group">
@@ -373,11 +354,27 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
                                     <h5 className="text-sm font-black text-slate-900 mb-1">Transporte y Flete ({localConfig.moneda})</h5>
                                     <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Monto plano por fabricación base</p>
                                 </div>
-                                <input 
-                                    type="number" 
+                                <input
+                                    type="number"
                                     value={localConfig.costosOperativos?.transporteFijo ?? 200}
                                     onChange={(e) => setLocalConfig({...localConfig, costosOperativos: { ...localConfig.costosOperativos, transporteFijo: Number(e.target.value) } as any})}
                                     min="0"
+                                    className="w-28 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-black text-primary text-center"
+                                />
+                            </div>
+
+                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 flex items-center justify-between gap-6">
+                                <div>
+                                    <h5 className="text-sm font-black text-slate-900 mb-1">IVA (%)</h5>
+                                    <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Impuesto al Valor Agregado</p>
+                                </div>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    max="100"
+                                    value={(localConfig.iva || 0.16) * 100}
+                                    onChange={(e) => setLocalConfig(prev => ({ ...prev, iva: (parseFloat(e.target.value) || 0) / 100 }))}
                                     className="w-28 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-black text-primary text-center"
                                 />
                             </div>
