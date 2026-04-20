@@ -45,7 +45,7 @@ const PropertiesPanel: React.FC = () => {
         );
     }
 
-    const baseColor = element.type === 'window' ? 'indigo' : 'sky';
+    const baseColor = element.type === 'window' ? 'sky' : 'sky';
 
     const addPanel = () => {
         const n = element.panels.length;

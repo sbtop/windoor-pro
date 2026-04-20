@@ -204,7 +204,7 @@ const DesignerPage: React.FC = () => {
                 <ToolButton
                     icon={<Square className="w-5 h-5" />}
                     label="Ventana"
-                    color="indigo"
+                    color="sky"
                     onClick={() => addElement('window')}
                 />
                 <ToolButton
@@ -241,7 +241,7 @@ const DesignerPage: React.FC = () => {
                 <ToolButton
                     icon={<Grid className="w-5 h-5" />}
                     label="Grid"
-                    color={showGrid ? 'indigo' : 'slate'}
+                    color={showGrid ? 'sky' : 'slate'}
                     onClick={() => setShowGrid(g => !g)}
                     active={showGrid}
                 />
@@ -335,20 +335,18 @@ const DesignerPage: React.FC = () => {
 interface ToolButtonProps {
     icon: React.ReactNode;
     label: string;
-    color: 'indigo' | 'sky' | 'slate' | 'red';
+    color: 'sky' | 'slate' | 'red';
     onClick: () => void;
     active?: boolean;
 }
 
 const colorMap = {
-    indigo: 'hover:bg-sky-50 hover:text-sky-600 hover:shadow-sky-100',
     sky: 'hover:bg-sky-50 hover:text-sky-600 hover:shadow-sky-100',
     slate: 'hover:bg-slate-50 hover:text-slate-700',
     red: 'hover:bg-red-50 hover:text-red-600 hover:shadow-red-100',
 };
 
 const activeMap = {
-    indigo: 'bg-sky-100 text-sky-600',
     sky: 'bg-sky-100 text-sky-600',
     slate: 'bg-slate-100 text-slate-700',
     red: 'bg-red-100 text-red-600',
