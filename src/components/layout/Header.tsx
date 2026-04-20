@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
     return (
         <>
         <header className="fixed top-4 left-4 right-4 md:left-72 md:right-8 h-16 z-50">
-            <div className="glass h-full rounded-2xl px-4 md:px-6 flex justify-between items-center border border-white/20 shadow-lg shadow-indigo-500/5">
+            <div className="glass h-full rounded-2xl px-4 md:px-6 flex justify-between items-center border border-white/20 shadow-lg shadow-sky-500/5">
                 {/* Logo Section */}
                 <div className="flex items-center gap-4">
                     <button 

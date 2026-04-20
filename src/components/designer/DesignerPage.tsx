@@ -306,8 +306,8 @@ const DesignerPage: React.FC = () => {
                 {/* Empty state */}
                 {elements.length === 0 && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
-                        <p className="text-lg font-display font-bold text-indigo-300">Canvas Vacío</p>
-                        <p className="text-sm text-indigo-300/70 mt-1 font-medium">Usa la barra izquierda para añadir ventanas o puertas</p>
+                        <p className="text-lg font-display font-bold text-sky-300">Canvas Vacío</p>
+                        <p className="text-sm text-sky-300/70 mt-1 font-medium">Usa la barra izquierda para añadir ventanas o puertas</p>
                     </div>
                 )}
 
@@ -341,14 +341,14 @@ interface ToolButtonProps {
 }
 
 const colorMap = {
-    indigo: 'hover:bg-indigo-50 hover:text-indigo-600 hover:shadow-indigo-100',
+    indigo: 'hover:bg-sky-50 hover:text-sky-600 hover:shadow-sky-100',
     sky: 'hover:bg-sky-50 hover:text-sky-600 hover:shadow-sky-100',
     slate: 'hover:bg-slate-50 hover:text-slate-700',
     red: 'hover:bg-red-50 hover:text-red-600 hover:shadow-red-100',
 };
 
 const activeMap = {
-    indigo: 'bg-indigo-100 text-indigo-600',
+    indigo: 'bg-sky-100 text-sky-600',
     sky: 'bg-sky-100 text-sky-600',
     slate: 'bg-slate-100 text-slate-700',
     red: 'bg-red-100 text-red-600',

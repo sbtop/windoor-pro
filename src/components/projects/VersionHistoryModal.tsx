@@ -101,7 +101,7 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+                    <div className="bg-gradient-to-r from-sky-600 to-purple-600 p-6 text-white">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-white/20 rounded-xl">
@@ -129,7 +129,7 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
                                 <div className="text-center">
-                                    <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
+                                    <div className="w-12 h-12 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mx-auto mb-4" />
                                     <p className="text-sm font-bold text-slate-500">Cargando historial...</p>
                                 </div>
                             </div>
@@ -154,13 +154,13 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                                         className={`p-4 rounded-2xl border-2 transition-all ${
                                             selectedVersion === version.version
                                                 ? 'bg-emerald-50 border-emerald-300'
-                                                : 'bg-slate-50 border-slate-100 hover:border-indigo-200'
+                                                : 'bg-slate-50 border-slate-100 hover:border-sky-200'
                                         }`}
                                     >
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-2">
-                                                    <span className="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-[10px] font-black">
+                                                    <span className="px-2 py-1 bg-sky-100 text-sky-700 rounded-lg text-[10px] font-black">
                                                         Versión {version.version}
                                                     </span>
                                                     {selectedVersion === version.version && (
@@ -191,7 +191,7 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                                             <button
                                                 onClick={() => handleRestore(version.version)}
                                                 disabled={restoring}
-                                                className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                                className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                                             >
                                                 <RotateCcw size={14} />
                                                 Restaurar

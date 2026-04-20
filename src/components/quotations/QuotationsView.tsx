@@ -340,7 +340,7 @@ const QuotationsView: React.FC = () => {
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Header */}
-                            <div className="bg-gradient-to-r from-primary to-indigo-600 p-6 text-white">
+                            <div className="bg-gradient-to-r from-primary to-sky-600 p-6 text-white">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-white/20 rounded-xl">

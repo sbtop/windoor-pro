@@ -34,7 +34,7 @@ const Reportes: React.FC = () => {
                     className="glass-card p-10 max-w-md w-full border-white/40 shadow-2xl relative z-10"
                 >
                     <div className="text-center mb-10">
-                        <div className="w-20 h-20 bg-gradient-to-br from-primary to-indigo-600 rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/20">
+                        <div className="w-20 h-20 bg-gradient-to-br from-primary to-sky-600 rounded-[24px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-primary/20">
                             <Lock className="w-10 h-10 text-white" />
                         </div>
                         <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-2">Sección Restringida</h2>
@@ -128,10 +128,10 @@ const Reportes: React.FC = () => {
                         <DollarSign size={80} />
                     </div>
                     <div className="flex items-center gap-2 mb-6">
-                        <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
+                        <div className="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center">
                             <TrendingUp size={16} />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300">Ingresos del Mes</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-sky-300">Ingresos del Mes</span>
                     </div>
                     <div className="text-4xl font-black tracking-tighter mb-2">{moneda}0</div>
                     <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-widest">

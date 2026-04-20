@@ -122,7 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
 
     return (
         <aside className="hidden md:flex fixed left-4 top-24 bottom-4 w-64 z-40 transition-all">
-            <div className="glass w-full h-full rounded-2xl flex flex-col border border-slate-200 shadow-xl shadow-indigo-500/5 overflow-hidden">
+            <div className="glass w-full h-full rounded-2xl flex flex-col border border-slate-200 shadow-xl shadow-sky-500/5 overflow-hidden">
                 <AnimatePresence mode="wait">
                     {isDesignerView ? (
                         <motion.div 

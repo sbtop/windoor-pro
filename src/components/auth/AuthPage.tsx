@@ -72,7 +72,7 @@ const AuthPage: React.FC = () => {
             {/* ── Left Side: Hero Section ── */}
             <div className="relative hidden lg:flex lg:w-3/5 flex-col justify-center p-16 xl:p-24 overflow-hidden">
                 {/* Background decorative elements */}
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full" />
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-sky-600/20 blur-[120px] rounded-full" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-600/10 blur-[100px] rounded-full" />
                 
                 <motion.div 
@@ -82,7 +82,7 @@ const AuthPage: React.FC = () => {
                     className="relative z-10"
                 >
                     <div className="flex items-center gap-4 mb-12">
-                        <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                        <div className="w-12 h-12 bg-sky-600 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-600/30">
                             <Building2 className="text-white w-6 h-6" />
                         </div>
                         <span className="text-xl font-black text-white tracking-tighter uppercase">WinDoor Pro</span>
@@ -90,7 +90,7 @@ const AuthPage: React.FC = () => {
 
                     <h1 className="text-6xl xl:text-7xl font-black text-white tracking-tight mb-8 leading-none">
                         Diseño de <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-sky-400">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-violet-400 to-sky-400">
                             Vanguardia
                         </span>
                     </h1>
@@ -101,7 +101,7 @@ const AuthPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-8 mb-16">
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-indigo-400">
+                            <div className="flex items-center gap-2 text-sky-400">
                                 <ShieldCheck size={20} />
                                 <span className="font-bold uppercase tracking-widest text-[10px]">Seguridad</span>
                             </div>
@@ -125,7 +125,7 @@ const AuthPage: React.FC = () => {
                     >
                         <div className="flex -space-x-3">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="w-10 h-10 rounded-full border-2 border-slate-900 bg-slate-800 overflow-hidden ring-2 ring-indigo-500/20">
+                                <div key={i} className="w-10 h-10 rounded-full border-2 border-slate-900 bg-slate-800 overflow-hidden ring-2 ring-sky-500/20">
                                     <img src={`https://i.pravatar.cc/100?u=${i + 10}`} alt="User" />
                                 </div>
                             ))}
@@ -140,7 +140,7 @@ const AuthPage: React.FC = () => {
 
             {/* ── Right Side: Auth Card ── */}
             <div className="relative flex-1 flex items-center justify-center p-6 lg:p-12">
-                <div className="absolute inset-0 bg-indigo-600/5 lg:hidden blur-[100px]" />
+                <div className="absolute inset-0 bg-sky-600/5 lg:hidden blur-[100px]" />
                 
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -150,11 +150,11 @@ const AuthPage: React.FC = () => {
                 >
                     <div className="bg-slate-900/40 backdrop-blur-2xl p-8 lg:p-12 rounded-[40px] border border-white/10 shadow-2xl overflow-hidden relative group">
                         {/* Interactive glow effect */}
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 blur-[60px] rounded-full group-hover:bg-indigo-500/20 transition-all duration-700" />
+                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 blur-[60px] rounded-full group-hover:bg-sky-500/20 transition-all duration-700" />
                         
                         <div className="relative z-10">
                             <div className="mb-10 lg:hidden flex flex-col items-center">
-                                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4">
+                                <div className="w-12 h-12 bg-sky-600 rounded-2xl flex items-center justify-center mb-4">
                                     <Building2 className="text-white w-6 h-6" />
                                 </div>
                                 <h1 className="text-xl font-black text-white uppercase tracking-tighter">WinDoor Pro</h1>
@@ -183,12 +183,12 @@ const AuthPage: React.FC = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Nombre de Empresa</label>
                                             <div className="relative group">
-                                                <User size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                                                <User size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-sky-400 transition-colors" />
                                                 <input 
                                                     type="text" 
                                                     value={name}
                                                     onChange={(e) => setName(e.target.value)}
-                                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-600"
                                                     placeholder="Ej. Aluminios del Norte"
                                                 />
                                             </div>
@@ -198,13 +198,13 @@ const AuthPage: React.FC = () => {
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Correo Electrónico</label>
                                         <div className="relative group">
-                                            <Mail size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                                            <Mail size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-sky-400 transition-colors" />
                                             <input 
                                                 type="email" 
                                                 required
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-600"
                                                 placeholder="tu@empresa.com"
                                             />
                                         </div>
@@ -214,13 +214,13 @@ const AuthPage: React.FC = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Contraseña</label>
                                             <div className="relative group">
-                                                <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                                                <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-sky-400 transition-colors" />
                                                 <input 
                                                     type="password" 
                                                     required
                                                     value={password}
                                                     onChange={(e) => setPassword(e.target.value)}
-                                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-600"
                                                     placeholder="••••••••"
                                                 />
                                             </div>
@@ -231,13 +231,13 @@ const AuthPage: React.FC = () => {
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Nueva Contraseña</label>
                                             <div className="relative group">
-                                                <KeyRound size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                                                <KeyRound size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-sky-400 transition-colors" />
                                                 <input 
                                                     type="password" 
                                                     required
                                                     value={newPassword}
                                                     onChange={(e) => setNewPassword(e.target.value)}
-                                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                                                    className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-bold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder:text-slate-600"
                                                     placeholder="Mínimo 6 caracteres"
                                                 />
                                             </div>
@@ -269,7 +269,7 @@ const AuthPage: React.FC = () => {
                                     <button 
                                         type="submit"
                                         disabled={loading}
-                                        className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-indigo-600/20 transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 disabled:opacity-50 mt-4 overflow-hidden group"
+                                        className="w-full py-5 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-sky-600/20 transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 disabled:opacity-50 mt-4 overflow-hidden group"
                                     >
                                         <span className="relative z-10 flex items-center gap-3">
                                             {loading ? 'Procesando...' : (
@@ -291,7 +291,7 @@ const AuthPage: React.FC = () => {
                                             onClick={() => setAuthMode('register')}
                                             className="w-full text-center text-[11px] font-black text-slate-500 hover:text-white uppercase tracking-[0.2em] transition-colors"
                                         >
-                                            ¿No tienes cuenta? <span className="text-indigo-400">Regístrate</span>
+                                            ¿No tienes cuenta? <span className="text-sky-400">Regístrate</span>
                                         </button>
                                         <button 
                                             type="button"
@@ -308,7 +308,7 @@ const AuthPage: React.FC = () => {
                                         onClick={() => setAuthMode('login')}
                                         className="w-full text-center text-[11px] font-black text-slate-500 hover:text-white uppercase tracking-[0.2em] transition-colors"
                                     >
-                                        Volver al <span className="text-indigo-400">Inicio de Sesión</span>
+                                        Volver al <span className="text-sky-400">Inicio de Sesión</span>
                                     </button>
                                 )}
                             </div>

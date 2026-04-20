@@ -217,7 +217,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
                     <div className={`p-6 text-white ${
                         mode === 'approve' ? 'bg-gradient-to-r from-emerald-600 to-teal-600' :
                         mode === 'reject' ? 'bg-gradient-to-r from-red-600 to-rose-600' :
-                        'bg-gradient-to-r from-indigo-600 to-purple-600'
+                        'bg-gradient-to-r from-sky-600 to-purple-600'
                     }`}>
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-3">
@@ -299,11 +299,11 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
                                         />
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-3 p-3 bg-indigo-50 rounded-xl border border-indigo-100">
-                                    <AlertCircle className="text-indigo-600 flex-shrink-0 mt-0.5" size={16} />
+                                <div className="flex items-start gap-3 p-3 bg-sky-50 rounded-xl border border-sky-100">
+                                    <AlertCircle className="text-sky-600 flex-shrink-0 mt-0.5" size={16} />
                                     <div>
-                                        <p className="text-xs font-black text-indigo-900">Información</p>
-                                        <p className="text-[11px] font-bold text-indigo-700">
+                                        <p className="text-xs font-black text-sky-900">Información</p>
+                                        <p className="text-[11px] font-bold text-sky-700">
                                             El cliente recibirá un enlace para revisar y aprobar la cotización digitalmente.
                                         </p>
                                     </div>

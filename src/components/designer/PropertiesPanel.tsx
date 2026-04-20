@@ -244,17 +244,17 @@ const PropertiesPanel: React.FC = () => {
                             animate={{ opacity: 1, y: 0 }}
                             className={sectionClass}
                         >
-                            <span className={cn(labelClass, "text-indigo-600")}>
+                            <span className={cn(labelClass, "text-sky-600")}>
                                 <Layers size={12} /> Ingeniería de Despiece
                             </span>
                             <div className="space-y-3">
-                                <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
+                                <div className="p-4 bg-sky-50/50 rounded-2xl border border-sky-100/50">
                                     <div className="flex justify-between items-center text-[11px] font-black mb-1">
-                                        <span className="text-indigo-900/60 uppercase tracking-widest">Área Total</span>
-                                        <span className="text-indigo-600 font-display text-lg">{calcResult.resumen.areaVidrioM2} m²</span>
+                                        <span className="text-sky-900/60 uppercase tracking-widest">Área Total</span>
+                                        <span className="text-sky-600 font-display text-lg">{calcResult.resumen.areaVidrioM2} m²</span>
                                     </div>
-                                    <div className="h-1.5 w-full bg-indigo-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-indigo-500 w-[60%]" />
+                                    <div className="h-1.5 w-full bg-sky-100 rounded-full overflow-hidden">
+                                        <div className="h-full bg-sky-500 w-[60%]" />
                                     </div>
                                 </div>
                                 <ul className="space-y-2">

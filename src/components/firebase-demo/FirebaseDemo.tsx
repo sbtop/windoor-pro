@@ -107,7 +107,7 @@ const FirebaseDemo: React.FC = () => {
                     <p className="mb-4 text-slate-500">No hay sesión activa.</p>
                     <button
                         onClick={handleLoginEjemplo}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded font-bold"
+                        className="bg-sky-600 text-white px-4 py-2 rounded font-bold"
                     >
                         Log in (test@windoor.com)
                     </button>

@@ -414,7 +414,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onViewChange }) => {
                                     let catColor = "text-slate-400 bg-slate-100";
                                     let catName = "Accesorios";
                                     
-                                    if(item.unidad === 'ml') { Icon = Ruler; catColor = "text-indigo-600 bg-indigo-50"; catName = "Extruido"; }
+                                    if(item.unidad === 'ml') { Icon = Ruler; catColor = "text-sky-600 bg-sky-50"; catName = "Extruido"; }
                                     if(item.unidad === 'm2') { Icon = Package; catColor = "text-sky-600 bg-sky-50"; catName = "Cristalería"; }
 
                                     return (
