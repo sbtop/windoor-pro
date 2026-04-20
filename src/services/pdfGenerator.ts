@@ -260,7 +260,7 @@ export const generateTechnicalPDF = (
         head: [['Descripción del Perfil', 'Piezas', 'Corte Exacto', 'Total Lineal']],
         body: perfilesData,
         theme: 'grid',
-        headStyles: { fillColor: [100, 116, 139], fontSize: 9 }, // slate-500
+        headStyles: { fillColor: [100, 116, 139], fontSize: 9 }, // sky-500
         styles: { fontSize: 8, textColor: [71, 85, 105] },
         margin: { left: 14, right: 14 }
     });
@@ -273,7 +273,7 @@ export const generateTechnicalPDF = (
         head: [['Accesorios, Selladores y Herrajes', 'Requerimiento Calculado']],
         body: accesoriosData,
         theme: 'grid',
-        headStyles: { fillColor: [100, 116, 139], fontSize: 9 }, // slate-500
+        headStyles: { fillColor: [100, 116, 139], fontSize: 9 }, // sky-500
         styles: { fontSize: 8, textColor: [71, 85, 105] },
         margin: { left: 14, right: 14 }
     });
@@ -286,7 +286,7 @@ export const generateTechnicalPDF = (
     doc.text('3. Presupuesto Estimado', 196, finalY - 8, { align: 'right' });
 
     doc.setFontSize(28);
-    doc.setTextColor(100, 116, 139); // slate-500
+    doc.setTextColor(14, 165, 233); // sky-500
     const moneda = pricingResult?.moneda || '$';
     const precio = pricingResult?.totales?.precioVenta || 0;
     doc.text(`${moneda}${precio.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 196, finalY + 4, { align: 'right' });
