@@ -8,18 +8,18 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#3730a3', // Indigo 800 (Very Dark)
-          600: '#312e81', // Indigo 900
-          700: '#1e1b4b', // Indigo 950
-          800: '#1e1b4b',
-          900: '#0f172a',
-          950: '#020617',
-          DEFAULT: '#3730a3',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9', // Sky 500 (Más claro)
+          600: '#0284c7', // Sky 600
+          700: '#0369a1', // Sky 700
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
+          DEFAULT: '#0ea5e9',
         },
         sidebar: {
           bg: '#1e293b', // Slate 800
