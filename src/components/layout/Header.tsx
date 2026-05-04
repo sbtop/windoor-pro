@@ -61,10 +61,10 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                         <img 
                             src="/favicon.svg" 
                             alt="Krystalii" 
-                            className="w-9 h-9 drop-shadow-md"
+                            className="w-11 h-11 drop-shadow-md"
                         />
-                        <span className="text-xl font-black tracking-tight text-slate-900 group-hover:text-primary transition-colors">
-                            Krystalii
+                        <span className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-primary transition-colors flex items-center">
+                            Krystal<span className="relative">i<span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-sky-500 rounded-full"></span></span><span className="relative">i<span className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-sky-500 rounded-full"></span></span>
                         </span>
                     </button>
                     

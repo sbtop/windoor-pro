@@ -82,10 +82,12 @@ const AuthPage: React.FC = () => {
                     className="relative z-10"
                 >
                     <div className="flex items-center gap-4 mb-12">
-                        <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg shadow-sky-600/30 border border-white/20">
-                            <img src="/favicon.svg" alt="Krystalii" className="w-10 h-10" />
+                        <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg shadow-sky-600/30 border border-white/20">
+                            <img src="/favicon.svg" alt="Krystalii" className="w-12 h-12" />
                         </div>
-                        <span className="text-2xl font-black text-white tracking-tighter uppercase">Krystalii</span>
+                        <span className="text-3xl font-black text-white tracking-tighter uppercase flex items-center">
+                            Krystal<span className="relative">i<span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-sky-400 rounded-full"></span></span><span className="relative">i<span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-sky-400 rounded-full"></span></span>
+                        </span>
                     </div>
 
                     <h1 className="text-6xl xl:text-7xl font-black text-white tracking-tight mb-8 leading-none">
@@ -154,10 +156,12 @@ const AuthPage: React.FC = () => {
                         
                         <div className="relative z-10">
                             <div className="mb-10 lg:hidden flex flex-col items-center">
-                                <div className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 border border-white/20">
-                                    <img src="/favicon.svg" alt="Krystalii" className="w-10 h-10" />
+                                <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 border border-white/20">
+                                    <img src="/favicon.svg" alt="Krystalii" className="w-12 h-12" />
                                 </div>
-                                <h1 className="text-2xl font-black text-white uppercase tracking-tighter">Krystalii</h1>
+                                <h1 className="text-3xl font-black text-white uppercase tracking-tighter flex items-center">
+                                    Krystal<span className="relative">i<span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-sky-400 rounded-full"></span></span><span className="relative">i<span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-sky-400 rounded-full"></span></span>
+                                </h1>
                             </div>
 
                             <div className="text-center lg:text-left mb-10">
