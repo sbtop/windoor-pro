@@ -56,12 +56,14 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                 <div className="flex items-center gap-4">
                     <button 
                         onClick={() => onViewChange?.('home')}
-                        className="flex items-center gap-2 group transition-transform active:scale-95"
+                        className="flex items-center gap-3 group transition-transform active:scale-95"
                     >
-                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
-                            <PenTool size={18} strokeWidth={2.5} />
-                        </div>
-                        <span className="text-lg font-black tracking-tight text-slate-900 group-hover:text-primary transition-colors">
+                        <img 
+                            src="/favicon.svg" 
+                            alt="Krystalii" 
+                            className="w-9 h-9 drop-shadow-md"
+                        />
+                        <span className="text-xl font-black tracking-tight text-slate-900 group-hover:text-primary transition-colors">
                             Krystalii
                         </span>
                     </button>

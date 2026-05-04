@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Glass Panels -->
+  <g transform="translate(10, 10)">
+    <!-- Back panel -->
+    <rect x="0" y="5" width="28" height="35" rx="4" fill="#10b981" fill-opacity="0.6" stroke="#059669" stroke-width="1.5"/>
+    <!-- Middle panel -->
+    <rect x="6" y="2" width="28" height="35" rx="4" fill="#14b8a6" fill-opacity="0.7" stroke="#0d9488" stroke-width="1.5"/>
+    <!-- Front panel -->
+    <rect x="12" y="0" width="28" height="35" rx="4" fill="#22d3ee" fill-opacity="0.5" stroke="#06b6d4" stroke-width="1.5"/>
+  </g>
+  
+  <!-- Text: Krystalii -->
+  <text x="55" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#0f172a" letter-spacing="-0.02em">
+    Krystalii
+  </text>
+  
+  <!-- Dots on the i's -->
+  <circle cx="157" cy="22" r="3" fill="#22d3ee"/>
+  <circle cx="169" cy="22" r="3" fill="#22d3ee"/>
+</svg>
