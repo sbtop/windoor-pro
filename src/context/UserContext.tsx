@@ -20,8 +20,8 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // ── Helpers para la "Base de datos" de cuentas ────────────────────────────────
-const ACCOUNTS_KEY = 'windoor-accounts-v2';
-const SESSION_KEY = 'windoor-session-v2';
+const ACCOUNTS_KEY = 'krystalii-accounts-v2';
+const SESSION_KEY = 'krystalii-session-v2';
 
 const getRegisteredAccounts = (): any[] => {
     try {

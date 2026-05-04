@@ -245,7 +245,7 @@ const Reportes: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="text-center text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mt-12 mb-8"
             >
-                Protocolo de Auditoría • {new Date().getFullYear()} • WinDoor Pro Secure
+                Protocolo de Auditoría • {new Date().getFullYear()} • Krystalii Secure
             </motion.p>
         </div>
     );

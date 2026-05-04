@@ -34,8 +34,8 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
             title: 'Introducción',
             icon: BookOpen,
             content: {
-                heading: 'Bienvenido a WinDoor Pro SaaS',
-                description: 'WinDoor Pro es una plataforma SaaS premium para la gestión profesional de proyectos de ventanas y puertas. Diseñada para fabricantes, instaladores y distribuidores que necesitan precisión técnica y eficiencia operativa.',
+                heading: 'Bienvenido a Krystalii',
+                description: 'Krystalii es una plataforma SaaS premium para la gestión profesional de proyectos de ventanas y puertas. Diseñada para fabricantes, instaladores y distribuidores que necesitan precisión técnica y eficiencia operativa.',
                 features: [
                     'Diseñador 2D interactivo con cálculos en tiempo real',
                     'Cotizaciones automáticas con márgenes configurables',
@@ -260,7 +260,7 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
                             </div>
                             <div>
                                 <h3 className="text-sm font-black text-slate-900">Manual</h3>
-                                <p className="text-[10px] font-bold text-slate-500">WinDoor Pro</p>
+                                <p className="text-[10px] font-bold text-slate-500">Krystalii</p>
                             </div>
                         </div>
                         

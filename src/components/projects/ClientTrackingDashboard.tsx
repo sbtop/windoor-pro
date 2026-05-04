@@ -88,7 +88,11 @@ const ClientTrackingDashboard: React.FC<ClientTrackingDashboardProps> = ({
     };
 
     const handleShare = () => {
-        const text = `WinDoor Pro — Seguimiento de Proyecto\nCliente: ${project.clientName}\nProyecto: ${project.projectName || 'Sin nombre'}\nEstado: ${project.status}\nTotal: $${project.quotation?.totales?.precioVenta?.toLocaleString() || 'Pendiente'}`;
+        const text = `Krystalii — Seguimiento de Proyecto
+Cliente: ${project.clientName}
+Proyecto: ${project.projectName || 'Sin nombre'}
+Estado: ${project.status}
+Total: $${project.quotation?.totales?.precioVenta?.toLocaleString() || 'Pendiente'}`;
         navigator.clipboard.writeText(text).then(() => {
             setClipboardToast(true);
             setTimeout(() => setClipboardToast(false), 2500);

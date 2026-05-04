@@ -11,7 +11,7 @@ export interface CompanyProfile {
 }
 
 const DEFAULT_COMPANY_PROFILE: CompanyProfile = {
-    companyName: 'WinDoor',
+    companyName: 'Krystalii',
     logoBase64: null,
     email: '',
     address: '',
@@ -52,7 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
                 }),
         }),
         {
-            name: 'windoor-settings-v5', // bumped to v5 to add IVA field
+            name: 'krystalii-settings-v5', // bumped to v5 to add IVA field
         }
     )
 );

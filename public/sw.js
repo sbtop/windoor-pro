@@ -1,9 +1,9 @@
-// WinDoor Pro - Service Worker
+// Krystalii - Service Worker
 // Cache strategy: Cache First, then Network
 
-const CACHE_NAME = 'windoor-pro-v1';
-const STATIC_CACHE = 'windoor-static-v1';
-const DYNAMIC_CACHE = 'windoor-dynamic-v1';
+const CACHE_NAME = 'krystalii-v1';
+const STATIC_CACHE = 'krystalii-static-v1';
+const DYNAMIC_CACHE = 'krystalii-dynamic-v1';
 
 // Precache essential assets
 const PRECACHE_ASSETS = [
@@ -45,7 +45,7 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames
             .filter((name) => {
-              return name.startsWith('windoor-') && 
+              return name.startsWith('krystalii-') && 
                      name !== STATIC_CACHE && 
                      name !== DYNAMIC_CACHE;
             })
@@ -178,7 +178,7 @@ self.addEventListener('push', (event) => {
       body: data.body,
       icon: '/icons/icon-192x192.png',
       badge: '/icons/icon-72x72.png',
-      tag: data.tag || 'windoor-notification',
+      tag: data.tag || 'krystalii-notification',
       requireInteraction: true,
       actions: [
         {

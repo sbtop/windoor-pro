@@ -94,7 +94,10 @@ const QuotationsView: React.FC = () => {
     };
 
     const handleShare = (quotation: ProjectData) => {
-        const text = `WinDoor Pro — Cotización\nCliente: ${quotation.clientName}\nProyecto: ${quotation.projectName || 'Sin nombre'}\nTotal: $${quotation.quotation?.totales?.precioVenta?.toLocaleString() || 0}`;
+        const text = `Krystalii — Cotización
+Cliente: ${quotation.clientName}
+Proyecto: ${quotation.projectName || 'Sin nombre'}
+Total: $${quotation.quotation?.totales?.precioVenta?.toLocaleString() || 0}`;
         navigator.clipboard.writeText(text).then(showClipboardToast);
     };
 

@@ -300,7 +300,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange }) => {
                         >
                             {/* Navigation Sidebar Header */}
                             <div className="mb-8 px-2">
-                                <h3 className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">WinDoor <span className="text-slate-300">SaaS</span></h3>
+                                <h3 className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">Krystalii</h3>
                                 <p className="text-[10px] text-slate-500 font-bold">Gestión y Herramientas</p>
                             </div>
 

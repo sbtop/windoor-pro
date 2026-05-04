@@ -152,7 +152,7 @@ export const generateTechnicalPDF = (
     const doc = new jsPDF('p', 'mm', 'a4');
 
     // ── Header Section ──────────────────────────────────────────────────────────
-    const safeCompanyName = branding?.companyName || 'WinDoor SaaS';
+    const safeCompanyName = branding?.companyName || 'Krystalii';
     
     if (branding?.logoBase64) {
         // Add custom logo
@@ -342,7 +342,7 @@ export const generateMultiElementPDF = (
     const doc = new jsPDF('p', 'mm', 'a4');
 
     // ── Header Section ──────────────────────────────────────────────────────────
-    const safeCompanyName = branding?.companyName || 'WinDoor SaaS';
+    const safeCompanyName = branding?.companyName || 'Krystalii';
     const tipoReporte = isDetailed ? 'Cotización Técnica Detallada' : 'Cotización';
     const quoteNumber = `COT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.floor(Math.random() * 1000)}`;
 

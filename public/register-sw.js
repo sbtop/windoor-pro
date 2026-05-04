@@ -44,7 +44,7 @@ window.addEventListener('offline', () => {
   
   // Show offline notification
   if ('Notification' in navigator && Notification.permission === 'granted') {
-    new Notification('WinDoor Pro', {
+    new Notification('Krystalii', {
       body: 'Modo offline activado. Los cambios se sincronizarán cuando estés en línea.',
       icon: '/icons/icon-192x192.png'
     });

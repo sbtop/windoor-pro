@@ -9,7 +9,7 @@ import { User } from 'firebase/auth';
 /**
  * 💡 ESTE ES UN COMPONENTE DE EJEMPLO
  * Muestra cómo integrar la Autenticación y la Base de Datos
- * en la lógica de React de WinDoor SaaS.
+ * en la lógica de React de Krystalii SaaS.
  */
 const FirebaseDemo: React.FC = () => {
     const [user, setUser] = useState<User | null>(null);
@@ -46,7 +46,7 @@ const FirebaseDemo: React.FC = () => {
         try {
             // En la vida real, usarías form inputs. 
             // Si no existe este usuario, fallará. Asegúrate de registrar uno con `registerUser(email, pw)`.
-            await loginUser('test@windoor.com', '123456');
+            await loginUser('test@krystalii.com', '123456');
         } catch (error) {
             alert("Fallo el login. Quizá necesitas crear el usuario en tu consola de Firebase primero.");
         }
@@ -109,7 +109,7 @@ const FirebaseDemo: React.FC = () => {
                         onClick={handleLoginEjemplo}
                         className="bg-sky-600 text-white px-4 py-2 rounded font-bold"
                     >
-                        Log in (test@windoor.com)
+                        Log in (test@krystalii.com)
                     </button>
                 </div>
             ) : (

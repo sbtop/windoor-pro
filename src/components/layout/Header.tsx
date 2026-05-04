@@ -62,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({ activeView, onViewChange }) => {
                             <PenTool size={18} strokeWidth={2.5} />
                         </div>
                         <span className="text-lg font-black tracking-tight text-slate-900 group-hover:text-primary transition-colors">
-                            WinDoor <span className="text-primary/60">Pro</span>
+                            Krystalii
                         </span>
                     </button>
                     

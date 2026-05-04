@@ -1,6 +1,6 @@
 {
-  "name": "WinDoor Pro",
-  "short_name": "WinDoor",
+  "name": "Krystalii",
+  "short_name": "Krystalii",
   "description": "Diseño profesional de ventanas y puertas - SaaS para instaladores",
   "start_url": "/",
   "display": "standalone",
@@ -17,7 +17,7 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Dashboard de proyectos WinDoor Pro"
+      "label": "Dashboard de proyectos Krystalii"
     },
     {
       "src": "/screenshots/designer.png",

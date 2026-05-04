@@ -89,7 +89,7 @@ export const useCalendarStore = create<CalendarState>()(
             },
         }),
         {
-            name: 'windoor-calendar-v2', // localStorage key
+            name: 'krystalii-calendar-v2', // localStorage key
         }
     )
 );

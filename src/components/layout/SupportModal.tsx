@@ -32,7 +32,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
         {
             icon: Mail,
             title: 'Correo Electrónico',
-            description: 'soporte@windoor-pro.com',
+            description: 'soporte@krystalii.com',
             availability: 'Respuesta en 24h',
             action: 'Enviar Email',
             priority: 'medium'
@@ -79,7 +79,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
                                 </div>
                                 <div>
                                     <h2 className="text-2xl font-black">Soporte Técnico</h2>
-                                    <p className="text-sm font-medium text-white/80">WinDoor Pro SaaS</p>
+                                    <p className="text-sm font-medium text-white/80">Krystalii SaaS</p>
                                 </div>
                             </div>
                             <button

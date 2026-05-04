@@ -85,7 +85,7 @@ const DesignerPage: React.FC = () => {
             return;
         }
 
-        let pName = "Mi Proyecto WinDoor";
+        let pName = "Mi Proyecto Krystalii";
         let cName = activeClient ? activeClient.name : "Cliente Mostrador";
 
         // Si no hay ID de proyecto activo, pedimos el nombre (es un proyecto nuevo manual)

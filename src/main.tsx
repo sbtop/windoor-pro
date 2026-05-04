@@ -4,10 +4,10 @@ import App from './App'
 import './index.css'
 
 // Clean up example data only once
-const CLEANUP_FLAG = 'windoor-cleanup-v1';
+const CLEANUP_FLAG = 'krystalii-cleanup-v1';
 if (!localStorage.getItem(CLEANUP_FLAG)) {
-    const PROJECTS_KEY = 'windoor-projects-v2';
-    const CLIENTS_KEY = 'windoor-clients-v2';
+    const PROJECTS_KEY = 'krystalii-projects-v2';
+    const CLIENTS_KEY = 'krystalii-clients-v2';
     
     localStorage.removeItem(PROJECTS_KEY);
     localStorage.removeItem(CLIENTS_KEY);

@@ -85,7 +85,7 @@ const AuthPage: React.FC = () => {
                         <div className="w-12 h-12 bg-sky-600 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-600/30">
                             <Building2 className="text-white w-6 h-6" />
                         </div>
-                        <span className="text-xl font-black text-white tracking-tighter uppercase">WinDoor Pro</span>
+                        <span className="text-xl font-black text-white tracking-tighter uppercase">Krystalii</span>
                     </div>
 
                     <h1 className="text-6xl xl:text-7xl font-black text-white tracking-tight mb-8 leading-none">
@@ -132,7 +132,7 @@ const AuthPage: React.FC = () => {
                         </div>
                         <div>
                             <p className="text-white font-bold text-sm">+2,500 Profesionales</p>
-                            <p className="text-slate-500 text-xs font-medium">Confían en la precisión de WinDoor Pro</p>
+                            <p className="text-slate-500 text-xs font-medium">Confían en la precisión de Krystalii</p>
                         </div>
                     </motion.div>
                 </motion.div>
@@ -157,7 +157,7 @@ const AuthPage: React.FC = () => {
                                 <div className="w-12 h-12 bg-sky-600 rounded-2xl flex items-center justify-center mb-4">
                                     <Building2 className="text-white w-6 h-6" />
                                 </div>
-                                <h1 className="text-xl font-black text-white uppercase tracking-tighter">WinDoor Pro</h1>
+                                <h1 className="text-xl font-black text-white uppercase tracking-tighter">Krystalii</h1>
                             </div>
 
                             <div className="text-center lg:text-left mb-10">
@@ -317,7 +317,7 @@ const AuthPage: React.FC = () => {
                     
                     <div className="mt-8 text-center flex items-center justify-center gap-2 text-[10px] text-slate-600 font-bold uppercase tracking-widest">
                         <Globe size={12} />
-                        WinDoor Pro v2.0 &bull; 2026 Premium Edition
+                        Krystalii v2.0 &bull; 2026 Premium Edition
                     </div>
                 </motion.div>
             </div>

@@ -4,8 +4,8 @@
  * Same function signatures — just swap the import, everything works.
  *
  * Data layout in localStorage:
- *   windoor-projects-v1  → ProjectData[]
- *   windoor-clients-v1   → ClientData[]
+ *   krystalii-projects-v1  → ProjectData[]
+ *   krystalii-clients-v1   → ClientData[]
  */
 
 import { ClientData } from '../../types';
@@ -55,9 +55,9 @@ export interface ProjectData {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const PROJECTS_KEY = 'windoor-projects-v2';
-const CLIENTS_KEY  = 'windoor-clients-v2';
-const METRICS_KEY  = 'windoor-metrics-v1';
+const PROJECTS_KEY = 'krystalii-projects-v2';
+const CLIENTS_KEY  = 'krystalii-clients-v2';
+const METRICS_KEY  = 'krystalii-metrics-v1';
 
 const generateId = (): string => {
     const hex = () => Math.floor(Math.random() * 0xFFFF).toString(16).padStart(4, '0');
