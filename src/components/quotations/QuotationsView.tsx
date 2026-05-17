@@ -14,7 +14,8 @@ import {
     CheckCircle2,
     Clock,
     AlertCircle,
-    X
+    X,
+    CheckCircle
 } from 'lucide-react';
 import { getUserProjects, ProjectData } from '../../lib/localStorage/db';
 import { useUserContext } from '../../context/UserContext';
@@ -23,6 +24,7 @@ import { generateMultiElementPDF, createTechnicalDrawing } from '../../services/
 import { calcularMaterialesVentana } from '../../services/manufacturing';
 import { calcularCotizacionSaaS } from '../../services/pricing';
 import { useSettingsStore } from '../../store/settingsStore';
+import ApprovalModal from '../projects/ApprovalModal';
 
 const QuotationsView: React.FC = () => {
     const [quotations, setQuotations] = useState<ProjectData[]>([]);
@@ -31,6 +33,8 @@ const QuotationsView: React.FC = () => {
     const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending' | 'rejected'>('all');
     const [selectedQuotation, setSelectedQuotation] = useState<ProjectData | null>(null);
     const [clipboardToast, setClipboardToast] = useState(false);
+    const [showApprovalModal, setShowApprovalModal] = useState(false);
+    const [approvalProject, setApprovalProject] = useState<ProjectData | null>(null);
     const { currentUser } = useUserContext();
     const { pricingConfig, companyProfile } = useSettingsStore();
     const userId = currentUser?.userId || 'unknown';
@@ -166,6 +170,11 @@ Total: $${quotation.quotation?.totales?.precioVenta?.toLocaleString() || 0}`;
 
     const handleViewQuotation = (quotation: ProjectData) => {
         setSelectedQuotation(quotation);
+    };
+
+    const handleApproval = (quotation: ProjectData) => {
+        setApprovalProject(quotation);
+        setShowApprovalModal(true);
     };
 
     if (loading) {
@@ -319,6 +328,14 @@ Total: $${quotation.quotation?.totales?.precioVenta?.toLocaleString() || 0}`;
                                     <Share2 size={14} />
                                     Compartir
                                 </button>
+                                <button
+                                    onClick={() => handleApproval(quotation)}
+                                    className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-black hover:bg-slate-200 transition-colors flex items-center gap-2"
+                                    title="Gestionar aprobación"
+                                >
+                                    <CheckCircle size={14} />
+                                    Aprobar
+                                </button>
                             </div>
                         </motion.div>
                     ))}
@@ -436,6 +453,26 @@ Total: $${quotation.quotation?.totales?.precioVenta?.toLocaleString() || 0}`;
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-6 py-3.5 rounded-2xl shadow-2xl text-sm font-black text-white bg-emerald-600 flex items-center gap-2 animate-in slide-in-from-bottom-4 duration-300">
                     ✓ Copiado al portapapeles
                 </div>
+            )}
+
+            {/* Approval Modal */}
+            {approvalProject && (
+                <ApprovalModal
+                    isOpen={showApprovalModal}
+                    onClose={() => {
+                        setShowApprovalModal(false);
+                        setApprovalProject(null);
+                    }}
+                    projectId={approvalProject.id || ''}
+                    projectName={approvalProject.projectName || approvalProject.clientName || 'Proyecto'}
+                    quotation={approvalProject.quotation}
+                    clientName={approvalProject.clientName}
+                    clientEmail={approvalProject.contactPhone}
+                    currentApproval={approvalProject.currentApproval}
+                    onApprovalChange={() => {
+                        loadQuotations();
+                    }}
+                />
             )}
         </div>
     );
