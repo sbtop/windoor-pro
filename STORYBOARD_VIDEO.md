@@ -274,5 +274,5 @@
 
 ---
 
-*Storyboard creado para Krystalii - Mayo 2026*
+*Storyboard creado para Krystalii - Junio 2026*
 *Versión: 1.0*

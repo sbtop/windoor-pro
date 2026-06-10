@@ -312,5 +312,5 @@ Para más información o asistencia:
 
 ---
 
-*Última actualización: Mayo 2026*
+*Última actualización: Junio 2026*
 *Versión: 1.0*
